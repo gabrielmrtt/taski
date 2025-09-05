@@ -8,10 +8,6 @@ type UpdateUserCredentialsRequest struct {
 	PhoneNumber *string `json:"phone_number"`
 }
 
-func (r *UpdateUserCredentialsRequest) Validate() error {
-	return nil
-}
-
 func (r *UpdateUserCredentialsRequest) ToInput() user_services.UpdateUserCredentialsInput {
 	return user_services.UpdateUserCredentialsInput{
 		Name:        r.Name,

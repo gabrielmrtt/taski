@@ -6,10 +6,6 @@ type ForgotUserPasswordRequest struct {
 	Email string `json:"email"`
 }
 
-func (r *ForgotUserPasswordRequest) Validate() error {
-	return nil
-}
-
 func (r *ForgotUserPasswordRequest) ToInput() user_services.ForgotUserPasswordInput {
 	return user_services.ForgotUserPasswordInput{
 		Email: r.Email,

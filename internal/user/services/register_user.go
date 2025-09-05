@@ -32,7 +32,45 @@ type RegisterUserInput struct {
 	PhoneNumber *string
 }
 
+func (i RegisterUserInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	_, err := core.NewName(i.Name)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "name",
+			Error: err.Error(),
+		})
+	}
+
+	_, err = user_core.NewEmail(i.Email)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "email",
+			Error: err.Error(),
+		})
+	}
+
+	_, err = user_core.NewPassword(i.Password)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "password",
+			Error: err.Error(),
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserDto, error) {
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())

@@ -31,3 +31,7 @@ type ComparableFilter[T any] struct {
 	In          *[]T
 	Negate      *bool
 }
+
+type ServiceInput interface {
+	Validate() error
+}

@@ -8,10 +8,6 @@ type RecoverUserPasswordRequest struct {
 	PasswordConfirmation string `json:"password_confirmation"`
 }
 
-func (r *RecoverUserPasswordRequest) Validate() error {
-	return nil
-}
-
 func (r *RecoverUserPasswordRequest) ToInput() user_services.RecoverUserPasswordInput {
 	return user_services.RecoverUserPasswordInput{
 		PasswordRecoveryToken: r.Token,

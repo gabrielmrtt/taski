@@ -26,7 +26,51 @@ type UpdateUserCredentialsInput struct {
 	PhoneNumber *string
 }
 
+func (i UpdateUserCredentialsInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	if i.Name != nil {
+		_, err := core.NewName(*i.Name)
+		if err != nil {
+			fields = append(fields, core.InvalidInputErrorField{
+				Field: "name",
+				Error: err.Error(),
+			})
+		}
+	}
+
+	if i.Email != nil {
+		_, err := user_core.NewEmail(*i.Email)
+		if err != nil {
+			fields = append(fields, core.InvalidInputErrorField{
+				Field: "email",
+				Error: err.Error(),
+			})
+		}
+	}
+
+	if i.PhoneNumber != nil {
+		_, err := user_core.NewPhoneNumber(*i.PhoneNumber)
+		if err != nil {
+			fields = append(fields, core.InvalidInputErrorField{
+				Field: "phone_number",
+				Error: err.Error(),
+			})
+		}
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *UpdateUserCredentialsService) Execute(userIdentity core.Identity, input UpdateUserCredentialsInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return core.NewInternalError(err.Error())

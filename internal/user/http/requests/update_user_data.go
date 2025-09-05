@@ -14,10 +14,6 @@ type UpdateUserDataRequest struct {
 	ProfilePicture *multipart.FileHeader `form:"profile_picture"`
 }
 
-func (r *UpdateUserDataRequest) Validate() error {
-	return nil
-}
-
 func (r *UpdateUserDataRequest) ToInput() user_services.UpdateUserDataInput {
 	var profilePicture *core.FileUploadInput
 

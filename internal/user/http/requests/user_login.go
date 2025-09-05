@@ -7,10 +7,6 @@ type UserLoginRequest struct {
 	Password string `json:"password"`
 }
 
-func (r *UserLoginRequest) Validate() error {
-	return nil
-}
-
 func (r *UserLoginRequest) ToInput() user_services.UserLoginInput {
 	return user_services.UserLoginInput{
 		Email:    r.Email,

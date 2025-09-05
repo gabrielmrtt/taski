@@ -23,7 +23,36 @@ type UserLoginInput struct {
 	Password string
 }
 
+func (i UserLoginInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	_, err := user_core.NewEmail(i.Email)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "email",
+			Error: err.Error(),
+		})
+	}
+
+	if i.Password == "" {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "password",
+			Error: "password is required",
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *UserLoginService) Execute(input UserLoginInput) (*user_core.UserLoginDto, error) {
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
 	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
 		Email: input.Email,
 	})

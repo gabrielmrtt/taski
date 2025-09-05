@@ -1,6 +1,7 @@
 package core_http
 
-type HttpRequest[INPUT any] interface {
-	Validate() error
-	ToInput() any
+import "github.com/gabrielmrtt/taski/internal/core"
+
+type HttpRequest[INPUT core.ServiceInput] interface {
+	ToInput() INPUT
 }

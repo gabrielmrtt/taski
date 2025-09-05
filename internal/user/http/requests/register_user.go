@@ -9,10 +9,6 @@ type RegisterUserRequest struct {
 	PhoneNumber *string `json:"phone_number"`
 }
 
-func (r *RegisterUserRequest) Validate() error {
-	return nil
-}
-
 func (r *RegisterUserRequest) ToInput() user_services.RegisterUserInput {
 	return user_services.RegisterUserInput{
 		Name:        r.Name,

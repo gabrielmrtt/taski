@@ -69,6 +69,11 @@ func NewUser(input NewUserInput) (*User, error) {
 		return nil, err
 	}
 
+	nameValueObject, err := core.NewName(input.Name)
+	if err != nil {
+		return nil, err
+	}
+
 	identity := core.NewIdentity("user")
 
 	now := datetimeutils.EpochNow()
@@ -87,7 +92,7 @@ func NewUser(input NewUserInput) (*User, error) {
 		Identity: identity,
 		Status:   UserStatusUnverified,
 		Credentials: &UserCredentials{
-			Name:        input.Name,
+			Name:        nameValueObject.Value,
 			Password:    hashedPassword,
 			Email:       emailValueObject.Value,
 			PhoneNumber: nil,
@@ -113,7 +118,12 @@ func (u *User) ChangeCredentialsName(name string) error {
 		return core.NewInternalError("user credentials not found")
 	}
 
-	u.Credentials.Name = name
+	nameValueObject, err := core.NewName(name)
+	if err != nil {
+		return err
+	}
+
+	u.Credentials.Name = nameValueObject.Value
 	now := datetimeutils.EpochNow()
 
 	u.Timestamps.UpdatedAt = &now
@@ -179,25 +189,53 @@ func (u *User) ChangeCredentialsPhoneNumber(phoneNumber string) error {
 	return nil
 }
 
-func (u *User) ChangeUserDataDisplayName(displayName string) {
-	u.Data.DisplayName = displayName
+func (u *User) ChangeUserDataDisplayName(displayName string) error {
+	if u.Data == nil {
+		return core.NewInternalError("user data not found")
+	}
+
+	displayNameValueObject, err := core.NewName(displayName)
+	if err != nil {
+		return err
+	}
+
+	u.Data.DisplayName = displayNameValueObject.Value
 	now := datetimeutils.EpochNow()
 
 	u.Timestamps.UpdatedAt = &now
+
+	return nil
 }
 
-func (u *User) ChangeUserDataAbout(about *string) {
-	u.Data.About = about
+func (u *User) ChangeUserDataAbout(about string) error {
+	if u.Data == nil {
+		return core.NewInternalError("user data not found")
+	}
+
+	aboutValueObject, err := core.NewDescription(about)
+	if err != nil {
+		return err
+	}
+
+	u.Data.About = &aboutValueObject.Value
 	now := datetimeutils.EpochNow()
 
 	u.Timestamps.UpdatedAt = &now
+
+	return nil
 }
 
-func (u *User) ChangeUserDataProfilePicture(profilePictureIdentity *core.Identity) {
+func (u *User) ChangeUserDataProfilePicture(profilePictureIdentity *core.Identity) error {
+	if u.Data == nil {
+		return core.NewInternalError("user data not found")
+	}
+
 	u.Data.ProfilePictureIdentity = profilePictureIdentity
 	now := datetimeutils.EpochNow()
 
 	u.Timestamps.UpdatedAt = &now
+
+	return nil
 }
 
 func (u *User) Activate() {

@@ -29,6 +29,24 @@ type ForgotUserPasswordInput struct {
 	Email string
 }
 
+func (i ForgotUserPasswordInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	_, err := user_core.NewEmail(i.Email)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "email",
+			Error: err.Error(),
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error {
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {

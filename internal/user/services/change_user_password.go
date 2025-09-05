@@ -24,7 +24,29 @@ type ChangeUserPasswordInput struct {
 	Password string
 }
 
+func (i ChangeUserPasswordInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	_, err := user_core.NewPassword(i.Password)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "password",
+			Error: err.Error(),
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *ChangeUserPasswordService) Execute(userIdentity core.Identity, input ChangeUserPasswordInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return core.NewInternalError(err.Error())

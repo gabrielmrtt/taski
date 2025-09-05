@@ -26,9 +26,39 @@ func NewRecoverUserPasswordService(
 type RecoverUserPasswordInput struct {
 	PasswordRecoveryToken string
 	Password              string
+	PasswordConfirmation  string
+}
+
+func (i RecoverUserPasswordInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	_, err := user_core.NewPassword(i.Password)
+	if err != nil {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "password",
+			Error: err.Error(),
+		})
+	}
+
+	if i.Password != i.PasswordConfirmation {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "password_confirmation",
+			Error: "password confirmation does not match",
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
 }
 
 func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return core.NewInternalError(err.Error())

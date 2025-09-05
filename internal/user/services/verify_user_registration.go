@@ -27,7 +27,28 @@ type VerifyUserRegistrationInput struct {
 	Token string
 }
 
+func (i VerifyUserRegistrationInput) Validate() error {
+	var fields []core.InvalidInputErrorField
+
+	if i.Token == "" {
+		fields = append(fields, core.InvalidInputErrorField{
+			Field: "token",
+			Error: "token is required",
+		})
+	}
+
+	if len(fields) > 0 {
+		return core.NewInvalidInputError("invalid input", fields)
+	}
+
+	return nil
+}
+
 func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return core.NewInternalError(err.Error())

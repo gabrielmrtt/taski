@@ -3,6 +3,8 @@ package user_core
 import (
 	"errors"
 	"regexp"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type Email struct {
@@ -41,6 +43,14 @@ func (e Email) Equals(_e Email) bool {
 	return e.Value == _e.Value
 }
 
+func IsValidEmail(fl validator.FieldLevel) bool {
+	email := fl.Field().String()
+
+	_, err := NewEmail(email)
+
+	return err == nil
+}
+
 type Password struct {
 	Value string
 }
@@ -70,6 +80,22 @@ func (p Password) Validate() error {
 	}
 
 	return nil
+}
+
+func (p Password) String() string {
+	return p.Value
+}
+
+func (p Password) Equals(_p Password) bool {
+	return p.Value == _p.Value
+}
+
+func IsValidPassword(fl validator.FieldLevel) bool {
+	password := fl.Field().String()
+
+	_, err := NewPassword(password)
+
+	return err == nil
 }
 
 type PhoneNumber struct {
