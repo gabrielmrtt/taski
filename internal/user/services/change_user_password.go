@@ -1,0 +1,74 @@
+package user_services
+
+import (
+	"github.com/gabrielmrtt/taski/internal/core"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
+)
+
+type ChangeUserPasswordService struct {
+	UserRepository        user_core.UserRepository
+	TransactionRepository core.TransactionRepository
+}
+
+func NewChangeUserPasswordService(
+	userRepository user_core.UserRepository,
+	transactionRepository core.TransactionRepository,
+) *ChangeUserPasswordService {
+	return &ChangeUserPasswordService{
+		UserRepository:        userRepository,
+		TransactionRepository: transactionRepository,
+	}
+}
+
+type ChangeUserPasswordInput struct {
+	Password string
+}
+
+func (s *ChangeUserPasswordService) Execute(userIdentity core.Identity, input ChangeUserPasswordInput) error {
+	tx, err := s.TransactionRepository.BeginTransaction()
+	if err != nil {
+		return core.NewInternalError(err.Error())
+	}
+
+	s.UserRepository.SetTransaction(tx)
+
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
+		Identity: userIdentity,
+		Include: map[string]any{
+			"credentials": true,
+		},
+	})
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	if user == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("user not found")
+	}
+
+	err = user.ChangeCredentialsPassword(input.Password)
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	err = s.UserRepository.UpdateUser(user)
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	return nil
+}

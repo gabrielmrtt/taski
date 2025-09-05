@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'taski_app'
+    ports:
+      - 8080:8080
+    networks:
+      - net
+    env_file: '.env'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - db
+      - redis
+      - mailhog
+  db:
+    image: 'postgres:latest'
+    container_name: 'taski_db'
+    ports:
+      - 5432:5432
+    networks:
+      - net
+    environment:
+      POSTGRES_DB: taski
+      POSTGRES_USER: taski_admin
+      POSTGRES_PASSWORD: 123456
+  redis:
+    image: 'redis:latest'
+    container_name: 'taski_redis'
+    ports:
+      - 6379:6379
+    networks:
+      - net
+    env_file: '.env'
+  mailhog:
+    image: 'mailhog/mailhog'
+    container_name: 'taski_mailhog'
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - net
+    env_file: '.env'
+networks:
+  net:
+    driver: bridge

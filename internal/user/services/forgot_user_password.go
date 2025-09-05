@@ -1,0 +1,79 @@
+package user_services
+
+import (
+	"time"
+
+	"github.com/gabrielmrtt/taski/internal/core"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
+)
+
+type ForgotUserPasswordService struct {
+	UserRepository             user_core.UserRepository
+	PasswordRecoveryRepository user_core.PasswordRecoveryRepository
+	TransactionRepository      core.TransactionRepository
+}
+
+func NewForgotUserPasswordService(
+	userRepository user_core.UserRepository,
+	passwordRecoveryRepository user_core.PasswordRecoveryRepository,
+	transactionRepository core.TransactionRepository,
+) *ForgotUserPasswordService {
+	return &ForgotUserPasswordService{
+		UserRepository:             userRepository,
+		PasswordRecoveryRepository: passwordRecoveryRepository,
+		TransactionRepository:      transactionRepository,
+	}
+}
+
+type ForgotUserPasswordInput struct {
+	Email string
+}
+
+func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error {
+	tx, err := s.TransactionRepository.BeginTransaction()
+	if err != nil {
+		return core.NewInternalError(err.Error())
+	}
+
+	s.UserRepository.SetTransaction(tx)
+	s.PasswordRecoveryRepository.SetTransaction(tx)
+
+	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
+		Email: input.Email,
+		Include: map[string]any{
+			"credentials": true,
+		},
+	})
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	if user == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("user not found")
+	}
+
+	passwordRecovery, err := user_core.NewPasswordRecovery(user.Identity, 48*time.Hour)
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	_, err = s.PasswordRecoveryRepository.StorePasswordRecovery(passwordRecovery)
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	return nil
+}

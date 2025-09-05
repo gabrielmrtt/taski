@@ -1,0 +1,57 @@
+package user_services
+
+import (
+	"github.com/gabrielmrtt/taski/internal/core"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
+)
+
+type UserLoginService struct {
+	UserRepository user_core.UserRepository
+}
+
+func NewUserLoginService(
+	userRepository user_core.UserRepository,
+) *UserLoginService {
+	return &UserLoginService{
+		UserRepository: userRepository,
+	}
+}
+
+type UserLoginInput struct {
+	Email    string
+	Password string
+}
+
+func (s *UserLoginService) Execute(input UserLoginInput) (*user_core.UserLoginDto, error) {
+	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
+		Email: input.Email,
+	})
+
+	if err != nil {
+		return nil, core.NewInternalError(err.Error())
+	}
+
+	if user == nil {
+		return nil, core.NewNotFoundError("user not found")
+	}
+
+	if user.IsDeleted() {
+		return nil, core.NewNotFoundError("user not found")
+	}
+
+	if !user.CheckPassword(input.Password) {
+		return nil, core.NewUnauthorizedError("invalid password")
+	}
+
+	if user.IsInactive() || user.IsUnverified() {
+		return nil, core.NewUnauthorizedError("user is not activated")
+	}
+
+	jwtToken, err := user_http_middlewares.GenerateJwtToken(user.Identity)
+	if err != nil {
+		return nil, core.NewInternalError(err.Error())
+	}
+
+	return user_core.UserLoginToDto(user, jwtToken), nil
+}

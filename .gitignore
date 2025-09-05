@@ -1,0 +1,42 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go build artifacts
+*.o
+*.a
+*.lo
+*.la
+*.lai
+*.sum
+
+# Go workspace
+bin/
+build/
+dist/
+tmp/
+*.log
+
+# Ignore vendor if you are not committing dependencies
+vendor/
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp
+*~
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# dotenv / configs
+.env
+.env.local
+.env.*
