@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func BootstrapControllers(engine *gin.Engine) {
+func BootstrapControllers(g *gin.RouterGroup) {
 	userRepository := user_database_postgres.NewUserPostgresRepository()
 	userRegistrationRepository := user_database_postgres.NewUserRegistrationPostgresRepository()
 	passwordRecoveryRepository := user_database_postgres.NewPasswordRecoveryPostgresRepository()
@@ -28,7 +28,7 @@ func BootstrapControllers(engine *gin.Engine) {
 	userRegistrationController := NewUserRegistrationController(registerUserService, verifyUserRegistrationService, forgotUserPasswordService, recoverUserPasswordService)
 	authController := NewAuthController(userLoginService)
 
-	userController.ConfigureRoutes(engine)
-	userRegistrationController.ConfigureRoutes(engine)
-	authController.ConfigureRoutes(engine)
+	userController.ConfigureRoutes(g)
+	userRegistrationController.ConfigureRoutes(g)
+	authController.ConfigureRoutes(g)
 }

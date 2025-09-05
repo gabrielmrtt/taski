@@ -17,9 +17,9 @@ func bootstrapApplication() {
 	engine.Use(gin.Recovery())
 	engine.Use(gin.Logger())
 
-	engine.Group(fmt.Sprintf("/api/%s", apiVersion))
+	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{
-		user_http.BootstrapControllers(engine)
+		user_http.BootstrapControllers(g)
 	}
 
 	engine.Run(fmt.Sprintf(":%s", appPort))

@@ -119,13 +119,13 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *UserController) ConfigureRoutes(engine *gin.Engine) {
-	engine.Group("/me").Use(user_http_middlewares.AuthMiddleware())
+func (c *UserController) ConfigureRoutes(group *gin.RouterGroup) {
+	g := group.Group("/me").Use(user_http_middlewares.AuthMiddleware())
 	{
-		engine.GET("", c.GetMe)
-		engine.PUT("/password", c.ChangeUserPassword)
-		engine.PUT("/credentials", c.UpdateUserCredentials)
-		engine.PUT("/data", c.UpdateUserData)
-		engine.DELETE("", c.DeleteUser)
+		g.GET("", c.GetMe)
+		g.PUT("/password", c.ChangeUserPassword)
+		g.PUT("/credentials", c.UpdateUserCredentials)
+		g.PUT("/data", c.UpdateUserData)
+		g.DELETE("", c.DeleteUser)
 	}
 }

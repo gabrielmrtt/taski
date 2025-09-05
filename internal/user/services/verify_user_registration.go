@@ -3,7 +3,6 @@ package user_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type VerifyUserRegistrationService struct {
@@ -51,9 +50,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 		return core.NewNotFoundError("user registration not found")
 	}
 
-	now := datetimeutils.EpochNow()
-
-	if userRegistration.Status == user_core.UserRegistrationStatusExpired || userRegistration.ExpiresAt < now {
+	if userRegistration.IsExpired() {
 		tx.Rollback()
 		return core.NewAlreadyExistsError("user registration expired")
 	}
@@ -75,7 +72,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	user.Status = user_core.UserStatusActive
 
-	_, err = s.UserRepository.StoreUser(user)
+	err = s.UserRepository.UpdateUser(user)
 
 	if err != nil {
 		tx.Rollback()

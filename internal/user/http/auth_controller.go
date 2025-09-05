@@ -38,9 +38,9 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
-func (c *AuthController) ConfigureRoutes(engine *gin.Engine) {
-	engine.Group("/auth")
+func (c *AuthController) ConfigureRoutes(group *gin.RouterGroup) {
+	g := group.Group("/auth")
 	{
-		engine.POST("/login", c.Login)
+		g.POST("/login", c.Login)
 	}
 }

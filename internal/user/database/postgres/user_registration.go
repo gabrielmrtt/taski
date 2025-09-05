@@ -2,6 +2,7 @@ package user_database_postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
@@ -11,7 +12,7 @@ import (
 )
 
 type UserRegistrationTable struct {
-	bun.BaseModel `bun:"table:user_registration,alias:ur"`
+	bun.BaseModel `bun:"table:user_registration"`
 
 	InternalId     string `bun:"internal_id,pk,notnull,type:uuid"`
 	UserInternalId string `bun:"user_internal_id,notnull,type:uuid"`
@@ -63,6 +64,10 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 	err := selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -71,12 +76,14 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 
 func (r *UserRegistrationPostgresRepository) StoreUserRegistration(userRegistration *user_core.UserRegistration) (*user_core.UserRegistration, error) {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return nil, err
@@ -99,17 +106,27 @@ func (r *UserRegistrationPostgresRepository) StoreUserRegistration(userRegistrat
 		return nil, err
 	}
 
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return userRegistrationTable.ToEntity(), nil
 }
 
 func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistration *user_core.UserRegistration) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -129,7 +146,19 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistra
 	_, err := tx.NewUpdate().Model(userRegistrationTable).Where("internal_id = ?", userRegistration.Identity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -137,12 +166,14 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistra
 
 func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(userRegistrationIdentity core.Identity) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -152,7 +183,19 @@ func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(userRegistra
 	_, err := tx.NewDelete().Model(&UserRegistrationTable{}).Where("internal_id = ?", userRegistrationIdentity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

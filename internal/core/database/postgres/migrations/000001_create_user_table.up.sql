@@ -25,3 +25,27 @@ CREATE TABLE IF NOT EXISTS user_data (
 
     CONSTRAINT fk_user_data_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
 );
+
+CREATE TABLE IF NOT EXISTS user_registration (
+    internal_id UUID NOT NULL PRIMARY KEY,
+    user_internal_id UUID NOT NULL,
+    token VARCHAR(510) NOT NULL,
+    status VARCHAR(100) NOT NULL,
+    expires_at BIGINT NOT NULL,
+    registered_at BIGINT NOT NULL,
+    verified_at BIGINT,
+
+    CONSTRAINT fk_user_registration_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+);
+
+CREATE TABLE IF NOT EXISTS password_recovery (
+    internal_id UUID NOT NULL PRIMARY KEY,
+    user_internal_id UUID NOT NULL,
+    token VARCHAR(510) NOT NULL,
+    status VARCHAR(100) NOT NULL,
+    recovered_at BIGINT,
+    expires_at BIGINT NOT NULL,
+    requested_at BIGINT NOT NULL,
+
+    CONSTRAINT fk_password_recovery_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+);

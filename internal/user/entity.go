@@ -313,3 +313,7 @@ func (u *UserRegistration) Verify() {
 	u.Status = UserRegistrationStatusVerified
 	u.VerifiedAt = &now
 }
+
+func (u *UserRegistration) IsExpired() bool {
+	return u.Status == UserRegistrationStatusExpired || u.ExpiresAt < datetimeutils.EpochNow()
+}

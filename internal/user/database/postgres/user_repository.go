@@ -2,6 +2,7 @@ package user_database_postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
@@ -11,7 +12,7 @@ import (
 )
 
 type UserTable struct {
-	bun.BaseModel `bun:"table:users,alias:u"`
+	bun.BaseModel `bun:"table:users,alias:users"`
 
 	InternalId string `bun:"internal_id,pk,notnull,type:uuid"`
 	PublicId   string `bun:"public_id,notnull,type:varchar(510)"`
@@ -63,7 +64,7 @@ func (u *UserTable) ToEntity() *user_core.User {
 }
 
 type UserCredentialsTable struct {
-	bun.BaseModel `bun:"table:user_credentials,alias:uc"`
+	bun.BaseModel `bun:"table:user_credentials"`
 
 	UserInternalId string  `bun:"user_internal_id,pk,notnull,type:uuid"`
 	Name           string  `bun:"name,notnull,type:varchar(255)"`
@@ -73,7 +74,7 @@ type UserCredentialsTable struct {
 }
 
 type UserDataTable struct {
-	bun.BaseModel `bun:"table:user_data,alias:ud"`
+	bun.BaseModel `bun:"table:user_data"`
 
 	UserInternalId           string  `bun:"user_internal_id,pk,notnull,type:uuid"`
 	DisplayName              string  `bun:"display_name,notnull,type:varchar(255)"`
@@ -97,7 +98,7 @@ func (r *UserPostgresRepository) SetTransaction(tx core.Transaction) error {
 
 func applyFilters(selectQuery *bun.SelectQuery, filters user_core.UserFilters) *bun.SelectQuery {
 	if filters.Email != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "email", filters.Email)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.email", filters.Email)
 	}
 
 	if filters.Status != nil {
@@ -105,23 +106,23 @@ func applyFilters(selectQuery *bun.SelectQuery, filters user_core.UserFilters) *
 	}
 
 	if filters.Name != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.name", filters.Name)
 	}
 
 	if filters.DisplayName != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "display_name", filters.DisplayName)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_data.display_name", filters.DisplayName)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "users.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "users.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DeletedAt != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "users.deleted_at", filters.DeletedAt)
 	}
 
 	return selectQuery
@@ -137,11 +138,15 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_core.GetUserByIde
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Where("internal_id = ?", params.Identity.Internal)
+	selectQuery = selectQuery.Model(&user).Where("users.internal_id = ?", params.Identity.Internal)
 
 	err := selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -158,11 +163,15 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailP
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Join("JOIN user_credentials uc ON users.internal_id = uc.user_internal_id").Where("uc.email = ?", params.Email)
+	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Where("user_credentials.email = ?", params.Email)
 
 	err := selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -185,6 +194,10 @@ func (r *UserPostgresRepository) ListUsersBy(params user_core.ListUsersParams) (
 	err := selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &[]user_core.User{}, nil
+		}
+
 		return nil, err
 	}
 
@@ -231,6 +244,15 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 	err = selectQuery.Scan(context.Background(), &users)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &core.PaginationOutput[user_core.User]{
+				Data:    []user_core.User{},
+				Page:    page,
+				HasMore: false,
+				Total:   0,
+			}, nil
+		}
+
 		return nil, err
 	}
 
@@ -250,12 +272,14 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 
 func (r *UserPostgresRepository) StoreUser(user *user_core.User) (*user_core.User, error) {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return nil, err
@@ -311,17 +335,27 @@ func (r *UserPostgresRepository) StoreUser(user *user_core.User) (*user_core.Use
 		return nil, err
 	}
 
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return userTable.ToEntity(), nil
 }
 
 func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -332,6 +366,7 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 		InternalId: user.Identity.Internal.String(),
 		PublicId:   user.Identity.Public,
 		Status:     string(user.Status),
+		CreatedAt:  *user.Timestamps.CreatedAt,
 		UpdatedAt:  user.Timestamps.UpdatedAt,
 		DeletedAt:  user.DeletedAt,
 	}
@@ -339,6 +374,10 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 	_, err := tx.NewUpdate().Model(userTable).Where("internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
 	}
 
@@ -354,6 +393,10 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 		_, err = tx.NewUpdate().Model(userCredentialsTable).Where("user_internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
 
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil
+			}
+
 			return err
 		}
 	}
@@ -376,6 +419,18 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 		_, err = tx.NewUpdate().Model(userDataTable).Where("user_internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
 
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil
+			}
+
+			return err
+		}
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
 			return err
 		}
 	}
@@ -385,12 +440,14 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 
 func (r *UserPostgresRepository) DeleteUser(userIdentity core.Identity) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -400,7 +457,19 @@ func (r *UserPostgresRepository) DeleteUser(userIdentity core.Identity) error {
 	_, err := tx.NewDelete().Model(&UserTable{}).Where("internal_id = ?", userIdentity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

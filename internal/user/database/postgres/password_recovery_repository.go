@@ -2,6 +2,7 @@ package user_database_postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
@@ -11,7 +12,7 @@ import (
 )
 
 type PasswordRecoveryTable struct {
-	bun.BaseModel `bun:"table:password_recovery,alias:pr"`
+	bun.BaseModel `bun:"table:password_recovery"`
 
 	InternalId     string `bun:"internal_id,pk,notnull,type:uuid"`
 	UserInternalId string `bun:"user_internal_id,notnull,type:uuid"`
@@ -63,6 +64,10 @@ func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params u
 	err := selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -71,12 +76,14 @@ func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params u
 
 func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(passwordRecovery *user_core.PasswordRecovery) (*user_core.PasswordRecovery, error) {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return nil, err
@@ -99,17 +106,27 @@ func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(passwordRecov
 		return nil, err
 	}
 
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return passwordRecoveryTable.ToEntity(), nil
 }
 
 func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(passwordRecovery *user_core.PasswordRecovery) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -129,7 +146,19 @@ func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(passwordReco
 	_, err := tx.NewUpdate().Model(passwordRecoveryTable).Where("internal_id = ?", passwordRecovery.Identity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -137,12 +166,14 @@ func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(passwordReco
 
 func (r *PasswordRecoveryPostgresRepository) DeletePasswordRecovery(passwordRecoveryIdentity core.Identity) error {
 	var tx bun.Tx
+	var shouldCommit bool = false
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		tx = *r.tx.Tx
 	} else {
 		var err error
 		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
 
 		if err != nil {
 			return err
@@ -152,7 +183,19 @@ func (r *PasswordRecoveryPostgresRepository) DeletePasswordRecovery(passwordReco
 	_, err := tx.NewDelete().Model(&PasswordRecoveryTable{}).Where("internal_id = ?", passwordRecoveryIdentity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
 		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
