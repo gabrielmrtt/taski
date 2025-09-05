@@ -138,7 +138,7 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_core.GetUserByIde
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Where("users.internal_id = ?", params.Identity.Internal)
+	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("users.internal_id = ?", params.Identity.Internal)
 
 	err := selectQuery.Scan(context.Background())
 
@@ -163,7 +163,7 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailP
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Where("user_credentials.email = ?", params.Email)
+	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("user_credentials.email = ?", params.Email)
 
 	err := selectQuery.Scan(context.Background())
 

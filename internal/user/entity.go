@@ -108,14 +108,23 @@ func NewUser(input NewUserInput) (*User, error) {
 	return user, nil
 }
 
-func (u *User) ChangeCredentialsName(name string) {
+func (u *User) ChangeCredentialsName(name string) error {
+	if u.Credentials == nil {
+		return core.NewInternalError("user credentials not found")
+	}
+
 	u.Credentials.Name = name
 	now := datetimeutils.EpochNow()
 
 	u.Timestamps.UpdatedAt = &now
+	return nil
 }
 
 func (u *User) ChangeCredentialsEmail(email string) error {
+	if u.Credentials == nil {
+		return core.NewInternalError("user credentials not found")
+	}
+
 	emailValueObject, err := NewEmail(email)
 	if err != nil {
 		return err
@@ -130,6 +139,10 @@ func (u *User) ChangeCredentialsEmail(email string) error {
 }
 
 func (u *User) ChangeCredentialsPassword(password string) error {
+	if u.Credentials == nil {
+		return core.NewInternalError("user credentials not found")
+	}
+
 	passwordValueObject, err := NewPassword(password)
 	if err != nil {
 		return err
@@ -149,6 +162,10 @@ func (u *User) ChangeCredentialsPassword(password string) error {
 }
 
 func (u *User) ChangeCredentialsPhoneNumber(phoneNumber string) error {
+	if u.Credentials == nil {
+		return core.NewInternalError("user credentials not found")
+	}
+
 	phoneNumberValueObject, err := NewPhoneNumber(phoneNumber)
 	if err != nil {
 		return err
@@ -220,6 +237,9 @@ func (u *User) IsDeleted() bool {
 }
 
 func (u *User) CheckPassword(password string) bool {
+	if u.Credentials == nil {
+		return false
+	}
 	return hashutils.ComparePassword(password, u.Credentials.Password)
 }
 
@@ -259,6 +279,14 @@ func NewPasswordRecovery(userIdentity core.Identity, expiresIn time.Duration) (*
 	}
 
 	return passwordRecovery, nil
+}
+
+func (p *PasswordRecovery) IsUsed() bool {
+	return p.Status == PasswordRecoveryStatusUsed
+}
+
+func (p *PasswordRecovery) IsExpired() bool {
+	return p.Status == PasswordRecoveryStatusExpired || p.ExpiresAt < datetimeutils.EpochNow()
 }
 
 func (p *PasswordRecovery) Use() {

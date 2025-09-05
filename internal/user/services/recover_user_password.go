@@ -3,7 +3,6 @@ package user_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RecoverUserPasswordService struct {
@@ -52,14 +51,12 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 		return core.NewNotFoundError("password recovery not found")
 	}
 
-	if passwordRecovery.Status == user_core.PasswordRecoveryStatusUsed {
+	if passwordRecovery.IsUsed() {
 		tx.Rollback()
 		return core.NewAlreadyExistsError("password recovery already used")
 	}
 
-	now := datetimeutils.EpochNow()
-
-	if passwordRecovery.Status == user_core.PasswordRecoveryStatusExpired || passwordRecovery.ExpiresAt < now {
+	if passwordRecovery.IsExpired() {
 		tx.Rollback()
 		return core.NewAlreadyExistsError("password recovery expired")
 	}
@@ -89,6 +86,15 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 	}
 
 	err = s.UserRepository.UpdateUser(user)
+
+	if err != nil {
+		tx.Rollback()
+		return core.NewInternalError(err.Error())
+	}
+
+	passwordRecovery.Use()
+
+	err = s.PasswordRecoveryRepository.UpdatePasswordRecovery(passwordRecovery)
 
 	if err != nil {
 		tx.Rollback()

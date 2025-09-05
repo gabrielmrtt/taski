@@ -123,7 +123,7 @@ func (c *UserController) ConfigureRoutes(group *gin.RouterGroup) {
 	g := group.Group("/me").Use(user_http_middlewares.AuthMiddleware())
 	{
 		g.GET("", c.GetMe)
-		g.PUT("/password", c.ChangeUserPassword)
+		g.PATCH("/password", c.ChangeUserPassword)
 		g.PUT("/credentials", c.UpdateUserCredentials)
 		g.PUT("/data", c.UpdateUserData)
 		g.DELETE("", c.DeleteUser)

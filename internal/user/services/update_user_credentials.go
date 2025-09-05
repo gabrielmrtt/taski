@@ -52,7 +52,11 @@ func (s *UpdateUserCredentialsService) Execute(userIdentity core.Identity, input
 	}
 
 	if input.Name != nil {
-		user.ChangeCredentialsName(*input.Name)
+		err = user.ChangeCredentialsName(*input.Name)
+		if err != nil {
+			tx.Rollback()
+			return core.NewInternalError(err.Error())
+		}
 	}
 
 	if input.Email != nil {
