@@ -21,9 +21,9 @@ type UserCredentialsDto struct {
 }
 
 type UserDataDto struct {
-	DisplayName    string  `json:"display_name"`
-	About          *string `json:"about"`
-	ProfilePicture *string `json:"profile_picture"`
+	DisplayName            string  `json:"display_name"`
+	About                  *string `json:"about"`
+	ProfilePicturePublicId *string `json:"profile_picture"`
 }
 
 func UserToDto(user *User) *UserDto {
@@ -40,8 +40,9 @@ func UserToDto(user *User) *UserDto {
 
 	if user.Data != nil {
 		userDataDto = &UserDataDto{
-			DisplayName: user.Data.DisplayName,
-			About:       user.Data.About,
+			DisplayName:            user.Data.DisplayName,
+			About:                  user.Data.About,
+			ProfilePicturePublicId: &user.Data.ProfilePictureIdentity.Public,
 		}
 	}
 

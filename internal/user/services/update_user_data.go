@@ -32,6 +32,7 @@ func NewUpdateUserDataService(
 }
 
 type UpdateUserDataInput struct {
+	UserIdentity   core.Identity
 	DisplayName    *string
 	About          *string
 	ProfilePicture *core.FileInput
@@ -78,7 +79,7 @@ func (i UpdateUserDataInput) Validate() error {
 	return nil
 }
 
-func (s *UpdateUserDataService) Execute(userIdentity core.Identity, input UpdateUserDataInput) error {
+func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 	if err := input.Validate(); err != nil {
 		return err
 	}
@@ -91,7 +92,7 @@ func (s *UpdateUserDataService) Execute(userIdentity core.Identity, input Update
 	s.UserRepository.SetTransaction(tx)
 
 	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: userIdentity,
+		Identity: input.UserIdentity,
 		Include: map[string]any{
 			"data": true,
 		},
@@ -126,8 +127,8 @@ func (s *UpdateUserDataService) Execute(userIdentity core.Identity, input Update
 	if input.ProfilePicture != nil {
 		uploadedFile, err := storage_services.NewUploadFileService(s.UploadedFileRepository, s.StorageRepository).Execute(storage_services.UploadFileInput{
 			File:       *input.ProfilePicture,
-			Directory:  "users/" + userIdentity.Internal.String() + "/profile_picture",
-			UploadedBy: userIdentity,
+			Directory:  "users/" + input.UserIdentity.Internal.String() + "/profile_picture",
+			UploadedBy: input.UserIdentity,
 		})
 
 		if err != nil {
@@ -142,7 +143,7 @@ func (s *UpdateUserDataService) Execute(userIdentity core.Identity, input Update
 
 		user.ChangeUserDataProfilePicture(&uploadedFile.Identity)
 	} else {
-		storage_services.NewDeleteFileByIdentityService(s.UploadedFileRepository, s.StorageRepository).Execute(userIdentity)
+		storage_services.NewDeleteFileByIdentityService(s.UploadedFileRepository, s.StorageRepository).Execute(input.UserIdentity)
 	}
 
 	err = s.UserRepository.UpdateUser(user)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gabrielmrtt/taski/config"
+	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
 	user_http "github.com/gabrielmrtt/taski/internal/user/http"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,7 @@ func bootstrapApplication() {
 	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{
 		user_http.BootstrapControllers(g)
+		storage_http.BootstrapControllers(g)
 	}
 
 	engine.Run(fmt.Sprintf(":%s", appPort))

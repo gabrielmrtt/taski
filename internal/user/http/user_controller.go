@@ -60,7 +60,9 @@ func (c *UserController) ChangeUserPassword(ctx *gin.Context) {
 		return
 	}
 
-	err := c.ChangeUserPasswordService.Execute(authenticatedUserIdentity, request.ToInput())
+	input := request.ToInput()
+	input.UserIdentity = authenticatedUserIdentity
+	err := c.ChangeUserPasswordService.Execute(input)
 	if err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
 		return
@@ -79,7 +81,9 @@ func (c *UserController) UpdateUserCredentials(ctx *gin.Context) {
 		return
 	}
 
-	err := c.UpdateUserCredentialsService.Execute(authenticatedUserIdentity, request.ToInput())
+	input := request.ToInput()
+	input.UserIdentity = authenticatedUserIdentity
+	err := c.UpdateUserCredentialsService.Execute(input)
 	if err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
 		return
@@ -98,7 +102,9 @@ func (c *UserController) UpdateUserData(ctx *gin.Context) {
 		return
 	}
 
-	err := c.UpdateUserDataService.Execute(authenticatedUserIdentity, request.ToInput())
+	input := request.ToInput()
+	input.UserIdentity = authenticatedUserIdentity
+	err := c.UpdateUserDataService.Execute(input)
 	if err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
 		return
@@ -110,7 +116,10 @@ func (c *UserController) UpdateUserData(ctx *gin.Context) {
 func (c *UserController) DeleteUser(ctx *gin.Context) {
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
-	err := c.DeleteUserService.Execute(authenticatedUserIdentity)
+	input := user_services.DeleteUserInput{
+		UserIdentity: authenticatedUserIdentity,
+	}
+	err := c.DeleteUserService.Execute(input)
 	if err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
 		return

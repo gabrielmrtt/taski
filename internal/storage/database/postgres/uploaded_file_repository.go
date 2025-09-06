@@ -17,6 +17,7 @@ type UploadedFileTable struct {
 
 	InternalId               string `bun:"internal_id,pk,notnull,type:uuid"`
 	PublicId                 string `bun:"public_id,notnull,type:varchar(510)"`
+	File                     string `bun:"file,notnull,type:text"`
 	FileDirectory            string `bun:"file_directory,notnull,type:text"`
 	FileMimeType             string `bun:"file_mime_type,notnull,type:varchar(100)"`
 	FileExtension            string `bun:"file_extension,notnull,type:varchar(3)"`
@@ -29,6 +30,7 @@ type UploadedFileTable struct {
 func (u *UploadedFileTable) ToEntity() *storage_core.UploadedFile {
 	return &storage_core.UploadedFile{
 		Identity:               core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "file"),
+		File:                   &u.File,
 		FileDirectory:          &u.FileDirectory,
 		FileMimeType:           &u.FileMimeType,
 		FileExtension:          &u.FileExtension,
@@ -95,6 +97,7 @@ func (r *UploadedFilePostgresRepository) StoreUploadedFile(uploadedFile *storage
 	uploadedFileTable := &UploadedFileTable{
 		InternalId:               uploadedFile.Identity.Internal.String(),
 		PublicId:                 uploadedFile.Identity.Public,
+		File:                     *uploadedFile.File,
 		FileDirectory:            *uploadedFile.FileDirectory,
 		FileMimeType:             *uploadedFile.FileMimeType,
 		FileExtension:            *uploadedFile.FileExtension,

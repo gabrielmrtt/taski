@@ -21,7 +21,8 @@ func NewChangeUserPasswordService(
 }
 
 type ChangeUserPasswordInput struct {
-	Password string
+	UserIdentity core.Identity
+	Password     string
 }
 
 func (i ChangeUserPasswordInput) Validate() error {
@@ -42,7 +43,7 @@ func (i ChangeUserPasswordInput) Validate() error {
 	return nil
 }
 
-func (s *ChangeUserPasswordService) Execute(userIdentity core.Identity, input ChangeUserPasswordInput) error {
+func (s *ChangeUserPasswordService) Execute(input ChangeUserPasswordInput) error {
 	if err := input.Validate(); err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func (s *ChangeUserPasswordService) Execute(userIdentity core.Identity, input Ch
 	s.UserRepository.SetTransaction(tx)
 
 	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: userIdentity,
+		Identity: input.UserIdentity,
 		Include: map[string]any{
 			"credentials": true,
 		},

@@ -21,9 +21,10 @@ func NewUpdateUserCredentialsService(
 }
 
 type UpdateUserCredentialsInput struct {
-	Name        *string
-	Email       *string
-	PhoneNumber *string
+	UserIdentity core.Identity
+	Name         *string
+	Email        *string
+	PhoneNumber  *string
 }
 
 func (i UpdateUserCredentialsInput) Validate() error {
@@ -66,7 +67,7 @@ func (i UpdateUserCredentialsInput) Validate() error {
 	return nil
 }
 
-func (s *UpdateUserCredentialsService) Execute(userIdentity core.Identity, input UpdateUserCredentialsInput) error {
+func (s *UpdateUserCredentialsService) Execute(input UpdateUserCredentialsInput) error {
 	if err := input.Validate(); err != nil {
 		return err
 	}
@@ -79,7 +80,7 @@ func (s *UpdateUserCredentialsService) Execute(userIdentity core.Identity, input
 	s.UserRepository.SetTransaction(tx)
 
 	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: userIdentity,
+		Identity: input.UserIdentity,
 		Include: map[string]any{
 			"credentials": true,
 		},

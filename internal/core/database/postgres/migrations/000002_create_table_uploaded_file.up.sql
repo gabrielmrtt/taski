@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS uploaded_file (
     internal_id UUID NOT NULL PRIMARY KEY,
     public_id VARCHAR(510) UNIQUE NOT NULL,
+    file TEXT NOT NULL,
     file_directory TEXT NOT NULL,
     file_mime_type VARCHAR(100) NOT NULL,
     file_extension VARCHAR(3) NOT NULL,

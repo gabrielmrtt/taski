@@ -20,7 +20,15 @@ func NewDeleteUserService(
 	}
 }
 
-func (s *DeleteUserService) Execute(userIdentity core.Identity) error {
+type DeleteUserInput struct {
+	UserIdentity core.Identity
+}
+
+func (i DeleteUserInput) Validate() error {
+	return nil
+}
+
+func (s *DeleteUserService) Execute(input DeleteUserInput) error {
 	tx, err := s.TransactionRepository.BeginTransaction()
 	if err != nil {
 		return core.NewInternalError(err.Error())
@@ -29,7 +37,7 @@ func (s *DeleteUserService) Execute(userIdentity core.Identity) error {
 	s.UserRepository.SetTransaction(tx)
 
 	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: userIdentity,
+		Identity: input.UserIdentity,
 		Include:  map[string]any{},
 	})
 
