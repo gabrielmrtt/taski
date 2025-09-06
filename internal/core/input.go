@@ -1,6 +1,6 @@
 package core
 
-type FileUploadInput struct {
+type FileInput struct {
 	FileName     string
 	FileContent  []byte
 	FileMimeType string

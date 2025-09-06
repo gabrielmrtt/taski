@@ -15,7 +15,7 @@ type UpdateUserDataRequest struct {
 }
 
 func (r *UpdateUserDataRequest) ToInput() user_services.UpdateUserDataInput {
-	var profilePicture *core.FileUploadInput
+	var profilePicture *core.FileInput
 
 	if r.ProfilePicture != nil {
 		file, err := r.ProfilePicture.Open()
@@ -30,7 +30,7 @@ func (r *UpdateUserDataRequest) ToInput() user_services.UpdateUserDataInput {
 			return user_services.UpdateUserDataInput{}
 		}
 
-		profilePicture = &core.FileUploadInput{
+		profilePicture = &core.FileInput{
 			FileName:     r.ProfilePicture.Filename,
 			FileContent:  content,
 			FileMimeType: r.ProfilePicture.Header.Get("Content-Type"),

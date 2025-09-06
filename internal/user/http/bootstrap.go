@@ -2,6 +2,8 @@ package user_http
 
 import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
+	storage_database_local "github.com/gabrielmrtt/taski/internal/storage/database/local"
+	storage_database_postgres "github.com/gabrielmrtt/taski/internal/storage/database/postgres"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	user_services "github.com/gabrielmrtt/taski/internal/user/services"
 	"github.com/gin-gonic/gin"
@@ -12,6 +14,8 @@ func BootstrapControllers(g *gin.RouterGroup) {
 	userRegistrationRepository := user_database_postgres.NewUserRegistrationPostgresRepository()
 	passwordRecoveryRepository := user_database_postgres.NewPasswordRecoveryPostgresRepository()
 	transactionRepository := core_database_postgres.NewTransactionPostgresRepository()
+	uploadedFileRepository := storage_database_postgres.NewUploadedFilePostgresRepository()
+	storageRepository := storage_database_local.NewLocalStorageRepository()
 
 	userLoginService := user_services.NewUserLoginService(userRepository)
 	registerUserService := user_services.NewRegisterUserService(userRepository, userRegistrationRepository, transactionRepository)
@@ -21,7 +25,7 @@ func BootstrapControllers(g *gin.RouterGroup) {
 	getMeService := user_services.NewGetMeService(userRepository)
 	changeUserPasswordService := user_services.NewChangeUserPasswordService(userRepository, transactionRepository)
 	updateUserCredentialsService := user_services.NewUpdateUserCredentialsService(userRepository, transactionRepository)
-	updateUserDataService := user_services.NewUpdateUserDataService(userRepository, transactionRepository)
+	updateUserDataService := user_services.NewUpdateUserDataService(userRepository, transactionRepository, uploadedFileRepository, storageRepository)
 	deleteUserService := user_services.NewDeleteUserService(userRepository, transactionRepository)
 
 	userController := NewUserController(getMeService, changeUserPasswordService, updateUserCredentialsService, updateUserDataService, deleteUserService)

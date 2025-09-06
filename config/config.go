@@ -48,6 +48,7 @@ func loadConfig() *Config {
 	cfg.MailPassword = os.Getenv("MAIL_PASSWORD")
 	cfg.MailFrom = os.Getenv("MAIL_FROM")
 	cfg.JwtSecret = os.Getenv("JWT_SECRET")
+	cfg.StorageLocalBasePath = os.Getenv("STORAGE_LOCAL_BASE_PATH")
 	expirationMinutes, err := strconv.ParseInt(os.Getenv("JWT_EXPIRATION_MINUTES"), 10, 64)
 	if err != nil {
 		panic(fmt.Errorf("failed to parse JWT_EXPIRATION_TIME: %w", err))

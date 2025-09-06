@@ -5,28 +5,36 @@ import (
 	"strings"
 
 	"github.com/gabrielmrtt/taski/internal/core"
+	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	storage_services "github.com/gabrielmrtt/taski/internal/storage/services"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
 )
 
 type UpdateUserDataService struct {
-	UserRepository        user_core.UserRepository
-	TransactionRepository core.TransactionRepository
+	UserRepository         user_core.UserRepository
+	TransactionRepository  core.TransactionRepository
+	UploadedFileRepository storage_core.UploadedFileRepository
+	StorageRepository      storage_core.StorageRepository
 }
 
 func NewUpdateUserDataService(
 	userRepository user_core.UserRepository,
 	transactionRepository core.TransactionRepository,
+	uploadedFileRepository storage_core.UploadedFileRepository,
+	storageRepository storage_core.StorageRepository,
 ) *UpdateUserDataService {
 	return &UpdateUserDataService{
-		UserRepository:        userRepository,
-		TransactionRepository: transactionRepository,
+		UserRepository:         userRepository,
+		TransactionRepository:  transactionRepository,
+		UploadedFileRepository: uploadedFileRepository,
+		StorageRepository:      storageRepository,
 	}
 }
 
 type UpdateUserDataInput struct {
 	DisplayName    *string
 	About          *string
-	ProfilePicture *core.FileUploadInput
+	ProfilePicture *core.FileInput
 }
 
 func (i UpdateUserDataInput) Validate() error {
@@ -53,7 +61,7 @@ func (i UpdateUserDataInput) Validate() error {
 	}
 
 	if i.ProfilePicture != nil {
-		acceptedMimeTypes := []string{"image/png", "image/jpeg"}
+		acceptedMimeTypes := storage_core.GetSupportedImageMimeTypes()
 
 		if !slices.Contains(acceptedMimeTypes, i.ProfilePicture.FileMimeType) {
 			fields = append(fields, core.InvalidInputErrorField{
@@ -113,6 +121,28 @@ func (s *UpdateUserDataService) Execute(userIdentity core.Identity, input Update
 			tx.Rollback()
 			return core.NewInternalError(err.Error())
 		}
+	}
+
+	if input.ProfilePicture != nil {
+		uploadedFile, err := storage_services.NewUploadFileService(s.UploadedFileRepository, s.StorageRepository).Execute(storage_services.UploadFileInput{
+			File:       *input.ProfilePicture,
+			Directory:  "users/" + userIdentity.Internal.String() + "/profile_picture",
+			UploadedBy: userIdentity,
+		})
+
+		if err != nil {
+			tx.Rollback()
+			return core.NewInternalError(err.Error())
+		}
+
+		if uploadedFile == nil {
+			tx.Rollback()
+			return core.NewInternalError("failed to upload file")
+		}
+
+		user.ChangeUserDataProfilePicture(&uploadedFile.Identity)
+	} else {
+		storage_services.NewDeleteFileByIdentityService(s.UploadedFileRepository, s.StorageRepository).Execute(userIdentity)
 	}
 
 	err = s.UserRepository.UpdateUser(user)
