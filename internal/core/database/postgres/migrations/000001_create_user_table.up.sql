@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS user_credentials (
     password VARCHAR(510) NOT NULL,
     phone_number VARCHAR(30),
 
-    CONSTRAINT fk_user_credentials_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+    CONSTRAINT fk_user_credentials_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_data (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS user_data (
     about VARCHAR(510),
     profile_picture_internal_id UUID,
 
-    CONSTRAINT fk_user_data_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+    CONSTRAINT fk_user_data_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_registration (
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS user_registration (
     registered_at BIGINT NOT NULL,
     verified_at BIGINT,
 
-    CONSTRAINT fk_user_registration_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+    CONSTRAINT fk_user_registration_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS password_recovery (
@@ -47,5 +47,5 @@ CREATE TABLE IF NOT EXISTS password_recovery (
     expires_at BIGINT NOT NULL,
     requested_at BIGINT NOT NULL,
 
-    CONSTRAINT fk_password_recovery_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id)
+    CONSTRAINT fk_password_recovery_user FOREIGN KEY (user_internal_id) REFERENCES users(internal_id) ON DELETE CASCADE
 );

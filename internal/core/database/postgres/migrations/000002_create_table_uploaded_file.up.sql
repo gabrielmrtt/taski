@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS uploaded_file (
     user_uploaded_by_internal_id UUID NOT NULL,
     uploaded_at BIGINT NOT NULL,
 
-    CONSTRAINT fk_uploaded_file_user_uploaded_by FOREIGN KEY (user_uploaded_by_internal_id) REFERENCES users(internal_id)
+    CONSTRAINT fk_uploaded_file_user_uploaded_by FOREIGN KEY (user_uploaded_by_internal_id) REFERENCES users(internal_id) ON DELETE CASCADE
 );
