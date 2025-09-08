@@ -39,10 +39,15 @@ func UserToDto(user *User) *UserDto {
 	}
 
 	if user.Data != nil {
+		var profilePicturePublicId *string
+		if user.Data.ProfilePictureIdentity != nil {
+			profilePicturePublicId = &user.Data.ProfilePictureIdentity.Public
+		}
+
 		userDataDto = &UserDataDto{
 			DisplayName:            user.Data.DisplayName,
 			About:                  user.Data.About,
-			ProfilePicturePublicId: &user.Data.ProfilePictureIdentity.Public,
+			ProfilePicturePublicId: profilePicturePublicId,
 		}
 	}
 

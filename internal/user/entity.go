@@ -74,7 +74,7 @@ func NewUser(input NewUserInput) (*User, error) {
 		return nil, err
 	}
 
-	identity := core.NewIdentity("user")
+	identity := core.NewIdentity("usr")
 
 	now := datetimeutils.EpochNow()
 

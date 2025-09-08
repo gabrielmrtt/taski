@@ -32,9 +32,10 @@ func NewPermission(input NewPermissionInput) (*Permission, error) {
 type Role struct {
 	Identity             core.Identity
 	Name                 string
+	Slug                 string
 	Description          string
 	Permissions          []Permission
-	OrganizationIdentity core.Identity
+	OrganizationIdentity *core.Identity
 	UserCreatorIdentity  *core.Identity
 	UserEditorIdentity   *core.Identity
 	IsSystemDefault      bool
@@ -46,7 +47,7 @@ type NewRoleInput struct {
 	Name                 string
 	Description          string
 	Permissions          []Permission
-	OrganizationIdentity core.Identity
+	OrganizationIdentity *core.Identity
 	UserCreatorIdentity  *core.Identity
 	IsSystemDefault      bool
 }

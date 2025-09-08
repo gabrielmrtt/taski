@@ -54,7 +54,7 @@ func (u *UserTable) ToEntity() *user_core.User {
 	}
 
 	return &user_core.User{
-		Identity:    core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "user"),
+		Identity:    core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "usr"),
 		Status:      user_core.UserStatuses(u.Status),
 		Credentials: userCredentials,
 		Data:        userData,

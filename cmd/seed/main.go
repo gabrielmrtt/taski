@@ -20,4 +20,8 @@ func main() {
 	permissionSeeder := seeders.NewPermissionSeeder(role_database_postgres.NewPermissionPostgresRepository())
 
 	runSeeder(permissionSeeder.Run, "permissions")
+
+	rolesSeeder := seeders.NewRolesSeeder(role_database_postgres.NewRolePostgresRepository(), role_database_postgres.NewPermissionPostgresRepository())
+
+	runSeeder(rolesSeeder.Run, "roles")
 }

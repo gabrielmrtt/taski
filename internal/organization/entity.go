@@ -33,7 +33,7 @@ func NewOrganization(input NewOrganizationInput) (*Organization, error) {
 	now := datetimeutils.EpochNow()
 
 	return &Organization{
-		Identity:            core.NewIdentity("organization"),
+		Identity:            core.NewIdentity("org"),
 		Name:                input.Name,
 		Status:              OrganizationStatusActive,
 		UserCreatorIdentity: input.UserCreatorIdentity,

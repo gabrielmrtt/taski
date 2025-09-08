@@ -26,7 +26,7 @@ type PasswordRecoveryTable struct {
 func (p *PasswordRecoveryTable) ToEntity() *user_core.PasswordRecovery {
 	return &user_core.PasswordRecovery{
 		Identity:     core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), "password_recovery"),
-		UserIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.UserInternalId), "user"),
+		UserIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.UserInternalId), "usr"),
 		Token:        p.Token,
 		Status:       user_core.PasswordRecoveryStatuses(p.Status),
 		RecoveredAt:  p.RecoveredAt,

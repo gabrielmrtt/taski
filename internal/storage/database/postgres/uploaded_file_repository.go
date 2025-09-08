@@ -34,7 +34,7 @@ func (u *UploadedFileTable) ToEntity() *storage_core.UploadedFile {
 		FileDirectory:          &u.FileDirectory,
 		FileMimeType:           &u.FileMimeType,
 		FileExtension:          &u.FileExtension,
-		UserUploadedByIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserUploadedByInternalId), "user"),
+		UserUploadedByIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserUploadedByInternalId), "usr"),
 		UploadedAt:             u.UploadedAt,
 	}
 }

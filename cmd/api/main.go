@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gabrielmrtt/taski/config"
+	organization_http "github.com/gabrielmrtt/taski/internal/organization/http"
+	role_http "github.com/gabrielmrtt/taski/internal/role/http"
 	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
 	user_http "github.com/gabrielmrtt/taski/internal/user/http"
 	"github.com/gin-gonic/gin"
@@ -22,6 +24,8 @@ func bootstrapApplication() {
 	{
 		user_http.BootstrapControllers(g)
 		storage_http.BootstrapControllers(g)
+		organization_http.BootstrapControllers(g)
+		role_http.BootstrapControllers(g)
 	}
 
 	engine.Run(fmt.Sprintf(":%s", appPort))

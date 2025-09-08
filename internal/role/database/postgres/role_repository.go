@@ -14,19 +14,20 @@ import (
 type RoleTable struct {
 	bun.BaseModel `bun:"table:roles,alias:roles"`
 
-	InternalId             string `bun:"internal_id,pk,notnull,type:uuid"`
-	PublicId               string `bun:"public_id,notnull,type:varchar(510)"`
-	Name                   string `bun:"name,notnull,type:varchar(255)"`
-	Description            string `bun:"description,type:varchar(510)"`
-	OrganizationInternalId string `bun:"organization_internal_id,notnull,type:uuid"`
-	UserCreatorInternalId  string `bun:"user_creator_internal_id,type:uuid"`
-	UserEditorInternalId   string `bun:"user_editor_internal_id,type:uuid"`
-	IsSystemDefault        bool   `bun:"is_system_default,notnull,type:boolean"`
-	CreatedAt              int64  `bun:"created_at,notnull,type:bigint"`
-	UpdatedAt              *int64 `bun:"updated_at,type:bigint"`
-	DeletedAt              *int64 `bun:"deleted_at,type:bigint"`
+	InternalId             string  `bun:"internal_id,pk,notnull,type:uuid"`
+	PublicId               string  `bun:"public_id,notnull,type:varchar(510)"`
+	Name                   string  `bun:"name,notnull,type:varchar(255)"`
+	Slug                   string  `bun:"slug,notnull,type:varchar(255)"`
+	Description            string  `bun:"description,type:varchar(510)"`
+	OrganizationInternalId *string `bun:"organization_internal_id,type:uuid"`
+	UserCreatorInternalId  *string `bun:"user_creator_internal_id,type:uuid"`
+	UserEditorInternalId   *string `bun:"user_editor_internal_id,type:uuid"`
+	IsSystemDefault        bool    `bun:"is_system_default,notnull,type:boolean"`
+	CreatedAt              int64   `bun:"created_at,notnull,type:bigint"`
+	UpdatedAt              *int64  `bun:"updated_at,type:bigint"`
+	DeletedAt              *int64  `bun:"deleted_at,type:bigint"`
 
-	RolePermission *RolePermissionTable `bun:"rel:has-many,join:internal_id=role_internal_id"`
+	RolePermission []*RolePermissionTable `bun:"rel:has-many,join:internal_id=role_internal_id"`
 }
 
 func (r *RoleTable) ToEntity() *role_core.Role {
@@ -34,21 +35,27 @@ func (r *RoleTable) ToEntity() *role_core.Role {
 	var userCreatorIdentity *core.Identity
 	var userEditorIdentity *core.Identity
 
-	if r.UserCreatorInternalId != "" {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(r.UserCreatorInternalId), "user")
+	if r.UserCreatorInternalId != nil {
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserCreatorInternalId), "usr")
 		userCreatorIdentity = &identity
 	}
 
-	if r.UserEditorInternalId != "" {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(r.UserEditorInternalId), "user")
+	if r.UserEditorInternalId != nil {
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserEditorInternalId), "usr")
 		userEditorIdentity = &identity
+	}
+
+	var organizationIdentity *core.Identity
+	if r.OrganizationInternalId != nil {
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.OrganizationInternalId), "organization")
+		organizationIdentity = &identity
 	}
 
 	return &role_core.Role{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(r.InternalId), "role"),
 		Name:                 r.Name,
 		Description:          r.Description,
-		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(r.OrganizationInternalId), "organization"),
+		OrganizationIdentity: organizationIdentity,
 		UserCreatorIdentity:  userCreatorIdentity,
 		UserEditorIdentity:   userEditorIdentity,
 		IsSystemDefault:      r.IsSystemDefault,
@@ -63,10 +70,10 @@ func (r *RoleTable) ToEntity() *role_core.Role {
 type RolePermissionTable struct {
 	bun.BaseModel `bun:"table:role_permission,alias:role_permission"`
 
-	RoleInternalId string `bun:"role_internal_id,notnull,type:uuid"`
-	PermissionSlug string `bun:"permission_slug,notnull,type:varchar(510)"`
+	RoleInternalId       string `bun:"role_internal_id,pk,notnull,type:uuid"`
+	PermissionInternalId string `bun:"permission_internal_id,pk,notnull,type:uuid"`
 
-	Permission *PermissionTable `bun:"rel:has-one,join:permission_slug=slug"`
+	Permission *PermissionTable `bun:"rel:has-one,join:permission_internal_id=internal_id"`
 }
 
 func (r *RolePermissionTable) ToEntity() *role_core.Permission {
@@ -92,6 +99,8 @@ func (r *RolePostgresRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *RolePostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters role_core.RoleFilters) *bun.SelectQuery {
+	selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+
 	if filters.Name != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "name", filters.Name)
 	}
@@ -135,6 +144,52 @@ func (r *RolePostgresRepository) GetRoleByIdentity(params role_core.GetRoleByIde
 		}
 
 		return nil, err
+	}
+
+	return role.ToEntity(), nil
+}
+
+func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params role_core.GetRoleByIdentityAndOrganizationIdentityParams) (*role_core.Role, error) {
+	var role RoleTable
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&role).Relation("RolePermission.Permission").Where("internal_id = ? AND organization_internal_id = ?", params.Identity.Internal.String(), params.OrganizationIdentity.Internal.String())
+
+	err := selectQuery.Scan(context.Background())
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+	}
+
+	return role.ToEntity(), nil
+}
+
+func (r *RolePostgresRepository) GetSystemDefaultRole(params role_core.GetDefaultRoleParams) (*role_core.Role, error) {
+	var role RoleTable
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&role).Where("slug = ? AND is_system_default = TRUE", params.Slug)
+
+	err := selectQuery.Scan(context.Background())
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 	}
 
 	return role.ToEntity(), nil
@@ -246,14 +301,33 @@ func (r *RolePostgresRepository) StoreRole(role *role_core.Role) (*role_core.Rol
 		}
 	}
 
+	var organizationInternalId *string
+	if role.OrganizationIdentity != nil {
+		identity := role.OrganizationIdentity.Internal.String()
+		organizationInternalId = &identity
+	}
+
+	var userCreatorInternalId *string
+	if role.UserCreatorIdentity != nil {
+		identity := role.UserCreatorIdentity.Internal.String()
+		userCreatorInternalId = &identity
+	}
+
+	var userEditorInternalId *string
+	if role.UserEditorIdentity != nil {
+		identity := role.UserEditorIdentity.Internal.String()
+		userEditorInternalId = &identity
+	}
+
 	roleTable := &RoleTable{
 		InternalId:             role.Identity.Internal.String(),
 		PublicId:               role.Identity.Public,
 		Name:                   role.Name,
+		Slug:                   role.Slug,
 		Description:            role.Description,
-		OrganizationInternalId: role.OrganizationIdentity.Internal.String(),
-		UserCreatorInternalId:  role.UserCreatorIdentity.Internal.String(),
-		UserEditorInternalId:   role.UserEditorIdentity.Internal.String(),
+		OrganizationInternalId: organizationInternalId,
+		UserCreatorInternalId:  userCreatorInternalId,
+		UserEditorInternalId:   userEditorInternalId,
 		IsSystemDefault:        role.IsSystemDefault,
 		CreatedAt:              *role.Timestamps.CreatedAt,
 		UpdatedAt:              role.Timestamps.UpdatedAt,
@@ -268,8 +342,8 @@ func (r *RolePostgresRepository) StoreRole(role *role_core.Role) (*role_core.Rol
 
 	for _, permission := range role.Permissions {
 		permissionTable := &RolePermissionTable{
-			RoleInternalId: roleTable.InternalId,
-			PermissionSlug: permission.Slug,
+			RoleInternalId:       roleTable.InternalId,
+			PermissionInternalId: permission.Identity.Internal.String(),
 		}
 
 		_, err = tx.NewInsert().Model(permissionTable).Exec(context.Background())
@@ -305,14 +379,33 @@ func (r *RolePostgresRepository) UpdateRole(role *role_core.Role) error {
 		}
 	}
 
+	var organizationInternalId *string
+	if role.OrganizationIdentity != nil {
+		identity := role.OrganizationIdentity.Internal.String()
+		organizationInternalId = &identity
+	}
+
+	var userCreatorInternalId *string
+	if role.UserCreatorIdentity != nil {
+		identity := role.UserCreatorIdentity.Internal.String()
+		userCreatorInternalId = &identity
+	}
+
+	var userEditorInternalId *string
+	if role.UserEditorIdentity != nil {
+		identity := role.UserEditorIdentity.Internal.String()
+		userEditorInternalId = &identity
+	}
+
 	roleTable := &RoleTable{
 		InternalId:             role.Identity.Internal.String(),
 		PublicId:               role.Identity.Public,
 		Name:                   role.Name,
+		Slug:                   role.Slug,
 		Description:            role.Description,
-		OrganizationInternalId: role.OrganizationIdentity.Internal.String(),
-		UserCreatorInternalId:  role.UserCreatorIdentity.Internal.String(),
-		UserEditorInternalId:   role.UserEditorIdentity.Internal.String(),
+		OrganizationInternalId: organizationInternalId,
+		UserCreatorInternalId:  userCreatorInternalId,
+		UserEditorInternalId:   userEditorInternalId,
 		IsSystemDefault:        role.IsSystemDefault,
 		CreatedAt:              *role.Timestamps.CreatedAt,
 		UpdatedAt:              role.Timestamps.UpdatedAt,
@@ -336,8 +429,8 @@ func (r *RolePostgresRepository) UpdateRole(role *role_core.Role) error {
 
 		for _, permission := range role.Permissions {
 			permissionTable := &RolePermissionTable{
-				RoleInternalId: roleTable.InternalId,
-				PermissionSlug: permission.Slug,
+				RoleInternalId:       roleTable.InternalId,
+				PermissionInternalId: permission.Identity.Internal.String(),
 			}
 
 			_, err = tx.NewInsert().Model(permissionTable).Exec(context.Background())
@@ -392,4 +485,59 @@ func (r *RolePostgresRepository) DeleteRole(roleIdentity core.Identity) error {
 	}
 
 	return nil
+}
+
+func (r *RolePostgresRepository) ChangeRoleUsersToDefault(roleIdentity core.Identity, roleSlug string) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	defaultRole, err := r.GetSystemDefaultRole(role_core.GetDefaultRoleParams{
+		Slug: roleSlug,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NewRaw("UPDATE organization_user SET role_internal_id = ? WHERE role_internal_id = ?", defaultRole.Identity.Internal.String(), roleIdentity.Internal.String()).Exec(context.Background())
+
+	if err != nil {
+		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *RolePostgresRepository) CheckIfOrganizatonHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error) {
+	var count int
+
+	err := r.db.NewRaw(
+		"SELECT COUNT(*) FROM organization_user WHERE organization_internal_id = ? and user_internal_id = ?",
+		organizationIdentity.Internal.String(),
+		userIdentity.Internal.String(),
+	).Scan(context.Background(), &count)
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }

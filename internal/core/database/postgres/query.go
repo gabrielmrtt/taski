@@ -10,7 +10,7 @@ import (
 func ApplyComparableFilter[T any](query *bun.SelectQuery, field string, filter *core.ComparableFilter[T]) *bun.SelectQuery {
 	if filter.Equals != nil {
 		if filter.Negate != nil {
-			query.Where(fmt.Sprintf("%s != ?", field), filter.Negate)
+			query.Where(fmt.Sprintf("%s != ?", field), filter.Equals)
 		} else {
 			query.Where(fmt.Sprintf("%s = ?", field), filter.Equals)
 		}
