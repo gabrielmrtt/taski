@@ -141,7 +141,7 @@ func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) {
 	g := group.Group("/organization")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
-		g.Use(organization_http_middlewares.OrganizationMiddleware())
+		g.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
 
 		g.GET("", c.ListOrganizations)
 		g.GET("/:organization_id", c.GetOrganization)

@@ -128,7 +128,7 @@ func (c *RoleController) ConfigureRoutes(group *gin.RouterGroup) {
 	orgGroup := group.Group("/organization/:organization_id")
 	{
 		orgGroup.Use(user_http_middlewares.AuthMiddleware())
-		orgGroup.Use(organization_http_middlewares.OrganizationMiddleware())
+		orgGroup.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
 		g := orgGroup.Group("/role")
 		{
 			g.GET("", c.ListRoles)

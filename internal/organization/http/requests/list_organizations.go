@@ -43,6 +43,7 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 				Equals: &status,
 			},
 		},
+		ShowDeleted: false,
 		Pagination: &core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,

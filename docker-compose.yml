@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 
 services:
   app:
@@ -14,9 +14,12 @@ services:
     volumes:
       - .:/usr/src/app
     depends_on:
-      - db
-      - redis
-      - mailhog
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mailhog:
+        condition: service_started
   db:
     image: 'postgres:latest'
     container_name: 'taski_db'
@@ -28,6 +31,11 @@ services:
       POSTGRES_DB: taski
       POSTGRES_USER: taski_admin
       POSTGRES_PASSWORD: 123456
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taski_admin -d taski -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   redis:
     image: 'redis:latest'
     container_name: 'taski_redis'

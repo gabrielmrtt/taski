@@ -69,6 +69,10 @@ func NewIdentityFromPublic(publicId string) Identity {
 	}
 }
 
+func (i Identity) Equals(_i Identity) bool {
+	return i.Public == _i.Public && i.Internal == _i.Internal
+}
+
 type Name struct {
 	Value string
 }

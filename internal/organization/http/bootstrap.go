@@ -20,8 +20,14 @@ func BootstrapControllers(g *gin.RouterGroup) {
 	listOrganizationsService := organization_services.NewListOrganizationsService(organizationRepository)
 	updateOrganizationService := organization_services.NewUpdateOrganizationService(organizationRepository, transactionRepository)
 	deleteOrganizationService := organization_services.NewDeleteOrganizationService(organizationRepository, transactionRepository)
+	inviteUserToOrganizationService := organization_services.NewInviteUserToOrganizationService(organizationRepository, userRepository, roleRepository, transactionRepository)
+	removeUserFromOrganizationService := organization_services.NewRemoveUserFromOrganizationService(organizationRepository, userRepository, transactionRepository)
+	acceptOrganizationUserInvitationService := organization_services.NewAcceptOrganizationUserInvitationService(organizationRepository, userRepository, transactionRepository)
+	refuseOrganizationUserInvitationService := organization_services.NewRefuseOrganizationUserInvitationService(organizationRepository, userRepository, transactionRepository)
 
 	organizationController := NewOrganizationController(listOrganizationsService, getOrganizationService, createOrganizationService, updateOrganizationService, deleteOrganizationService)
+	organizationUserController := NewOrganizationUserController(inviteUserToOrganizationService, removeUserFromOrganizationService, acceptOrganizationUserInvitationService, refuseOrganizationUserInvitationService)
 
 	organizationController.ConfigureRoutes(g)
+	organizationUserController.ConfigureRoutes(g)
 }

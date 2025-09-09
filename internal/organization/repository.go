@@ -35,10 +35,11 @@ type ListOrganizationUsersParams struct {
 }
 
 type PaginateOrganizationsParams struct {
-	Filters    OrganizationFilters
-	Include    map[string]any
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	Filters     OrganizationFilters
+	ShowDeleted bool
+	Include     map[string]any
+	SortInput   *core.SortInput
+	Pagination  *core.PaginationInput
 }
 
 type PaginateOrganizationUsersParams struct {
@@ -59,12 +60,13 @@ type OrganizationRepository interface {
 	UpdateOrganization(organization *Organization) error
 	DeleteOrganization(identity core.Identity) error
 
+	GetOrganizationUserByIdentity(organizationIdentity core.Identity, userIdentity core.Identity) (*OrganizationUser, error)
 	ListOrganizationUsersBy(filters ListOrganizationUsersParams) (*[]OrganizationUser, error)
 	PaginateOrganizationUsersBy(params PaginateOrganizationUsersParams) (*core.PaginationOutput[OrganizationUser], error)
 
 	CreateOrganizationUser(organizationUser *OrganizationUser) (*OrganizationUser, error)
 	UpdateOrganizationUser(organizationUser *OrganizationUser) error
-	DeleteOrganizationUser(identity core.Identity) error
+	DeleteOrganizationUser(organizationIdentity core.Identity, userIdentity core.Identity) error
 
 	CheckIfOrganizationHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error)
 }

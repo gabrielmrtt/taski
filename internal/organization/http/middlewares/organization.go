@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func OrganizationMiddleware() gin.HandlerFunc {
+func BlockIfUserIsNotPartOfOrganization() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		organizationId := ctx.Param("organization_id")
 
@@ -32,6 +32,47 @@ func OrganizationMiddleware() gin.HandlerFunc {
 
 		if !hasUser {
 			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
+			ctx.Abort()
+			return
+		}
+
+		ctx.Next()
+	}
+}
+
+func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		organizationId := ctx.Param("organization_id")
+		userId := ctx.Param("user_id")
+		authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
+
+		if organizationId == "" || userId == "" {
+			ctx.Next()
+			return
+		}
+
+		organizationIdentity := core.NewIdentityFromPublic(organizationId)
+
+		repo := organization_database_postgres.NewOrganizationPostgresRepository()
+
+		hasUser, err := repo.CheckIfOrganizationHasUser(organizationIdentity, authenticatedUserIdentity)
+
+		if err != nil {
+			core_http.NewHttpErrorResponse(ctx, err)
+			ctx.Abort()
+			return
+		}
+
+		if !hasUser {
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
+			ctx.Abort()
+			return
+		}
+
+		userIdentity := core.NewIdentityFromPublic(userId)
+
+		if !userIdentity.Equals(authenticatedUserIdentity) {
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not the same as the authenticated user"))
 			ctx.Abort()
 			return
 		}

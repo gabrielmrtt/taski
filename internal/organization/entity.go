@@ -81,6 +81,8 @@ type OrganizationUserStatuses string
 const (
 	OrganizationUserStatusActive   OrganizationUserStatuses = "active"
 	OrganizationUserStatusInactive OrganizationUserStatuses = "inactive"
+	OrganizationUserStatusInvited  OrganizationUserStatuses = "invited"
+	OrganizationUserStatusRefused  OrganizationUserStatuses = "refused"
 )
 
 type OrganizationUser struct {
@@ -120,4 +122,20 @@ func (o *OrganizationUser) IsActive() bool {
 
 func (o *OrganizationUser) IsInactive() bool {
 	return o.Status == OrganizationUserStatusInactive
+}
+
+func (o *OrganizationUser) IsInvited() bool {
+	return o.Status == OrganizationUserStatusInvited
+}
+
+func (o *OrganizationUser) Invite() {
+	o.Status = OrganizationUserStatusInvited
+}
+
+func (o *OrganizationUser) AcceptInvitation() {
+	o.Status = OrganizationUserStatusActive
+}
+
+func (o *OrganizationUser) RefuseInvitation() {
+	o.Status = OrganizationUserStatusRefused
 }

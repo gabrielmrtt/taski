@@ -224,6 +224,10 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	selectQuery = selectQuery.Model(&organizations)
 	selectQuery = r.applyOrganizationFilters(selectQuery, params.Filters)
 
+	if !params.ShowDeleted {
+		selectQuery = selectQuery.Where("deleted_at IS NULL")
+	}
+
 	countBeforePagination, err := selectQuery.Count(context.Background())
 
 	if err != nil {
@@ -238,7 +242,7 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 		return nil, err
 	}
 
-	var organizationEntities []organization_core.Organization
+	var organizationEntities []organization_core.Organization = []organization_core.Organization{}
 
 	for _, organization := range organizations {
 		organizationEntities = append(organizationEntities, *organization.ToEntity())
@@ -465,7 +469,7 @@ func (r *OrganizationPostgresRepository) UpdateOrganizationUser(organizationUser
 	return nil
 }
 
-func (r *OrganizationPostgresRepository) DeleteOrganizationUser(organizationUserIdentity core.Identity) error {
+func (r *OrganizationPostgresRepository) DeleteOrganizationUser(organizationIdentity core.Identity, userIdentity core.Identity) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -481,7 +485,7 @@ func (r *OrganizationPostgresRepository) DeleteOrganizationUser(organizationUser
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&OrganizationUserTable{}).Where("internal_id = ?", organizationUserIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&OrganizationUserTable{}).Where("organization_internal_id = ? and user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -500,9 +504,10 @@ func (r *OrganizationPostgresRepository) CheckIfOrganizationHasUser(organization
 	var count int
 
 	err := r.db.NewRaw(
-		"SELECT COUNT(*) FROM organization_user WHERE organization_internal_id = ? and user_internal_id = ?",
+		"SELECT COUNT(*) FROM organization_user WHERE organization_internal_id = ? and user_internal_id = ? AND status = ?",
 		organizationIdentity.Internal.String(),
 		userIdentity.Internal.String(),
+		organization_core.OrganizationUserStatusActive,
 	).Scan(context.Background(), &count)
 
 	if err != nil {
@@ -510,6 +515,27 @@ func (r *OrganizationPostgresRepository) CheckIfOrganizationHasUser(organization
 	}
 
 	return count > 0, nil
+}
+
+func (r *OrganizationPostgresRepository) GetOrganizationUserByIdentity(organizationIdentity core.Identity, userIdentity core.Identity) (*organization_core.OrganizationUser, error) {
+	var organizationUser OrganizationUserTable
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&organizationUser).Relation("User").Relation("Role").Relation("Organization").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_internal_id = ? and user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String())
+
+	err := selectQuery.Scan(context.Background())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return organizationUser.ToEntity(), nil
 }
 
 func (r *OrganizationPostgresRepository) ListOrganizationUsersBy(params organization_core.ListOrganizationUsersParams) (*[]organization_core.OrganizationUser, error) {

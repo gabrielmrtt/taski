@@ -1,10 +1,10 @@
 package core
 
 type PaginationOutput[T any] struct {
-	Data    []T
-	Page    int
-	HasMore bool
-	Total   int
+	Data    []T  `json:"data"`
+	Page    int  `json:"page"`
+	HasMore bool `json:"has_more"`
+	Total   int  `json:"total"`
 }
 
 func HasMorePages(currentPage int, totalItems int, perPage int) bool {
