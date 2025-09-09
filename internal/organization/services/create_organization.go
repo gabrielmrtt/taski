@@ -8,23 +8,26 @@ import (
 )
 
 type CreateOrganizationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
-	RoleRepository         role_core.RoleRepository
-	UserRepository         user_core.UserRepository
-	TransactionRepository  core.TransactionRepository
+	OrganizationRepository     organization_core.OrganizationRepository
+	OrganizationUserRepository organization_core.OrganizationUserRepository
+	RoleRepository             role_core.RoleRepository
+	UserRepository             user_core.UserRepository
+	TransactionRepository      core.TransactionRepository
 }
 
 func NewCreateOrganizationService(
 	organizationRepository organization_core.OrganizationRepository,
+	organizationUserRepository organization_core.OrganizationUserRepository,
 	roleRepository role_core.RoleRepository,
 	userRepository user_core.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateOrganizationService {
 	return &CreateOrganizationService{
-		OrganizationRepository: organizationRepository,
-		RoleRepository:         roleRepository,
-		UserRepository:         userRepository,
-		TransactionRepository:  transactionRepository,
+		OrganizationRepository:     organizationRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		RoleRepository:             roleRepository,
+		UserRepository:             userRepository,
+		TransactionRepository:      transactionRepository,
 	}
 }
 
@@ -62,6 +65,9 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 	}
 
 	s.OrganizationRepository.SetTransaction(tx)
+	s.OrganizationUserRepository.SetTransaction(tx)
+	s.RoleRepository.SetTransaction(tx)
+	s.UserRepository.SetTransaction(tx)
 
 	organization, err := organization_core.NewOrganization(organization_core.NewOrganizationInput{
 		Name:                input.Name,
@@ -115,7 +121,7 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, err
 	}
 
-	organizationUser, err = s.OrganizationRepository.CreateOrganizationUser(organizationUser)
+	organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organizationUser)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

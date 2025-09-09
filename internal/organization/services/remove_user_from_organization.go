@@ -7,20 +7,23 @@ import (
 )
 
 type RemoveUserFromOrganizationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
-	UserRepository         user_core.UserRepository
-	TransactionRepository  core.TransactionRepository
+	OrganizationRepository     organization_core.OrganizationRepository
+	OrganizationUserRepository organization_core.OrganizationUserRepository
+	UserRepository             user_core.UserRepository
+	TransactionRepository      core.TransactionRepository
 }
 
 func NewRemoveUserFromOrganizationService(
 	organizationRepository organization_core.OrganizationRepository,
+	organizationUserRepository organization_core.OrganizationUserRepository,
 	userRepository user_core.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *RemoveUserFromOrganizationService {
 	return &RemoveUserFromOrganizationService{
-		OrganizationRepository: organizationRepository,
-		UserRepository:         userRepository,
-		TransactionRepository:  transactionRepository,
+		OrganizationRepository:     organizationRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		UserRepository:             userRepository,
+		TransactionRepository:      transactionRepository,
 	}
 }
 
@@ -46,7 +49,7 @@ func (s *RemoveUserFromOrganizationService) Execute(input RemoveUserFromOrganiza
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organizationUser, err := s.OrganizationRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
 
 	if err != nil {
 		return err
@@ -56,7 +59,7 @@ func (s *RemoveUserFromOrganizationService) Execute(input RemoveUserFromOrganiza
 		return core.NewNotFoundError("organization user not found")
 	}
 
-	err = s.OrganizationRepository.DeleteOrganizationUser(input.OrganizationIdentity, input.UserIdentity)
+	err = s.OrganizationUserRepository.DeleteOrganizationUser(input.OrganizationIdentity, input.UserIdentity)
 	if err != nil {
 		return err
 	}

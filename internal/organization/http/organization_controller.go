@@ -137,16 +137,17 @@ func (c *OrganizationController) DeleteOrganization(ctx *gin.Context) {
 	return
 }
 
-func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) {
+func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
 	g := group.Group("/organization")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
-		g.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
 
-		g.GET("", c.ListOrganizations)
-		g.GET("/:organization_id", c.GetOrganization)
-		g.POST("", c.CreateOrganization)
-		g.PUT("/:organization_id", c.UpdateOrganization)
-		g.DELETE("/:organization_id", c.DeleteOrganization)
+		g.GET("", c.ListOrganizations).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+		g.GET("/:organization_id", c.GetOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+		g.POST("", c.CreateOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+		g.PUT("/:organization_id", c.UpdateOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+		g.DELETE("/:organization_id", c.DeleteOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
 	}
+
+	return g
 }

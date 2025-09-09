@@ -7,20 +7,23 @@ import (
 )
 
 type RefuseOrganizationUserInvitationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
-	UserRepository         user_core.UserRepository
-	TransactionRepository  core.TransactionRepository
+	OrganizationRepository     organization_core.OrganizationRepository
+	OrganizationUserRepository organization_core.OrganizationUserRepository
+	UserRepository             user_core.UserRepository
+	TransactionRepository      core.TransactionRepository
 }
 
 func NewRefuseOrganizationUserInvitationService(
 	organizationRepository organization_core.OrganizationRepository,
+	organizationUserRepository organization_core.OrganizationUserRepository,
 	userRepository user_core.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *RefuseOrganizationUserInvitationService {
 	return &RefuseOrganizationUserInvitationService{
-		OrganizationRepository: organizationRepository,
-		UserRepository:         userRepository,
-		TransactionRepository:  transactionRepository,
+		OrganizationRepository:     organizationRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		UserRepository:             userRepository,
+		TransactionRepository:      transactionRepository,
 	}
 }
 
@@ -46,7 +49,7 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organizationUser, err := s.OrganizationRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
 	if err != nil {
 		return err
 	}
@@ -57,7 +60,7 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 
 	organizationUser.RefuseInvitation()
 
-	err = s.OrganizationRepository.UpdateOrganizationUser(organizationUser)
+	err = s.OrganizationUserRepository.UpdateOrganizationUser(organizationUser)
 	if err != nil {
 		return err
 	}

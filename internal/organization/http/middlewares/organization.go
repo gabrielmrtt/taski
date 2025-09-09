@@ -20,9 +20,9 @@ func BlockIfUserIsNotPartOfOrganization() gin.HandlerFunc {
 		organizationIdentity := core.NewIdentityFromPublic(organizationId)
 		authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
-		repo := organization_database_postgres.NewOrganizationPostgresRepository()
+		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
 
-		hasUser, err := repo.CheckIfOrganizationHasUser(organizationIdentity, authenticatedUserIdentity)
+		orgUser, err := repo.GetOrganizationUserByIdentity(organizationIdentity, authenticatedUserIdentity)
 
 		if err != nil {
 			core_http.NewHttpErrorResponse(ctx, err)
@@ -30,7 +30,7 @@ func BlockIfUserIsNotPartOfOrganization() gin.HandlerFunc {
 			return
 		}
 
-		if !hasUser {
+		if orgUser == nil || !orgUser.IsActive() {
 			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
 			ctx.Abort()
 			return
@@ -53,9 +53,12 @@ func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
 
 		organizationIdentity := core.NewIdentityFromPublic(organizationId)
 
-		repo := organization_database_postgres.NewOrganizationPostgresRepository()
+		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
 
-		hasUser, err := repo.CheckIfOrganizationHasUser(organizationIdentity, authenticatedUserIdentity)
+		orgUser, err := repo.GetOrganizationUserByIdentity(
+			organizationIdentity,
+			authenticatedUserIdentity,
+		)
 
 		if err != nil {
 			core_http.NewHttpErrorResponse(ctx, err)
@@ -63,7 +66,7 @@ func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
 			return
 		}
 
-		if !hasUser {
+		if orgUser == nil {
 			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
 			ctx.Abort()
 			return

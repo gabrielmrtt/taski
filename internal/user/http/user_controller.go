@@ -128,13 +128,17 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *UserController) ConfigureRoutes(group *gin.RouterGroup) {
-	g := group.Group("/me").Use(user_http_middlewares.AuthMiddleware())
+func (c *UserController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
+	g := group.Group("/me")
 	{
+		g.Use(user_http_middlewares.AuthMiddleware())
+
 		g.GET("", c.GetMe)
 		g.PATCH("/password", c.ChangeUserPassword)
 		g.PUT("/credentials", c.UpdateUserCredentials)
 		g.PUT("/data", c.UpdateUserData)
 		g.DELETE("", c.DeleteUser)
 	}
+
+	return g
 }

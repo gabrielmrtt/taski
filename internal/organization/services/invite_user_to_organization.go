@@ -8,23 +8,26 @@ import (
 )
 
 type InviteUserToOrganizationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
-	UserRepository         user_core.UserRepository
-	RoleRepository         role_core.RoleRepository
-	TransactionRepository  core.TransactionRepository
+	OrganizationRepository     organization_core.OrganizationRepository
+	OrganizationUserRepository organization_core.OrganizationUserRepository
+	UserRepository             user_core.UserRepository
+	RoleRepository             role_core.RoleRepository
+	TransactionRepository      core.TransactionRepository
 }
 
 func NewInviteUserToOrganizationService(
 	organizationRepository organization_core.OrganizationRepository,
+	organizationUserRepository organization_core.OrganizationUserRepository,
 	userRepository user_core.UserRepository,
 	roleRepository role_core.RoleRepository,
 	transactionRepository core.TransactionRepository,
 ) *InviteUserToOrganizationService {
 	return &InviteUserToOrganizationService{
-		OrganizationRepository: organizationRepository,
-		UserRepository:         userRepository,
-		RoleRepository:         roleRepository,
-		TransactionRepository:  transactionRepository,
+		OrganizationRepository:     organizationRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		UserRepository:             userRepository,
+		RoleRepository:             roleRepository,
+		TransactionRepository:      transactionRepository,
 	}
 }
 
@@ -81,24 +84,23 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		return core.NewNotFoundError("role not found")
 	}
 
-	organizationUser, err := s.OrganizationRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, user.Identity)
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, user.Identity)
 	if err != nil {
 		return err
 	}
 
-	if organizationUser != nil {
+	if organizationUser == nil {
 		organizationUser, err := organization_core.NewOrganizationUser(organization_core.NewOrganizationUserInput{
 			OrganizationIdentity: input.OrganizationIdentity,
 			User:                 user,
 			Role:                 role,
 			Status:               organization_core.OrganizationUserStatusInvited,
 		})
-
 		if err != nil {
 			return err
 		}
 
-		organizationUser, err = s.OrganizationRepository.CreateOrganizationUser(organizationUser)
+		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organizationUser)
 		if err != nil {
 			return err
 		}

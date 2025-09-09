@@ -8,7 +8,6 @@ import (
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
 	organization_http_requests "github.com/gabrielmrtt/taski/internal/organization/http/requests"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
-	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,6 +34,12 @@ func NewOrganizationUserController(
 
 func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) {
 	var request organization_http_requests.InviteUserToOrganizationRequest
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 
 	input := request.ToInput()
@@ -107,15 +112,12 @@ func (c *OrganizationUserController) RefuseOrganizationUserInvitation(ctx *gin.C
 	return
 }
 
-func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) {
-	g := group.Group("/organization/:organization_id/user")
-	{
-		g.Use(user_http_middlewares.AuthMiddleware())
+func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
+	group.POST("/organization/:organization_id/user", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.InviteUserToOrganization)
+	group.DELETE("/organization/:organization_id/user/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.RemoveUserFromOrganization)
 
-		g.POST("/:user_id", c.InviteUserToOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g.DELETE("/:user_id", c.RemoveUserFromOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+	group.PATCH("/organization/:organization_id/user/:user_id/accept-invitation", organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser(), c.AcceptOrganizationUserInvitation)
+	group.PATCH("/organization/:organization_id/user/:user_id/refuse-invitation", organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser(), c.RefuseOrganizationUserInvitation)
 
-		g.PATCH("/:user_id/accept-invitation", c.AcceptOrganizationUserInvitation).Use(organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser())
-		g.PATCH("/:user_id/refuse-invitation", c.RefuseOrganizationUserInvitation).Use(organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser())
-	}
+	return group
 }

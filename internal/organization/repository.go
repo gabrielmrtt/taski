@@ -59,6 +59,10 @@ type OrganizationRepository interface {
 	StoreOrganization(organization *Organization) (*Organization, error)
 	UpdateOrganization(organization *Organization) error
 	DeleteOrganization(identity core.Identity) error
+}
+
+type OrganizationUserRepository interface {
+	SetTransaction(tx core.Transaction) error
 
 	GetOrganizationUserByIdentity(organizationIdentity core.Identity, userIdentity core.Identity) (*OrganizationUser, error)
 	ListOrganizationUsersBy(filters ListOrganizationUsersParams) (*[]OrganizationUser, error)
@@ -67,6 +71,4 @@ type OrganizationRepository interface {
 	CreateOrganizationUser(organizationUser *OrganizationUser) (*OrganizationUser, error)
 	UpdateOrganizationUser(organizationUser *OrganizationUser) error
 	DeleteOrganizationUser(organizationIdentity core.Identity, userIdentity core.Identity) error
-
-	CheckIfOrganizationHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error)
 }

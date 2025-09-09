@@ -18,8 +18,8 @@ type JwtClaims struct {
 
 func GetAuthenticatedUserIdentity(ctx *gin.Context) core.Identity {
 	authenticatedUserId := ctx.GetString("authenticated_user_id")
+
 	if authenticatedUserId == "" {
-		core_http.NewHttpErrorResponse(ctx, core.NewUnauthenticatedError("missing authenticated user id"))
 		return core.Identity{}
 	}
 
