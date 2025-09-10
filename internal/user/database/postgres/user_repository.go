@@ -241,7 +241,7 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
 
-	err = selectQuery.Scan(context.Background(), &users)
+	err = selectQuery.Scan(context.Background())
 
 	if err != nil {
 		if err == sql.ErrNoRows {

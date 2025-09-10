@@ -84,13 +84,15 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		return core.NewNotFoundError("role not found")
 	}
 
-	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, user.Identity)
+	var organizationUser *organization_core.OrganizationUser = nil
+
+	organizationUser, err = s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, user.Identity)
 	if err != nil {
 		return err
 	}
 
 	if organizationUser == nil {
-		organizationUser, err := organization_core.NewOrganizationUser(organization_core.NewOrganizationUserInput{
+		organizationUser, err = organization_core.NewOrganizationUser(organization_core.NewOrganizationUserInput{
 			OrganizationIdentity: input.OrganizationIdentity,
 			User:                 user,
 			Role:                 role,

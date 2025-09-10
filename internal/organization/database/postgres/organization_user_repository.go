@@ -159,9 +159,18 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organiz
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
 
-	err = selectQuery.Scan(context.Background(), &organizationUsers)
+	err = selectQuery.Scan(context.Background())
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &core.PaginationOutput[organization_core.OrganizationUser]{
+				Data:    []organization_core.OrganizationUser{},
+				Page:    page,
+				HasMore: false,
+				Total:   0,
+			}, nil
+		}
+
 		return nil, err
 	}
 

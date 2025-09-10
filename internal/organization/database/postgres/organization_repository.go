@@ -192,6 +192,15 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	err = selectQuery.Scan(context.Background(), &organizations)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &core.PaginationOutput[organization_core.Organization]{
+				Data:    []organization_core.Organization{},
+				Page:    page,
+				HasMore: false,
+				Total:   0,
+			}, nil
+		}
+
 		return nil, err
 	}
 
