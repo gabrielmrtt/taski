@@ -1,4 +1,298 @@
+definitions:
+  github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse:
+    properties:
+      errors: {}
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user.UserCredentialsDto:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user.UserDataDto:
+    properties:
+      about:
+        type: string
+      display_name:
+        type: string
+      profile_picture:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user.UserDto:
+    properties:
+      created_at:
+        type: string
+      credentials:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserCredentialsDto'
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDataDto'
+      id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user_http_requests.ForgotUserPasswordRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user_http_requests.RecoverUserPasswordRequest:
+    properties:
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      token:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user_http_requests.RegisterUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_user_http_requests.VerifyUserRegistrationRequest:
+    properties:
+      token:
+        type: string
+    type: object
+  internal_user_http.ForgotUserPasswordResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_user_http.GetMeResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_user_http.RecoverUserPasswordResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_user_http.RegisterUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_user_http.VerifyUserRegistrationResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /me:
+    get:
+      consumes:
+      - application/json
+      description: Get me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_user_http.GetMeResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get me
+      tags:
+      - User
+  /user-registration:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: Register User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_user_http.RegisterUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Register a new user
+      tags:
+      - User Registration
+  /user-registration/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Forgot user password
+      parameters:
+      - description: Forgot User Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.ForgotUserPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_user_http.ForgotUserPasswordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Forgot user password
+      tags:
+      - User Registration
+  /user-registration/recover-password:
+    post:
+      consumes:
+      - application/json
+      description: Recover user password
+      parameters:
+      - description: Recover User Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.RecoverUserPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_user_http.RecoverUserPasswordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Recover user password
+      tags:
+      - User Registration
+  /user-registration/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify user registration
+      parameters:
+      - description: Verify User Registration Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.VerifyUserRegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_user_http.VerifyUserRegistrationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Verify user registration
+      tags:
+      - User Registration
 swagger: "2.0"

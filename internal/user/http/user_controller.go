@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
 	user_http_requests "github.com/gabrielmrtt/taski/internal/user/http/requests"
 	user_services "github.com/gabrielmrtt/taski/internal/user/services"
@@ -34,6 +35,19 @@ func NewUserController(
 	}
 }
 
+type GetMeResponse = core_http.HttpSuccessResponseWithData[user_core.UserDto]
+
+// GetMe godoc
+// @Summary Get me
+// @Schemes
+// @Description Get me
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} GetMeResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /me [get]
 func (c *UserController) GetMe(ctx *gin.Context) {
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 

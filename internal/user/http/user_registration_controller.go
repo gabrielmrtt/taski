@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_http_requests "github.com/gabrielmrtt/taski/internal/user/http/requests"
 	user_services "github.com/gabrielmrtt/taski/internal/user/services"
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,21 @@ func NewUserRegistrationController(
 	}
 }
 
+type RegisterUserResponse = core_http.HttpSuccessResponseWithData[user_core.UserDto]
+
+// RegisterUser godoc
+// @Summary Register a new user
+// @Schemes
+// @Description Register a new user
+// @Tags User Registration
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.RegisterUserRequest true "Register User Request"
+// @Success 200 {object} RegisterUserResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 409 {object} core_http.HttpErrorResponse
+// @Router /user-registration [post]
 func (c *UserRegistrationController) RegisterUser(ctx *gin.Context) {
 	var request user_http_requests.RegisterUserRequest
 
@@ -47,6 +63,21 @@ func (c *UserRegistrationController) RegisterUser(ctx *gin.Context) {
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
+type VerifyUserRegistrationResponse = core_http.EmptyHttpSuccessResponse
+
+// VerifyUserRegistration godoc
+// @Summary Verify user registration
+// @Schemes
+// @Description Verify user registration
+// @Tags User Registration
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.VerifyUserRegistrationRequest true "Verify User Registration Request"
+// @Success 200 {object} VerifyUserRegistrationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 409 {object} core_http.HttpErrorResponse
+// @Router /user-registration/verify [post]
 func (c *UserRegistrationController) VerifyUserRegistration(ctx *gin.Context) {
 	var request user_http_requests.VerifyUserRegistrationRequest
 
@@ -64,6 +95,21 @@ func (c *UserRegistrationController) VerifyUserRegistration(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type ForgotUserPasswordResponse = core_http.EmptyHttpSuccessResponse
+
+// ForgotUserPassword godoc
+// @Summary Forgot user password
+// @Schemes
+// @Description Forgot user password
+// @Tags User Registration
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.ForgotUserPasswordRequest true "Forgot User Password Request"
+// @Success 200 {object} ForgotUserPasswordResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 409 {object} core_http.HttpErrorResponse
+// @Router /user-registration/forgot-password [post]
 func (c *UserRegistrationController) ForgotUserPassword(ctx *gin.Context) {
 	var request user_http_requests.ForgotUserPasswordRequest
 
@@ -81,6 +127,21 @@ func (c *UserRegistrationController) ForgotUserPassword(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type RecoverUserPasswordResponse = core_http.EmptyHttpSuccessResponse
+
+// RecoverUserPassword godoc
+// @Summary Recover user password
+// @Schemes
+// @Description Recover user password
+// @Tags User Registration
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.RecoverUserPasswordRequest true "Recover User Password Request"
+// @Success 200 {object} RecoverUserPasswordResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 409 {object} core_http.HttpErrorResponse
+// @Router /user-registration/recover-password [post]
 func (c *UserRegistrationController) RecoverUserPassword(ctx *gin.Context) {
 	var request user_http_requests.RecoverUserPasswordRequest
 
