@@ -24,16 +24,29 @@ func (r *ListRolesRequest) FromQuery(ctx *gin.Context) error {
 }
 
 func (r *ListRolesRequest) ToInput() role_services.ListRolesInput {
-	sortDirection := core.SortDirection(*r.SortDirection)
+	var nameFilter *core.ComparableFilter[string] = nil
+	if r.Name != nil {
+		nameFilter = &core.ComparableFilter[string]{
+			Like: r.Name,
+		}
+	}
+
+	var descriptionFilter *core.ComparableFilter[string] = nil
+	if r.Description != nil {
+		descriptionFilter = &core.ComparableFilter[string]{
+			Like: r.Description,
+		}
+	}
+
+	var sortDirection core.SortDirection
+	if r.SortDirection != nil {
+		sortDirection = core.SortDirection(*r.SortDirection)
+	}
 
 	return role_services.ListRolesInput{
 		Filters: role_core.RoleFilters{
-			Name: &core.ComparableFilter[string]{
-				Equals: r.Name,
-			},
-			Description: &core.ComparableFilter[string]{
-				Equals: r.Description,
-			},
+			Name:        nameFilter,
+			Description: descriptionFilter,
 		},
 		Pagination: &core.PaginationInput{
 			Page:    r.Page,

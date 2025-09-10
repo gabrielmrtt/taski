@@ -124,17 +124,17 @@ func (c *RoleController) ListRoles(ctx *gin.Context) {
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
-func (c *RoleController) ConfigureRoutes(group *gin.RouterGroup) {
-	orgGroup := group.Group("/organization/:organization_id")
+func (c *RoleController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
+	g := group.Group("/organization/:organization_id/role")
 	{
-		orgGroup.Use(user_http_middlewares.AuthMiddleware())
-		orgGroup.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g := orgGroup.Group("/role")
-		{
-			g.GET("", c.ListRoles)
-			g.POST("", c.CreateRole)
-			g.PUT("/:role_id", c.UpdateRole)
-			g.DELETE("/:role_id", c.DeleteRole)
-		}
+		g.Use(user_http_middlewares.AuthMiddleware())
+		g.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+
+		g.GET("", c.ListRoles)
+		g.POST("", c.CreateRole)
+		g.PUT("/:role_id", c.UpdateRole)
+		g.DELETE("/:role_id", c.DeleteRole)
 	}
+
+	return g
 }

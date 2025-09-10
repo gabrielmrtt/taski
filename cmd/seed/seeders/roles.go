@@ -50,7 +50,7 @@ func (s *RolesSeeder) Run() error {
 			Identity:        core.NewIdentity("role"),
 			Name:            "Default",
 			Slug:            "default",
-			IsSystemDefault: false,
+			IsSystemDefault: true,
 			Description:     "Default role",
 			Permissions:     *permissions,
 			Timestamps: core.Timestamps{

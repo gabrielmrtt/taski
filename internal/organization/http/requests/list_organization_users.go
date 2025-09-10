@@ -40,21 +40,21 @@ func (r *ListOrganizationUsersRequest) ToInput() organization_services.ListOrgan
 	var nameFilter *core.ComparableFilter[string] = nil
 	if r.Name != nil {
 		nameFilter = &core.ComparableFilter[string]{
-			Equals: r.Name,
+			Like: r.Name,
 		}
 	}
 
 	var emailFilter *core.ComparableFilter[string] = nil
 	if r.Email != nil {
 		emailFilter = &core.ComparableFilter[string]{
-			Equals: r.Email,
+			Like: r.Email,
 		}
 	}
 
 	var displayNameFilter *core.ComparableFilter[string] = nil
 	if r.DisplayName != nil {
 		displayNameFilter = &core.ComparableFilter[string]{
-			Equals: r.DisplayName,
+			Like: r.DisplayName,
 		}
 	}
 

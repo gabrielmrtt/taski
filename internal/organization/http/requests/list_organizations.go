@@ -37,7 +37,7 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 	var nameFilter *core.ComparableFilter[string] = nil
 	if r.Name != nil {
 		nameFilter = &core.ComparableFilter[string]{
-			Equals: r.Name,
+			Like: r.Name,
 		}
 	}
 

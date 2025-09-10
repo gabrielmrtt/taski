@@ -3,6 +3,7 @@ package role_database_postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
@@ -256,7 +257,7 @@ func (r *RolePostgresRepository) PaginateRolesBy(params role_core.PaginateRolesP
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
 
-	err = selectQuery.Scan(context.Background(), &roles)
+	err = selectQuery.Scan(context.Background())
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -508,6 +509,10 @@ func (r *RolePostgresRepository) ChangeRoleUsersToDefault(roleIdentity core.Iden
 	})
 	if err != nil {
 		return err
+	}
+
+	if defaultRole == nil {
+		return errors.New("default role not found")
 	}
 
 	_, err = tx.NewRaw("UPDATE organization_user SET role_internal_id = ? WHERE role_internal_id = ?", defaultRole.Identity.Internal.String(), roleIdentity.Internal.String()).Exec(context.Background())
