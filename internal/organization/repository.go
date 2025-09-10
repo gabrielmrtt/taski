@@ -17,11 +17,11 @@ type OrganizationFilters struct {
 }
 
 type OrganizationUserFilters struct {
-	Name           *core.ComparableFilter[string]
-	Email          *core.ComparableFilter[string]
-	DisplayName    *core.ComparableFilter[string]
-	RoleInternalId *core.ComparableFilter[string]
-	Status         *core.ComparableFilter[OrganizationUserStatuses]
+	Name         *core.ComparableFilter[string]
+	Email        *core.ComparableFilter[string]
+	DisplayName  *core.ComparableFilter[string]
+	RolePublicId *core.ComparableFilter[string]
+	Status       *core.ComparableFilter[OrganizationUserStatuses]
 }
 
 type ListOrganizationsParams struct {
@@ -66,7 +66,7 @@ type OrganizationUserRepository interface {
 
 	GetOrganizationUserByIdentity(organizationIdentity core.Identity, userIdentity core.Identity) (*OrganizationUser, error)
 	ListOrganizationUsersBy(filters ListOrganizationUsersParams) (*[]OrganizationUser, error)
-	PaginateOrganizationUsersBy(params PaginateOrganizationUsersParams) (*core.PaginationOutput[OrganizationUser], error)
+	PaginateOrganizationUsersBy(organizationIdentity core.Identity, params PaginateOrganizationUsersParams) (*core.PaginationOutput[OrganizationUser], error)
 
 	CreateOrganizationUser(organizationUser *OrganizationUser) (*OrganizationUser, error)
 	UpdateOrganizationUser(organizationUser *OrganizationUser) error

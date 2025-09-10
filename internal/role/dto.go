@@ -1,30 +1,49 @@
 package role_core
 
-import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
+import (
+	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
+)
 
 type RoleDto struct {
 	Id              string   `json:"id"`
 	Name            string   `json:"name"`
 	Description     string   `json:"description"`
 	Permissions     []string `json:"permissions"`
-	OrganizationId  string   `json:"organization_id"`
+	OrganizationId  *string  `json:"organization_id"`
 	IsSystemDefault bool     `json:"is_system_default"`
-	UserCreatorId   string   `json:"user_creator_id"`
-	UserEditorId    string   `json:"user_editor_id"`
+	UserCreatorId   *string  `json:"user_creator_id"`
+	UserEditorId    *string  `json:"user_editor_id"`
 	CreatedAt       string   `json:"created_at"`
-	UpdatedAt       string   `json:"updated_at"`
+	UpdatedAt       *string  `json:"updated_at"`
 }
 
 func RoleToDto(role *Role) *RoleDto {
-	var permissions []string
+	var permissions []string = make([]string, 0)
 	for _, permission := range role.Permissions {
 		permissions = append(permissions, permission.Slug)
 	}
 
 	createdAt := datetimeutils.EpochToRFC3339(*role.Timestamps.CreatedAt)
-	var updatedAt string
+	var updatedAt *string = nil
 	if role.Timestamps.UpdatedAt != nil {
-		updatedAt = datetimeutils.EpochToRFC3339(*role.Timestamps.UpdatedAt)
+		updatedAtString := datetimeutils.EpochToRFC3339(*role.Timestamps.UpdatedAt)
+		updatedAt = &updatedAtString
+	}
+
+	var organizationId *string = nil
+
+	if role.OrganizationIdentity != nil {
+		organizationId = &role.OrganizationIdentity.Public
+	}
+
+	var userCreatorId *string = nil
+	if role.UserCreatorIdentity != nil {
+		userCreatorId = &role.UserCreatorIdentity.Public
+	}
+
+	var userEditorId *string = nil
+	if role.UserEditorIdentity != nil {
+		userEditorId = &role.UserEditorIdentity.Public
 	}
 
 	return &RoleDto{
@@ -32,10 +51,10 @@ func RoleToDto(role *Role) *RoleDto {
 		Name:            role.Name,
 		Description:     role.Description,
 		Permissions:     permissions,
-		OrganizationId:  role.OrganizationIdentity.Public,
+		OrganizationId:  organizationId,
 		IsSystemDefault: role.IsSystemDefault,
-		UserCreatorId:   role.UserCreatorIdentity.Public,
-		UserEditorId:    role.UserEditorIdentity.Public,
+		UserCreatorId:   userCreatorId,
+		UserEditorId:    userEditorId,
 		CreatedAt:       createdAt,
 		UpdatedAt:       updatedAt,
 	}

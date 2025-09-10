@@ -7,21 +7,22 @@ import (
 )
 
 type OrganizationDto struct {
-	Id            string `json:"id"`
-	Name          string `json:"name"`
-	Status        string `json:"status"`
-	UserCreatorId string `json:"user_creator_id"`
-	UserEditorId  string `json:"user_editor_id"`
-	CreatedAt     string `json:"created_at"`
-	UpdatedAt     string `json:"updated_at"`
+	Id            string  `json:"id"`
+	Name          string  `json:"name"`
+	Status        string  `json:"status"`
+	UserCreatorId string  `json:"user_creator_id"`
+	UserEditorId  *string `json:"user_editor_id"`
+	CreatedAt     string  `json:"created_at"`
+	UpdatedAt     *string `json:"updated_at"`
 }
 
 func OrganizationToDto(organization *Organization) *OrganizationDto {
 	createdAt := datetimeutils.EpochToRFC3339(*organization.Timestamps.CreatedAt)
 
-	var updatedAt string
+	var updatedAt *string = nil
 	if organization.Timestamps.UpdatedAt != nil {
-		updatedAt = datetimeutils.EpochToRFC3339(*organization.Timestamps.UpdatedAt)
+		updatedAtString := datetimeutils.EpochToRFC3339(*organization.Timestamps.UpdatedAt)
+		updatedAt = &updatedAtString
 	}
 
 	var userCreatorId string
@@ -29,9 +30,9 @@ func OrganizationToDto(organization *Organization) *OrganizationDto {
 		userCreatorId = organization.UserCreatorIdentity.Public
 	}
 
-	var userEditorId string
+	var userEditorId *string = nil
 	if organization.UserEditorIdentity != nil {
-		userEditorId = organization.UserEditorIdentity.Public
+		userEditorId = &organization.UserEditorIdentity.Public
 	}
 
 	return &OrganizationDto{

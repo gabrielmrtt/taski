@@ -10,8 +10,8 @@ type UserDto struct {
 	Credentials *UserCredentialsDto `json:"credentials"`
 	Data        *UserDataDto        `json:"data"`
 
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt *string `json:"updated_at"`
 }
 
 type UserCredentialsDto struct {
@@ -53,10 +53,11 @@ func UserToDto(user *User) *UserDto {
 
 	createdAt := datetimeutils.EpochToRFC3339(*user.Timestamps.CreatedAt)
 
-	var updatedAt string
+	var updatedAt *string = nil
 
 	if user.Timestamps.UpdatedAt != nil {
-		updatedAt = datetimeutils.EpochToRFC3339(*user.Timestamps.UpdatedAt)
+		updatedAtString := datetimeutils.EpochToRFC3339(*user.Timestamps.UpdatedAt)
+		updatedAt = &updatedAtString
 	}
 
 	return &UserDto{

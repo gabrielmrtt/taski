@@ -61,12 +61,12 @@ func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.Selec
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_data.display_name", filters.DisplayName)
 	}
 
-	if filters.RoleInternalId != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "role_internal_id", filters.RoleInternalId)
+	if filters.RolePublicId != nil {
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "role.public_id", filters.RolePublicId)
 	}
 
 	if filters.Status != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "status", filters.Status)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "organization_user.status", filters.Status)
 	}
 
 	return selectQuery
@@ -82,7 +82,7 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(organ
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUser).Relation("User").Relation("Role").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&organizationUser).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 
@@ -107,7 +107,7 @@ func (r *OrganizationUserPostgresRepository) ListOrganizationUsersBy(params orga
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUsers).Relation("User").Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
+	selectQuery = selectQuery.Model(&organizationUsers).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	err := selectQuery.Scan(context.Background())
@@ -127,7 +127,7 @@ func (r *OrganizationUserPostgresRepository) ListOrganizationUsersBy(params orga
 	return &organizationUserEntities, nil
 }
 
-func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params organization_core.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
+func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organizationIdentity core.Identity, params organization_core.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
 	var organizationUsers []OrganizationUserTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -147,7 +147,8 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUsers).Relation("User").Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
+	selectQuery = selectQuery.Model(&organizationUsers).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
+	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ?", organizationIdentity.Internal.String())
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -164,7 +165,7 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 		return nil, err
 	}
 
-	var organizationUserEntities []organization_core.OrganizationUser
+	var organizationUserEntities []organization_core.OrganizationUser = make([]organization_core.OrganizationUser, 0)
 
 	for _, organizationUser := range organizationUsers {
 		organizationUserEntities = append(organizationUserEntities, *organizationUser.ToEntity())

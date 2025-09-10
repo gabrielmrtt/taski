@@ -34,14 +34,24 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 		sortDirection = core.SortDirection(*r.SortDirection)
 	}
 
+	var nameFilter *core.ComparableFilter[string] = nil
+	if r.Name != nil {
+		nameFilter = &core.ComparableFilter[string]{
+			Equals: r.Name,
+		}
+	}
+
+	var statusFilter *core.ComparableFilter[organization_core.OrganizationStatuses] = nil
+	if r.Status != nil {
+		statusFilter = &core.ComparableFilter[organization_core.OrganizationStatuses]{
+			Equals: &status,
+		}
+	}
+
 	return organization_services.ListOrganizationsInput{
 		Filters: organization_core.OrganizationFilters{
-			Name: &core.ComparableFilter[string]{
-				Equals: r.Name,
-			},
-			Status: &core.ComparableFilter[organization_core.OrganizationStatuses]{
-				Equals: &status,
-			},
+			Name:   nameFilter,
+			Status: statusFilter,
 		},
 		ShowDeleted: false,
 		Pagination: &core.PaginationInput{

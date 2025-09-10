@@ -31,7 +31,7 @@ func BlockIfUserIsNotPartOfOrganization() gin.HandlerFunc {
 		}
 
 		if orgUser == nil || !orgUser.IsActive() {
-			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you're not part of this organization"))
 			ctx.Abort()
 			return
 		}
@@ -67,7 +67,7 @@ func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
 		}
 
 		if orgUser == nil {
-			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not part of the organization"))
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you're not part of this organization"))
 			ctx.Abort()
 			return
 		}
@@ -75,7 +75,7 @@ func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
 		userIdentity := core.NewIdentityFromPublic(userId)
 
 		if !userIdentity.Equals(authenticatedUserIdentity) {
-			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("user is not the same as the authenticated user"))
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you can't execute this action"))
 			ctx.Abort()
 			return
 		}

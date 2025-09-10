@@ -142,11 +142,11 @@ func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.Ro
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
-		g.GET("", c.ListOrganizations).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g.GET("/:organization_id", c.GetOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g.POST("", c.CreateOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g.PUT("/:organization_id", c.UpdateOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
-		g.DELETE("/:organization_id", c.DeleteOrganization).Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
+		g.GET("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.ListOrganizations)
+		g.GET("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.GetOrganization)
+		g.POST("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.CreateOrganization)
+		g.PUT("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.UpdateOrganization)
+		g.DELETE("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.DeleteOrganization)
 	}
 
 	return g
