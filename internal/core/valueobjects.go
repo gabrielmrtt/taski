@@ -30,6 +30,20 @@ func NewIdentity(publicPrefix string) Identity {
 	}
 }
 
+func NewIdentityWithoutPublic() Identity {
+	return Identity{
+		Public:   "",
+		Internal: uuid.New(),
+	}
+}
+
+func NewIdentityWithoutPublicFromInternal(internalId uuid.UUID) Identity {
+	return Identity{
+		Public:   "",
+		Internal: internalId,
+	}
+}
+
 func NewIdentityFromInternal(internalId uuid.UUID, publicPrefix string) Identity {
 	length := new(big.Int).SetBytes(internalId[:])
 

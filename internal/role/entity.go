@@ -7,6 +7,8 @@ import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
+const RoleIdentityPrefix = "rol"
+
 type Permission struct {
 	Identity    core.Identity
 	Name        string
@@ -22,7 +24,7 @@ type NewPermissionInput struct {
 
 func NewPermission(input NewPermissionInput) (*Permission, error) {
 	return &Permission{
-		Identity:    core.NewIdentity("perm"),
+		Identity:    core.NewIdentityWithoutPublic(),
 		Name:        input.Name,
 		Description: input.Description,
 		Slug:        input.Slug,
@@ -56,7 +58,7 @@ func NewRole(input NewRoleInput) (*Role, error) {
 	now := datetimeutils.EpochNow()
 
 	return &Role{
-		Identity:             core.NewIdentity("role"),
+		Identity:             core.NewIdentity(RoleIdentityPrefix),
 		Name:                 input.Name,
 		Description:          input.Description,
 		Permissions:          input.Permissions,

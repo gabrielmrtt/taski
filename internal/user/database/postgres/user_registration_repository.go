@@ -25,8 +25,8 @@ type UserRegistrationTable struct {
 
 func (u *UserRegistrationTable) ToEntity() *user_core.UserRegistration {
 	return &user_core.UserRegistration{
-		Identity:     core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "user_registration"),
-		UserIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserInternalId), "usr"),
+		Identity:     core.NewIdentityWithoutPublicFromInternal(uuid.MustParse(u.InternalId)),
+		UserIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserInternalId), user_core.UserIdentityPrefix),
 		Token:        u.Token,
 		Status:       user_core.UserRegistrationStatuses(u.Status),
 		ExpiresAt:    u.ExpiresAt,

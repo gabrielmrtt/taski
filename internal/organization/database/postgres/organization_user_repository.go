@@ -27,7 +27,7 @@ type OrganizationUserTable struct {
 
 func (o *OrganizationUserTable) ToEntity() *organization_core.OrganizationUser {
 	return &organization_core.OrganizationUser{
-		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(o.OrganizationInternalId), "org"),
+		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(o.OrganizationInternalId), organization_core.OrganizationIdentityPrefix),
 		User:                 o.User.ToEntity(),
 		Role:                 o.Role.ToEntity(),
 		Status:               organization_core.OrganizationUserStatuses(o.Status),

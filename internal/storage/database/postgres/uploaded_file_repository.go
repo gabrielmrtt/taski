@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -29,12 +30,12 @@ type UploadedFileTable struct {
 
 func (u *UploadedFileTable) ToEntity() *storage_core.UploadedFile {
 	return &storage_core.UploadedFile{
-		Identity:               core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "file"),
+		Identity:               core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), storage_core.UploadedFileIdentityPrefix),
 		File:                   &u.File,
 		FileDirectory:          &u.FileDirectory,
 		FileMimeType:           &u.FileMimeType,
 		FileExtension:          &u.FileExtension,
-		UserUploadedByIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserUploadedByInternalId), "usr"),
+		UserUploadedByIdentity: core.NewIdentityFromInternal(uuid.MustParse(u.UserUploadedByInternalId), user_core.UserIdentityPrefix),
 		UploadedAt:             u.UploadedAt,
 	}
 }

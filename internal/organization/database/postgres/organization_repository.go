@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -30,17 +31,17 @@ func (o *OrganizationTable) ToEntity() *organization_core.Organization {
 	var userEditorIdentity *core.Identity
 
 	if o.UserCreatorInternalId != nil {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(*o.UserCreatorInternalId), "usr")
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*o.UserCreatorInternalId), user_core.UserIdentityPrefix)
 		userCreatorIdentity = &identity
 	}
 
 	if o.UserEditorInternalId != nil {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(*o.UserEditorInternalId), "usr")
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*o.UserEditorInternalId), user_core.UserIdentityPrefix)
 		userEditorIdentity = &identity
 	}
 
 	return &organization_core.Organization{
-		Identity:            core.NewIdentityFromInternal(uuid.MustParse(o.InternalId), "org"),
+		Identity:            core.NewIdentityFromInternal(uuid.MustParse(o.InternalId), organization_core.OrganizationIdentityPrefix),
 		Name:                o.Name,
 		Status:              organization_core.OrganizationStatuses(o.Status),
 		UserCreatorIdentity: userCreatorIdentity,

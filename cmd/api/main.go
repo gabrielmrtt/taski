@@ -4,21 +4,27 @@ import (
 	"fmt"
 
 	"github.com/gabrielmrtt/taski/config"
+	"github.com/gabrielmrtt/taski/docs"
 	organization_http "github.com/gabrielmrtt/taski/internal/organization/http"
 	role_http "github.com/gabrielmrtt/taski/internal/role/http"
 	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
 	user_http "github.com/gabrielmrtt/taski/internal/user/http"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func bootstrapApplication() {
-	engine := gin.Default()
+	engine := gin.New()
 
 	apiVersion := config.Instance.ApiVersion
 	appPort := config.Instance.AppPort
 
 	engine.Use(gin.Recovery())
 	engine.Use(gin.Logger())
+	engine.SetTrustedProxies(nil)
+
+	docs.SwaggerInfo.BasePath = fmt.Sprintf("/api/%s", apiVersion)
 
 	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{
@@ -28,6 +34,7 @@ func bootstrapApplication() {
 		role_http.BootstrapControllers(g)
 	}
 
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	engine.Run(fmt.Sprintf(":%s", appPort))
 }
 

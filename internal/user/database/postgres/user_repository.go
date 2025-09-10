@@ -6,6 +6,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
+	storage_core "github.com/gabrielmrtt/taski/internal/storage"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -42,7 +43,7 @@ func (u *UserTable) ToEntity() *user_core.User {
 		var profilePictureIdentity *core.Identity
 
 		if u.UserData.ProfilePictureInternalId != nil {
-			identity := core.NewIdentityFromInternal(uuid.MustParse(*u.UserData.ProfilePictureInternalId), "file")
+			identity := core.NewIdentityFromInternal(uuid.MustParse(*u.UserData.ProfilePictureInternalId), storage_core.UploadedFileIdentityPrefix)
 			profilePictureIdentity = &identity
 		}
 
@@ -54,7 +55,7 @@ func (u *UserTable) ToEntity() *user_core.User {
 	}
 
 	return &user_core.User{
-		Identity:    core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), "usr"),
+		Identity:    core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), user_core.UserIdentityPrefix),
 		Status:      user_core.UserStatuses(u.Status),
 		Credentials: userCredentials,
 		Data:        userData,

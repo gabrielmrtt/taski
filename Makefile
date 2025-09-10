@@ -15,3 +15,6 @@ migrate-down:
 
 seed:
 	@go run cmd/seed/main.go
+
+swagger:
+	@swag init -g cmd/api/main.go -d . -o docs

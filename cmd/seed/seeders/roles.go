@@ -31,7 +31,7 @@ func (s *RolesSeeder) Run() error {
 
 	roles := []role_core.Role{
 		{
-			Identity:        core.NewIdentity("role"),
+			Identity:        core.NewIdentity(role_core.RoleIdentityPrefix),
 			Name:            "Admin",
 			Slug:            "admin",
 			IsSystemDefault: true,
@@ -47,7 +47,7 @@ func (s *RolesSeeder) Run() error {
 			DeletedAt:            nil,
 		},
 		{
-			Identity:        core.NewIdentity("role"),
+			Identity:        core.NewIdentity(role_core.RoleIdentityPrefix),
 			Name:            "Default",
 			Slug:            "default",
 			IsSystemDefault: true,

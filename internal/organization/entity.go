@@ -14,6 +14,8 @@ const (
 	OrganizationStatusInactive OrganizationStatuses = "inactive"
 )
 
+const OrganizationIdentityPrefix = "org"
+
 type Organization struct {
 	Identity            core.Identity
 	Name                string
@@ -33,7 +35,7 @@ func NewOrganization(input NewOrganizationInput) (*Organization, error) {
 	now := datetimeutils.EpochNow()
 
 	return &Organization{
-		Identity:            core.NewIdentity("org"),
+		Identity:            core.NewIdentity(OrganizationIdentityPrefix),
 		Name:                input.Name,
 		Status:              OrganizationStatusActive,
 		UserCreatorIdentity: input.UserCreatorIdentity,

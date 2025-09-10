@@ -18,6 +18,8 @@ const (
 	UserStatusInactive   UserStatuses = "inactive"
 )
 
+const UserIdentityPrefix = "usr"
+
 type User struct {
 	Identity    core.Identity
 	Status      UserStatuses
@@ -74,7 +76,7 @@ func NewUser(input NewUserInput) (*User, error) {
 		return nil, err
 	}
 
-	identity := core.NewIdentity("usr")
+	identity := core.NewIdentity(UserIdentityPrefix)
 
 	now := datetimeutils.EpochNow()
 

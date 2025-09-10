@@ -7,7 +7,9 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
+	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -37,23 +39,23 @@ func (r *RoleTable) ToEntity() *role_core.Role {
 	var userEditorIdentity *core.Identity
 
 	if r.UserCreatorInternalId != nil {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserCreatorInternalId), "usr")
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserCreatorInternalId), user_core.UserIdentityPrefix)
 		userCreatorIdentity = &identity
 	}
 
 	if r.UserEditorInternalId != nil {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserEditorInternalId), "usr")
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.UserEditorInternalId), user_core.UserIdentityPrefix)
 		userEditorIdentity = &identity
 	}
 
 	var organizationIdentity *core.Identity
 	if r.OrganizationInternalId != nil {
-		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.OrganizationInternalId), "organization")
+		identity := core.NewIdentityFromInternal(uuid.MustParse(*r.OrganizationInternalId), organization_core.OrganizationIdentityPrefix)
 		organizationIdentity = &identity
 	}
 
 	return &role_core.Role{
-		Identity:             core.NewIdentityFromInternal(uuid.MustParse(r.InternalId), "role"),
+		Identity:             core.NewIdentityFromInternal(uuid.MustParse(r.InternalId), role_core.RoleIdentityPrefix),
 		Name:                 r.Name,
 		Description:          r.Description,
 		OrganizationIdentity: organizationIdentity,

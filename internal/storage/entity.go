@@ -7,6 +7,8 @@ import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
+const UploadedFileIdentityPrefix = "fil"
+
 type UploadedFile struct {
 	Identity               core.Identity
 	File                   *string
@@ -27,7 +29,7 @@ type NewUploadedFileInput struct {
 
 func NewUploadedFile(input NewUploadedFileInput) (*UploadedFile, error) {
 	return &UploadedFile{
-		Identity:               core.NewIdentity("file"),
+		Identity:               core.NewIdentity(UploadedFileIdentityPrefix),
 		File:                   input.File,
 		FileDirectory:          input.FileDirectory,
 		FileMimeType:           input.FileMimeType,
