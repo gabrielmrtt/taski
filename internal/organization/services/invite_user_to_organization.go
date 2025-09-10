@@ -54,9 +54,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{
-		Identity: input.OrganizationIdentity,
-	})
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		return err
 	}
@@ -73,9 +71,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		return core.NewNotFoundError("user not found")
 	}
 
-	role, err := s.RoleRepository.GetRoleByIdentity(role_core.GetRoleByIdentityParams{
-		Identity: input.RoleIdentity,
-	})
+	role, err := s.RoleRepository.GetRoleByIdentity(role_core.GetRoleByIdentityParams{RoleIdentity: input.RoleIdentity})
 	if err != nil {
 		return err
 	}
@@ -85,8 +81,10 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	}
 
 	var organizationUser *organization_core.OrganizationUser = nil
-
-	organizationUser, err = s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, user.Identity)
+	organizationUser, err = s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+		OrganizationIdentity: input.OrganizationIdentity,
+		UserIdentity:         user.Identity,
+	})
 	if err != nil {
 		return err
 	}
@@ -102,7 +100,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 			return err
 		}
 
-		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organizationUser)
+		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_core.CreateOrganizationUserParams{OrganizationUser: organizationUser})
 		if err != nil {
 			return err
 		}
@@ -111,7 +109,6 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	organizationUser.Invite()
 
 	err = tx.Commit()
-
 	if err != nil {
 		return err
 	}

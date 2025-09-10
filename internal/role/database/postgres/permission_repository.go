@@ -78,36 +78,6 @@ func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_core.GetP
 	return permission.ToEntity(), nil
 }
 
-func (r *PermissionPostgresRepository) ListPermissionsBy(params role_core.ListPermissionsParams) (*[]role_core.Permission, error) {
-	var permissions []PermissionTable
-	var selectQuery *bun.SelectQuery
-
-	if r.tx != nil && !r.tx.IsClosed() {
-		selectQuery = r.tx.Tx.NewSelect()
-	} else {
-		selectQuery = r.db.NewSelect()
-	}
-
-	selectQuery = selectQuery.Model(&permissions)
-	selectQuery = r.applyFilters(selectQuery, params.Filters)
-
-	err := selectQuery.Scan(context.Background())
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-	}
-
-	var permissionEntities []role_core.Permission
-
-	for _, permission := range permissions {
-		permissionEntities = append(permissionEntities, *permission.ToEntity())
-	}
-
-	return &permissionEntities, nil
-}
-
 func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_core.PaginatePermissionsParams) (*core.PaginationOutput[role_core.Permission], error) {
 	var permissions []PermissionTable
 	var selectQuery *bun.SelectQuery
@@ -130,23 +100,18 @@ func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_core.Pa
 
 	selectQuery = selectQuery.Model(&permissions)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
-
 	countBeforePagination, err := selectQuery.Count(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-
 	err = selectQuery.Scan(context.Background(), &permissions)
-
 	if err != nil {
 		return nil, err
 	}
 
 	var permissionEntities []role_core.Permission
-
 	for _, permission := range permissions {
 		permissionEntities = append(permissionEntities, *permission.ToEntity())
 	}
@@ -159,7 +124,7 @@ func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_core.Pa
 	}, nil
 }
 
-func (r *PermissionPostgresRepository) StorePermission(permission *role_core.Permission) (*role_core.Permission, error) {
+func (r *PermissionPostgresRepository) StorePermission(params role_core.StorePermissionParams) (*role_core.Permission, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -176,14 +141,13 @@ func (r *PermissionPostgresRepository) StorePermission(permission *role_core.Per
 	}
 
 	permissionTable := &PermissionTable{
-		InternalId:  permission.Identity.Internal.String(),
-		Slug:        permission.Slug,
-		Name:        permission.Name,
-		Description: permission.Description,
+		InternalId:  params.Permission.Identity.Internal.String(),
+		Slug:        params.Permission.Slug,
+		Name:        params.Permission.Name,
+		Description: params.Permission.Description,
 	}
 
 	_, err := tx.NewInsert().Model(permissionTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +159,7 @@ func (r *PermissionPostgresRepository) StorePermission(permission *role_core.Per
 	return permissionTable.ToEntity(), nil
 }
 
-func (r *PermissionPostgresRepository) UpdatePermission(permission *role_core.Permission) error {
+func (r *PermissionPostgresRepository) UpdatePermission(params role_core.UpdatePermissionParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -212,14 +176,13 @@ func (r *PermissionPostgresRepository) UpdatePermission(permission *role_core.Pe
 	}
 
 	permissionTable := &PermissionTable{
-		InternalId:  permission.Identity.Internal.String(),
-		Slug:        permission.Slug,
-		Name:        permission.Name,
-		Description: permission.Description,
+		InternalId:  params.Permission.Identity.Internal.String(),
+		Slug:        params.Permission.Slug,
+		Name:        params.Permission.Name,
+		Description: params.Permission.Description,
 	}
 
-	_, err := tx.NewUpdate().Model(permissionTable).Where("slug = ?", permission.Slug).Exec(context.Background())
-
+	_, err := tx.NewUpdate().Model(permissionTable).Where("slug = ?", params.Permission.Slug).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -238,7 +201,7 @@ func (r *PermissionPostgresRepository) UpdatePermission(permission *role_core.Pe
 	return nil
 }
 
-func (r *PermissionPostgresRepository) DeletePermission(permissionSlug string) error {
+func (r *PermissionPostgresRepository) DeletePermission(params role_core.DeletePermissionParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -254,8 +217,7 @@ func (r *PermissionPostgresRepository) DeletePermission(permissionSlug string) e
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&PermissionTable{}).Where("slug = ?", permissionSlug).Exec(context.Background())
-
+	_, err := tx.NewDelete().Model(&PermissionTable{}).Where("slug = ?", params.PermissionSlug).Exec(context.Background())
 	if err != nil {
 		return err
 	}

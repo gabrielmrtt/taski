@@ -91,13 +91,7 @@ func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 
 	s.UserRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: input.UserIdentity,
-		Include: map[string]any{
-			"data": true,
-		},
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -130,7 +124,6 @@ func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 			Directory:  "users/" + input.UserIdentity.Internal.String() + "/profile_picture",
 			UploadedBy: input.UserIdentity,
 		})
-
 		if err != nil {
 			tx.Rollback()
 			return core.NewInternalError(err.Error())
@@ -146,8 +139,7 @@ func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 		storage_services.NewDeleteFileByIdentityService(s.UploadedFileRepository, s.StorageRepository).Execute(input.UserIdentity)
 	}
 
-	err = s.UserRepository.UpdateUser(user)
-
+	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

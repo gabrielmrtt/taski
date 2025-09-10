@@ -4,21 +4,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 )
 
-type GetRoleByIdentityParams struct {
-	Identity core.Identity
-	Include  map[string]any
-}
-
-type GetRoleByIdentityAndOrganizationIdentityParams struct {
-	Identity             core.Identity
-	OrganizationIdentity core.Identity
-	Include              map[string]any
-}
-
-type GetDefaultRoleParams struct {
-	Slug string
-}
-
 type RoleFilters struct {
 	OrganizationIdentity core.Identity
 	Name                 *core.ComparableFilter[string]
@@ -28,16 +13,40 @@ type RoleFilters struct {
 	DeletedAt            *core.ComparableFilter[int64]
 }
 
-type ListRolesParams struct {
-	Filters RoleFilters
-	Include map[string]any
+type GetRoleByIdentityParams struct {
+	RoleIdentity core.Identity
+}
+
+type GetRoleByIdentityAndOrganizationIdentityParams struct {
+	RoleIdentity         core.Identity
+	OrganizationIdentity core.Identity
+}
+
+type GetDefaultRoleParams struct {
+	Slug string
 }
 
 type PaginateRolesParams struct {
 	Filters    RoleFilters
-	Include    map[string]any
 	SortInput  *core.SortInput
 	Pagination *core.PaginationInput
+}
+
+type StoreRoleParams struct {
+	Role *Role
+}
+
+type UpdateRoleParams struct {
+	Role *Role
+}
+
+type DeleteRoleParams struct {
+	RoleIdentity core.Identity
+}
+
+type ChangeRoleUsersToDefaultParams struct {
+	RoleIdentity    core.Identity
+	DefaultRoleSlug string
 }
 
 type RoleRepository interface {
@@ -46,25 +55,14 @@ type RoleRepository interface {
 	GetRoleByIdentity(params GetRoleByIdentityParams) (*Role, error)
 	GetRoleByIdentityAndOrganizationIdentity(params GetRoleByIdentityAndOrganizationIdentityParams) (*Role, error)
 	GetSystemDefaultRole(params GetDefaultRoleParams) (*Role, error)
-	ListRolesBy(params ListRolesParams) (*[]Role, error)
 	PaginateRolesBy(params PaginateRolesParams) (*core.PaginationOutput[Role], error)
-	ChangeRoleUsersToDefault(roleIdentity core.Identity, defaultRoleSlug string) error
+	ChangeRoleUsersToDefault(params ChangeRoleUsersToDefaultParams) error
 
 	CheckIfOrganizatonHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error)
 
-	StoreRole(role *Role) (*Role, error)
-	UpdateRole(role *Role) error
-	DeleteRole(roleIdentity core.Identity) error
-}
-
-type GetPermissionByIdentityParams struct {
-	Identity core.Identity
-	Include  map[string]any
-}
-
-type GetPermissionBySlugParams struct {
-	Slug    string
-	Include map[string]any
+	StoreRole(params StoreRoleParams) (*Role, error)
+	UpdateRole(params UpdateRoleParams) error
+	DeleteRole(params DeleteRoleParams) error
 }
 
 type PermissionFilters struct {
@@ -72,25 +70,39 @@ type PermissionFilters struct {
 	Slug *core.ComparableFilter[string]
 }
 
-type ListPermissionsParams struct {
-	Filters PermissionFilters
-	Include map[string]any
+type GetPermissionByIdentityParams struct {
+	Identity core.Identity
+}
+
+type GetPermissionBySlugParams struct {
+	Slug string
 }
 
 type PaginatePermissionsParams struct {
 	Filters    PermissionFilters
-	Include    map[string]any
+	SortInput  *core.SortInput
 	Pagination *core.PaginationInput
+}
+
+type StorePermissionParams struct {
+	Permission *Permission
+}
+
+type UpdatePermissionParams struct {
+	Permission *Permission
+}
+
+type DeletePermissionParams struct {
+	PermissionSlug string
 }
 
 type PermissionRepository interface {
 	SetTransaction(tx core.Transaction) error
 
 	GetPermissionBySlug(params GetPermissionBySlugParams) (*Permission, error)
-	ListPermissionsBy(params ListPermissionsParams) (*[]Permission, error)
 	PaginatePermissionsBy(params PaginatePermissionsParams) (*core.PaginationOutput[Permission], error)
 
-	StorePermission(permission *Permission) (*Permission, error)
-	UpdatePermission(permission *Permission) error
-	DeletePermission(permissionSlug string) error
+	StorePermission(params StorePermissionParams) (*Permission, error)
+	UpdatePermission(params UpdatePermissionParams) error
+	DeletePermission(params DeletePermissionParams) error
 }

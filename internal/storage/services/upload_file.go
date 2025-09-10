@@ -42,10 +42,12 @@ func (e *UploadFileService) Execute(input UploadFileInput) (*storage_core.Upload
 		return nil, err
 	}
 
-	uploadedFile, err = e.UploadedFileRepository.StoreUploadedFile(uploadedFile)
+	uploadedFile, err = e.UploadedFileRepository.StoreUploadedFile(storage_core.StoreUploadedFileParams{UploadedFile: uploadedFile})
+	if err != nil {
+		return nil, err
+	}
 
 	err = e.StorageRepository.StoreFile(input.Directory, input.File.FileName, input.File.FileContent)
-
 	if err != nil {
 		return nil, err
 	}

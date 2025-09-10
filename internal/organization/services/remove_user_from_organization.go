@@ -49,8 +49,10 @@ func (s *RemoveUserFromOrganizationService) Execute(input RemoveUserFromOrganiza
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
-
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+		OrganizationIdentity: input.OrganizationIdentity,
+		UserIdentity:         input.UserIdentity,
+	})
 	if err != nil {
 		return err
 	}
@@ -59,7 +61,10 @@ func (s *RemoveUserFromOrganizationService) Execute(input RemoveUserFromOrganiza
 		return core.NewNotFoundError("organization user not found")
 	}
 
-	err = s.OrganizationUserRepository.DeleteOrganizationUser(input.OrganizationIdentity, input.UserIdentity)
+	err = s.OrganizationUserRepository.DeleteOrganizationUser(organization_core.DeleteOrganizationUserParams{
+		OrganizationIdentity: input.OrganizationIdentity,
+		UserIdentity:         input.UserIdentity,
+	})
 	if err != nil {
 		return err
 	}

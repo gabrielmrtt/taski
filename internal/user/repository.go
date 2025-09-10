@@ -4,16 +4,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 )
 
-type GetUserByIdentityParams struct {
-	Identity core.Identity
-	Include  map[string]any
-}
-
-type GetUserByEmailParams struct {
-	Email   string
-	Include map[string]any
-}
-
 type UserFilters struct {
 	Email       *core.ComparableFilter[string]
 	Status      *core.ComparableFilter[UserStatuses]
@@ -24,15 +14,29 @@ type UserFilters struct {
 	DeletedAt   *core.ComparableFilter[int64]
 }
 
-type ListUsersParams struct {
-	Filters UserFilters
-	Include map[string]any
+type GetUserByIdentityParams struct {
+	UserIdentity core.Identity
+}
+
+type GetUserByEmailParams struct {
+	Email string
 }
 
 type PaginateUsersParams struct {
 	Filters    UserFilters
-	Include    map[string]any
 	Pagination *core.PaginationInput
+}
+
+type StoreUserParams struct {
+	User *User
+}
+
+type UpdateUserParams struct {
+	User *User
+}
+
+type DeleteUserParams struct {
+	UserIdentity core.Identity
 }
 
 type UserRepository interface {
@@ -40,17 +44,27 @@ type UserRepository interface {
 
 	GetUserByIdentity(params GetUserByIdentityParams) (*User, error)
 	GetUserByEmail(params GetUserByEmailParams) (*User, error)
-	ListUsersBy(params ListUsersParams) (*[]User, error)
 	PaginateUsersBy(params PaginateUsersParams) (*core.PaginationOutput[User], error)
 
-	StoreUser(user *User) (*User, error)
-	UpdateUser(user *User) error
-	DeleteUser(userIdentity core.Identity) error
+	StoreUser(params StoreUserParams) (*User, error)
+	UpdateUser(params UpdateUserParams) error
+	DeleteUser(params DeleteUserParams) error
 }
 
 type GetUserRegistrationByTokenParams struct {
-	Token   string
-	Include map[string]any
+	Token string
+}
+
+type StoreUserRegistrationParams struct {
+	UserRegistration *UserRegistration
+}
+
+type UpdateUserRegistrationParams struct {
+	UserRegistration *UserRegistration
+}
+
+type DeleteUserRegistrationParams struct {
+	UserRegistrationIdentity core.Identity
 }
 
 type UserRegistrationRepository interface {
@@ -58,14 +72,25 @@ type UserRegistrationRepository interface {
 
 	GetUserRegistrationByToken(params GetUserRegistrationByTokenParams) (*UserRegistration, error)
 
-	StoreUserRegistration(userRegistration *UserRegistration) (*UserRegistration, error)
-	UpdateUserRegistration(userRegistration *UserRegistration) error
-	DeleteUserRegistration(userRegistrationIdentity core.Identity) error
+	StoreUserRegistration(params StoreUserRegistrationParams) (*UserRegistration, error)
+	UpdateUserRegistration(params UpdateUserRegistrationParams) error
+	DeleteUserRegistration(params DeleteUserRegistrationParams) error
 }
 
 type GetPasswordRecoveryByTokenParams struct {
-	Token   string
-	Include map[string]any
+	Token string
+}
+
+type StorePasswordRecoveryParams struct {
+	PasswordRecovery *PasswordRecovery
+}
+
+type UpdatePasswordRecoveryParams struct {
+	PasswordRecovery *PasswordRecovery
+}
+
+type DeletePasswordRecoveryParams struct {
+	PasswordRecoveryIdentity core.Identity
 }
 
 type PasswordRecoveryRepository interface {
@@ -73,7 +98,7 @@ type PasswordRecoveryRepository interface {
 
 	GetPasswordRecoveryByToken(params GetPasswordRecoveryByTokenParams) (*PasswordRecovery, error)
 
-	StorePasswordRecovery(passwordRecovery *PasswordRecovery) (*PasswordRecovery, error)
-	UpdatePasswordRecovery(passwordRecovery *PasswordRecovery) error
-	DeletePasswordRecovery(passwordRecoveryIdentity core.Identity) error
+	StorePasswordRecovery(params StorePasswordRecoveryParams) (*PasswordRecovery, error)
+	UpdatePasswordRecovery(params UpdatePasswordRecoveryParams) error
+	DeletePasswordRecovery(params DeletePasswordRecoveryParams) error
 }

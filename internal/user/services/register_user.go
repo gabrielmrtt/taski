@@ -79,13 +79,7 @@ func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserD
 	s.UserRepository.SetTransaction(tx)
 	s.UserRegistrationRepository.SetTransaction(tx)
 
-	userAlreadyExists, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
-		Email: input.Email,
-		Include: map[string]any{
-			"credentials": true,
-		},
-	})
-
+	userAlreadyExists, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
@@ -102,28 +96,24 @@ func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserD
 		Password:    input.Password,
 		PhoneNumber: input.PhoneNumber,
 	})
-
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	_, err = s.UserRepository.StoreUser(user)
-
+	_, err = s.UserRepository.StoreUser(user_core.StoreUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
 	}
 
 	userRegistration, err := user_core.NewUserRegistration(user.Identity, 48*time.Hour)
-
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	_, err = s.UserRegistrationRepository.StoreUserRegistration(userRegistration)
-
+	_, err = s.UserRegistrationRepository.StoreUserRegistration(user_core.StoreUserRegistrationParams{UserRegistration: userRegistration})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())

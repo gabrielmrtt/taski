@@ -54,7 +54,7 @@ func (s *DeleteRoleService) Execute(input DeleteRoleInput) error {
 	}
 
 	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_core.GetRoleByIdentityAndOrganizationIdentityParams{
-		Identity:             input.RoleIdentity,
+		RoleIdentity:         input.RoleIdentity,
 		OrganizationIdentity: input.OrganizationIdentity,
 	})
 	if err != nil {
@@ -69,13 +69,16 @@ func (s *DeleteRoleService) Execute(input DeleteRoleInput) error {
 
 	role.Delete()
 
-	err = s.RoleRepository.UpdateRole(role)
+	err = s.RoleRepository.UpdateRole(role_core.UpdateRoleParams{Role: role})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.RoleRepository.ChangeRoleUsersToDefault(input.RoleIdentity, "default")
+	err = s.RoleRepository.ChangeRoleUsersToDefault(role_core.ChangeRoleUsersToDefaultParams{
+		RoleIdentity:    input.RoleIdentity,
+		DefaultRoleSlug: "default",
+	})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

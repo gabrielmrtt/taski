@@ -83,7 +83,6 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 	s.PermissionRepository.SetTransaction(tx)
 
 	organizationHasUser, err := s.RoleRepository.CheckIfOrganizatonHasUser(input.OrganizationIdentity, input.UserCreatorIdentity)
-
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +92,6 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 	}
 
 	permissions := make([]role_core.Permission, 0)
-
 	for _, permissionSlug := range input.Permissions {
 		permission, err := s.PermissionRepository.GetPermissionBySlug(role_core.GetPermissionBySlugParams{
 			Slug: permissionSlug,
@@ -119,7 +117,7 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 		return nil, err
 	}
 
-	role, err = s.RoleRepository.StoreRole(role)
+	role, err = s.RoleRepository.StoreRole(role_core.StoreRoleParams{Role: role})
 	if err != nil {
 		return nil, err
 	}

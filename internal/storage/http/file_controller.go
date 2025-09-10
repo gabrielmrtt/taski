@@ -21,7 +21,21 @@ func NewFileController(
 	}
 }
 
-func (c *FileController) GetFileContentByIdentity(ctx *gin.Context) {
+type GetFileContentByIdentityResponse = []byte
+
+// GetFileContent godoc
+// @Summary Get file content
+// @Description Returns the file contents.
+// @Tags File
+// @Accept json
+// @Param file_id path string true "File ID"
+// @Produce json
+// @Success 200 {object} GetFileContentByIdentityResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /file/:file_id [get]
+func (c *FileController) GetFileContent(ctx *gin.Context) {
 	fileId := ctx.Param("file_id")
 
 	input := storage_services.GetFileContentByIdentityInput{
@@ -40,6 +54,6 @@ func (c *FileController) GetFileContentByIdentity(ctx *gin.Context) {
 func (c *FileController) ConfigureRoutes(group *gin.RouterGroup) {
 	g := group.Group("/file")
 	{
-		g.GET("/:file_id", c.GetFileContentByIdentity)
+		g.GET("/:file_id", c.GetFileContent)
 	}
 }

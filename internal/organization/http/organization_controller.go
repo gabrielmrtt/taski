@@ -5,6 +5,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
 	organization_http_requests "github.com/gabrielmrtt/taski/internal/organization/http/requests"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
@@ -36,6 +37,21 @@ func NewOrganizationController(
 	}
 }
 
+type ListOrganizationsResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
+
+// ListOrganizations godoc
+// @Summary List organizations
+// @Description List accessible organizations by the authenticated user (created by them or organizations they are part of).
+// @Tags Organization
+// @Accept json
+// @Param request query organization_http_requests.ListOrganizationsRequest true "Query parameters"
+// @Produce json
+// @Success 200 {object} ListOrganizationsResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization [get]
 func (c *OrganizationController) ListOrganizations(ctx *gin.Context) {
 	var request organization_http_requests.ListOrganizationsRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
@@ -58,6 +74,22 @@ func (c *OrganizationController) ListOrganizations(ctx *gin.Context) {
 	return
 }
 
+type GetOrganizationResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
+
+// GetOrganization godoc
+// @Summary Get an organization
+// @Description Returns an accessible organization by the authenticated user and the organization ID.
+// @Tags Organization
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Produce json
+// @Success 200 {object} GetOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id [get]
 func (c *OrganizationController) GetOrganization(ctx *gin.Context) {
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	input := organization_services.GetOrganizationInput{
@@ -74,6 +106,21 @@ func (c *OrganizationController) GetOrganization(ctx *gin.Context) {
 	return
 }
 
+type CreateOrganizationResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
+
+// CreateOrganization godoc
+// @Summary Create an organization
+// @Description Creates a new organization.
+// @Tags Organization
+// @Accept json
+// @Param request body organization_http_requests.CreateOrganizationRequest true "Request body"
+// @Produce json
+// @Success 200 {object} CreateOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization [post]
 func (c *OrganizationController) CreateOrganization(ctx *gin.Context) {
 	var request organization_http_requests.CreateOrganizationRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
@@ -96,6 +143,23 @@ func (c *OrganizationController) CreateOrganization(ctx *gin.Context) {
 	return
 }
 
+type UpdateOrganizationResponse = core_http.EmptyHttpSuccessResponse
+
+// UpdateOrganization godoc
+// @Summary Update an organization
+// @Description Updates an existing and accessible organization by the authenticated user and the organization ID.
+// @Tags Organization
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param request body organization_http_requests.UpdateOrganizationRequest true "Request body"
+// @Produce json
+// @Success 200 {object} UpdateOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id [put]
 func (c *OrganizationController) UpdateOrganization(ctx *gin.Context) {
 	var request organization_http_requests.UpdateOrganizationRequest
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
@@ -120,6 +184,22 @@ func (c *OrganizationController) UpdateOrganization(ctx *gin.Context) {
 	return
 }
 
+type DeleteOrganizationResponse = core_http.EmptyHttpSuccessResponse
+
+// DeleteOrganization godoc
+// @Summary Delete an organization
+// @Description Deletes an existing and accessible organization by the authenticated user and the organization ID.
+// @Tags Organization
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Produce json
+// @Success 200 {object} DeleteOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id [delete]
 func (c *OrganizationController) DeleteOrganization(ctx *gin.Context) {
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 

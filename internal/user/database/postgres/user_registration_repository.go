@@ -60,9 +60,7 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 	}
 
 	selectQuery = selectQuery.Model(&userRegistration).Where("token = ?", params.Token)
-
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -74,7 +72,7 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 	return userRegistration.ToEntity(), nil
 }
 
-func (r *UserRegistrationPostgresRepository) StoreUserRegistration(userRegistration *user_core.UserRegistration) (*user_core.UserRegistration, error) {
+func (r *UserRegistrationPostgresRepository) StoreUserRegistration(params user_core.StoreUserRegistrationParams) (*user_core.UserRegistration, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -91,17 +89,16 @@ func (r *UserRegistrationPostgresRepository) StoreUserRegistration(userRegistrat
 	}
 
 	userRegistrationTable := &UserRegistrationTable{
-		InternalId:     userRegistration.Identity.Internal.String(),
-		UserInternalId: userRegistration.UserIdentity.Internal.String(),
-		Token:          userRegistration.Token,
-		Status:         string(userRegistration.Status),
-		ExpiresAt:      userRegistration.ExpiresAt,
-		RegisteredAt:   userRegistration.RegisteredAt,
-		VerifiedAt:     userRegistration.VerifiedAt,
+		InternalId:     params.UserRegistration.Identity.Internal.String(),
+		UserInternalId: params.UserRegistration.UserIdentity.Internal.String(),
+		Token:          params.UserRegistration.Token,
+		Status:         string(params.UserRegistration.Status),
+		ExpiresAt:      params.UserRegistration.ExpiresAt,
+		RegisteredAt:   params.UserRegistration.RegisteredAt,
+		VerifiedAt:     params.UserRegistration.VerifiedAt,
 	}
 
 	_, err := tx.NewInsert().Model(userRegistrationTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +114,7 @@ func (r *UserRegistrationPostgresRepository) StoreUserRegistration(userRegistrat
 	return userRegistrationTable.ToEntity(), nil
 }
 
-func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistration *user_core.UserRegistration) error {
+func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(params user_core.UpdateUserRegistrationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -134,17 +131,16 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistra
 	}
 
 	userRegistrationTable := &UserRegistrationTable{
-		InternalId:     userRegistration.Identity.Internal.String(),
-		UserInternalId: userRegistration.UserIdentity.Internal.String(),
-		Token:          userRegistration.Token,
-		Status:         string(userRegistration.Status),
-		ExpiresAt:      userRegistration.ExpiresAt,
-		RegisteredAt:   userRegistration.RegisteredAt,
-		VerifiedAt:     userRegistration.VerifiedAt,
+		InternalId:     params.UserRegistration.Identity.Internal.String(),
+		UserInternalId: params.UserRegistration.UserIdentity.Internal.String(),
+		Token:          params.UserRegistration.Token,
+		Status:         string(params.UserRegistration.Status),
+		ExpiresAt:      params.UserRegistration.ExpiresAt,
+		RegisteredAt:   params.UserRegistration.RegisteredAt,
+		VerifiedAt:     params.UserRegistration.VerifiedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(userRegistrationTable).Where("internal_id = ?", userRegistration.Identity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewUpdate().Model(userRegistrationTable).Where("internal_id = ?", params.UserRegistration.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -155,7 +151,6 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistra
 
 	if shouldCommit {
 		err = tx.Commit()
-
 		if err != nil {
 			return err
 		}
@@ -164,7 +159,7 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(userRegistra
 	return nil
 }
 
-func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(userRegistrationIdentity core.Identity) error {
+func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(params user_core.DeleteUserRegistrationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -180,8 +175,7 @@ func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(userRegistra
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&UserRegistrationTable{}).Where("internal_id = ?", userRegistrationIdentity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewDelete().Model(&UserRegistrationTable{}).Where("internal_id = ?", params.UserRegistrationIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -192,7 +186,6 @@ func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(userRegistra
 
 	if shouldCommit {
 		err = tx.Commit()
-
 		if err != nil {
 			return err
 		}

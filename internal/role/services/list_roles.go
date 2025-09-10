@@ -20,7 +20,6 @@ func NewListRolesService(
 type ListRolesInput struct {
 	OrganizationIdentity core.Identity
 	Filters              role_core.RoleFilters
-	Include              map[string]any
 	SortInput            *core.SortInput
 	Pagination           *core.PaginationInput
 	LoggedUserIdentity   core.Identity
@@ -48,11 +47,9 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 
 	roles, err := s.RoleRepository.PaginateRolesBy(role_core.PaginateRolesParams{
 		Filters:    input.Filters,
-		Include:    input.Include,
 		SortInput:  input.SortInput,
 		Pagination: input.Pagination,
 	})
-
 	if err != nil {
 		return nil, err
 	}

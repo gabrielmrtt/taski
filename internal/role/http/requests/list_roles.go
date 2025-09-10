@@ -9,12 +9,12 @@ import (
 )
 
 type ListRolesRequest struct {
-	Name          *string `schema:"name"`
-	Description   *string `schema:"description"`
-	Page          *int    `schema:"page"`
-	PerPage       *int    `schema:"per_page"`
-	SortBy        *string `schema:"sort_by"`
-	SortDirection *string `schema:"sort_direction"`
+	Name          *string `json:"name" schema:"name"`
+	Description   *string `json:"description" schema:"description"`
+	Page          *int    `json:"page" schema:"page"`
+	PerPage       *int    `json:"per_page" schema:"per_page"`
+	SortBy        *string `json:"sort_by" schema:"sort_by"`
+	SortDirection *string `json:"sort_direction" schema:"sort_direction"`
 }
 
 func (r *ListRolesRequest) FromQuery(ctx *gin.Context) error {

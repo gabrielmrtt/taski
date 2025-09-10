@@ -56,11 +56,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	s.UserRegistrationRepository.SetTransaction(tx)
 
-	userRegistration, err := s.UserRegistrationRepository.GetUserRegistrationByToken(user_core.GetUserRegistrationByTokenParams{
-		Token:   input.Token,
-		Include: map[string]any{},
-	})
-
+	userRegistration, err := s.UserRegistrationRepository.GetUserRegistrationByToken(user_core.GetUserRegistrationByTokenParams{Token: input.Token})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -76,11 +72,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 		return core.NewAlreadyExistsError("user registration expired")
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: userRegistration.UserIdentity,
-		Include:  map[string]any{},
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: userRegistration.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -93,8 +85,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	user.Status = user_core.UserStatusActive
 
-	err = s.UserRepository.UpdateUser(user)
-
+	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -102,8 +93,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	userRegistration.Verify()
 
-	err = s.UserRegistrationRepository.UpdateUserRegistration(userRegistration)
-
+	err = s.UserRegistrationRepository.UpdateUserRegistration(user_core.UpdateUserRegistrationParams{UserRegistration: userRegistration})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

@@ -98,10 +98,9 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 	}
 
 	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_core.GetRoleByIdentityAndOrganizationIdentityParams{
-		Identity:             input.RoleIdentity,
+		RoleIdentity:         input.RoleIdentity,
 		OrganizationIdentity: input.OrganizationIdentity,
 	})
-
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -141,7 +140,7 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 		}
 	}
 
-	err = s.RoleRepository.UpdateRole(role)
+	err = s.RoleRepository.UpdateRole(role_core.UpdateRoleParams{Role: role})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

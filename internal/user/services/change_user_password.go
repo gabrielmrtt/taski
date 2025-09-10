@@ -55,13 +55,7 @@ func (s *ChangeUserPasswordService) Execute(input ChangeUserPasswordInput) error
 
 	s.UserRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: input.UserIdentity,
-		Include: map[string]any{
-			"credentials": true,
-		},
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -73,21 +67,18 @@ func (s *ChangeUserPasswordService) Execute(input ChangeUserPasswordInput) error
 	}
 
 	err = user.ChangeCredentialsPassword(input.Password)
-
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.UserRepository.UpdateUser(user)
-
+	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
 	err = tx.Commit()
-
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

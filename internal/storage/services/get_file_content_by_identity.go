@@ -25,9 +25,7 @@ type GetFileContentByIdentityInput struct {
 }
 
 func (s *GetFileContentByIdentityService) Execute(input GetFileContentByIdentityInput) (*core.FileInput, error) {
-	file, err := s.FileRepository.GetUploadedFileByIdentity(storage_core.GetUploadedFileByIdentityParams{
-		Identity: input.FileIdentity,
-	})
+	file, err := s.FileRepository.GetUploadedFileByIdentity(storage_core.GetUploadedFileByIdentityParams{FileIdentity: input.FileIdentity})
 	if err != nil {
 		return nil, err
 	}

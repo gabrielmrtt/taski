@@ -6,6 +6,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
+	role_core "github.com/gabrielmrtt/taski/internal/role"
 	role_http_requests "github.com/gabrielmrtt/taski/internal/role/http/requests"
 	role_services "github.com/gabrielmrtt/taski/internal/role/services"
 	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
@@ -33,6 +34,23 @@ func NewRoleController(
 	}
 }
 
+type CreateRoleResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDto]
+
+// CreateRole godoc
+// @Summary Create a role in an organization
+// @Description Creates a new role in an organization.
+// @Tags Role
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param request body role_http_requests.CreateRoleRequest true "Request body"
+// @Produce json
+// @Success 200 {object} CreateRoleResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/role [post]
 func (c *RoleController) CreateRole(ctx *gin.Context) {
 	var request role_http_requests.CreateRoleRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
@@ -56,6 +74,24 @@ func (c *RoleController) CreateRole(ctx *gin.Context) {
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
+type UpdateRoleResponse = core_http.EmptyHttpSuccessResponse
+
+// UpdateRole godoc
+// @Summary Update a role in an organization
+// @Description Updates an existing role in an organization.
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param organization_id path string true "Organization ID"
+// @Param role_id path string true "Role ID"
+// @Param request body role_http_requests.UpdateRoleRequest true "Request body"
+// @Success 200 {object} UpdateRoleResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/role/:role_id [put]
 func (c *RoleController) UpdateRole(ctx *gin.Context) {
 	var request role_http_requests.UpdateRoleRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
@@ -81,6 +117,23 @@ func (c *RoleController) UpdateRole(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type DeleteRoleResponse = core_http.EmptyHttpSuccessResponse
+
+// DeleteRole godoc
+// @Summary Delete a role in an organization
+// @Description Deletes an existing role in an organization.
+// @Tags Role
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param role_id path string true "Role ID"
+// @Produce json
+// @Success 200 {object} DeleteRoleResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/role/:role_id [delete]
 func (c *RoleController) DeleteRole(ctx *gin.Context) {
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
@@ -101,6 +154,23 @@ func (c *RoleController) DeleteRole(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type ListRolesResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDto]
+
+// ListRoles godoc
+// @Summary List roles in an organization
+// @Description Lists all existing roles in an organization.
+// @Tags Role
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param request query role_http_requests.ListRolesRequest true "Query parameters"
+// @Produce json
+// @Success 200 {object} ListRolesResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/role [get]
 func (c *RoleController) ListRoles(ctx *gin.Context) {
 	var request role_http_requests.ListRolesRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)

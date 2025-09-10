@@ -67,10 +67,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 	s.UserRepository.SetTransaction(tx)
 	s.PasswordRecoveryRepository.SetTransaction(tx)
 
-	passwordRecovery, err := s.PasswordRecoveryRepository.GetPasswordRecoveryByToken(user_core.GetPasswordRecoveryByTokenParams{
-		Token: input.PasswordRecoveryToken,
-	})
-
+	passwordRecovery, err := s.PasswordRecoveryRepository.GetPasswordRecoveryByToken(user_core.GetPasswordRecoveryByTokenParams{Token: input.PasswordRecoveryToken})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -91,13 +88,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 		return core.NewAlreadyExistsError("password recovery expired")
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: passwordRecovery.UserIdentity,
-		Include: map[string]any{
-			"credentials": true,
-		},
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: passwordRecovery.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -109,14 +100,12 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 	}
 
 	err = user.ChangeCredentialsPassword(input.Password)
-
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.UserRepository.UpdateUser(user)
-
+	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -124,8 +113,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 
 	passwordRecovery.Use()
 
-	err = s.PasswordRecoveryRepository.UpdatePasswordRecovery(passwordRecovery)
-
+	err = s.PasswordRecoveryRepository.UpdatePasswordRecovery(user_core.UpdatePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

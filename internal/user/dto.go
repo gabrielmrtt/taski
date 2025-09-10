@@ -21,9 +21,9 @@ type UserCredentialsDto struct {
 }
 
 type UserDataDto struct {
-	DisplayName            string  `json:"display_name"`
-	About                  *string `json:"about"`
-	ProfilePicturePublicId *string `json:"profile_picture"`
+	DisplayName          string  `json:"display_name"`
+	About                *string `json:"about"`
+	ProfilePictureFileId *string `json:"profile_picture_file_id"`
 }
 
 func UserToDto(user *User) *UserDto {
@@ -39,22 +39,20 @@ func UserToDto(user *User) *UserDto {
 	}
 
 	if user.Data != nil {
-		var profilePicturePublicId *string
+		var profilePicturePublicId *string = nil
 		if user.Data.ProfilePictureIdentity != nil {
 			profilePicturePublicId = &user.Data.ProfilePictureIdentity.Public
 		}
 
 		userDataDto = &UserDataDto{
-			DisplayName:            user.Data.DisplayName,
-			About:                  user.Data.About,
-			ProfilePicturePublicId: profilePicturePublicId,
+			DisplayName:          user.Data.DisplayName,
+			About:                user.Data.About,
+			ProfilePictureFileId: profilePicturePublicId,
 		}
 	}
 
-	createdAt := datetimeutils.EpochToRFC3339(*user.Timestamps.CreatedAt)
-
+	var createdAt string = datetimeutils.EpochToRFC3339(*user.Timestamps.CreatedAt)
 	var updatedAt *string = nil
-
 	if user.Timestamps.UpdatedAt != nil {
 		updatedAtString := datetimeutils.EpochToRFC3339(*user.Timestamps.UpdatedAt)
 		updatedAt = &updatedAtString

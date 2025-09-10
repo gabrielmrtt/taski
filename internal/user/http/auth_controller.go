@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_http_requests "github.com/gabrielmrtt/taski/internal/user/http/requests"
 	user_services "github.com/gabrielmrtt/taski/internal/user/services"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,20 @@ func NewAuthController(
 	}
 }
 
+type LoginResponse = core_http.HttpSuccessResponseWithData[user_core.UserLoginDto]
+
+// Login godoc
+// @Summary Login
+// @Description Authenticates an user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.UserLoginRequest true "Request body"
+// @Success 200 {object} LoginResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var request user_http_requests.UserLoginRequest
 

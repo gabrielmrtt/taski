@@ -3,15 +3,23 @@ package storage_core
 import "github.com/gabrielmrtt/taski/internal/core"
 
 type GetUploadedFileByIdentityParams struct {
-	Identity core.Identity
+	FileIdentity core.Identity
+}
+
+type StoreUploadedFileParams struct {
+	UploadedFile *UploadedFile
+}
+
+type DeleteUploadedFileParams struct {
+	FileIdentity core.Identity
 }
 
 type UploadedFileRepository interface {
 	SetTransaction(tx core.Transaction) error
 
 	GetUploadedFileByIdentity(params GetUploadedFileByIdentityParams) (*UploadedFile, error)
-	StoreUploadedFile(uploadedFile *UploadedFile) (*UploadedFile, error)
-	DeleteUploadedFile(identity core.Identity) error
+	StoreUploadedFile(params StoreUploadedFileParams) (*UploadedFile, error)
+	DeleteUploadedFile(params DeleteUploadedFileParams) error
 }
 
 type StorageRepository interface {

@@ -64,7 +64,7 @@ func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storag
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&uploadedFile).Where("internal_id = ?", params.Identity.Internal.String())
+	selectQuery = selectQuery.Model(&uploadedFile).Where("internal_id = ?", params.FileIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 
@@ -79,7 +79,7 @@ func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storag
 	return uploadedFile.ToEntity(), nil
 }
 
-func (r *UploadedFilePostgresRepository) StoreUploadedFile(uploadedFile *storage_core.UploadedFile) (*storage_core.UploadedFile, error) {
+func (r *UploadedFilePostgresRepository) StoreUploadedFile(params storage_core.StoreUploadedFileParams) (*storage_core.UploadedFile, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -96,14 +96,14 @@ func (r *UploadedFilePostgresRepository) StoreUploadedFile(uploadedFile *storage
 	}
 
 	uploadedFileTable := &UploadedFileTable{
-		InternalId:               uploadedFile.Identity.Internal.String(),
-		PublicId:                 uploadedFile.Identity.Public,
-		File:                     *uploadedFile.File,
-		FileDirectory:            *uploadedFile.FileDirectory,
-		FileMimeType:             *uploadedFile.FileMimeType,
-		FileExtension:            *uploadedFile.FileExtension,
-		UserUploadedByInternalId: uploadedFile.UserUploadedByIdentity.Internal.String(),
-		UploadedAt:               uploadedFile.UploadedAt,
+		InternalId:               params.UploadedFile.Identity.Internal.String(),
+		PublicId:                 params.UploadedFile.Identity.Public,
+		File:                     *params.UploadedFile.File,
+		FileDirectory:            *params.UploadedFile.FileDirectory,
+		FileMimeType:             *params.UploadedFile.FileMimeType,
+		FileExtension:            *params.UploadedFile.FileExtension,
+		UserUploadedByInternalId: params.UploadedFile.UserUploadedByIdentity.Internal.String(),
+		UploadedAt:               params.UploadedFile.UploadedAt,
 	}
 
 	_, err := tx.NewInsert().Model(uploadedFileTable).Exec(context.Background())
@@ -119,7 +119,7 @@ func (r *UploadedFilePostgresRepository) StoreUploadedFile(uploadedFile *storage
 	return uploadedFileTable.ToEntity(), nil
 }
 
-func (r *UploadedFilePostgresRepository) DeleteUploadedFile(identity core.Identity) error {
+func (r *UploadedFilePostgresRepository) DeleteUploadedFile(params storage_core.DeleteUploadedFileParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -135,7 +135,7 @@ func (r *UploadedFilePostgresRepository) DeleteUploadedFile(identity core.Identi
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&UploadedFileTable{}).Where("internal_id = ?", identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&UploadedFileTable{}).Where("internal_id = ?", params.FileIdentity.Internal.String()).Exec(context.Background())
 
 	if err != nil {
 		if err == sql.ErrNoRows {

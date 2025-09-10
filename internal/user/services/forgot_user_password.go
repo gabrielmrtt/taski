@@ -56,13 +56,7 @@ func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error
 	s.UserRepository.SetTransaction(tx)
 	s.PasswordRecoveryRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
-		Email: input.Email,
-		Include: map[string]any{
-			"credentials": true,
-		},
-	})
-
+	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -74,14 +68,12 @@ func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error
 	}
 
 	passwordRecovery, err := user_core.NewPasswordRecovery(user.Identity, 48*time.Hour)
-
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
-	_, err = s.PasswordRecoveryRepository.StorePasswordRecovery(passwordRecovery)
-
+	_, err = s.PasswordRecoveryRepository.StorePasswordRecovery(user_core.StorePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

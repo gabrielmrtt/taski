@@ -19,15 +19,10 @@ func NewGetMeService(
 
 type GetMeInput struct {
 	LoggedUserIdentity core.Identity
-	Include            map[string]any
 }
 
 func (s *GetMeService) Execute(input GetMeInput) (*user_core.UserDto, error) {
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: input.LoggedUserIdentity,
-		Include:  input.Include,
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

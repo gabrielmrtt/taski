@@ -139,10 +139,8 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_core.GetUserByIde
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("users.internal_id = ?", params.Identity.Internal)
-
+	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("users.internal_id = ?", params.UserIdentity.Internal)
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -165,9 +163,7 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailP
 	}
 
 	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("user_credentials.email = ?", params.Email)
-
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -177,38 +173,6 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailP
 	}
 
 	return user.ToEntity(), nil
-}
-
-func (r *UserPostgresRepository) ListUsersBy(params user_core.ListUsersParams) (*[]user_core.User, error) {
-	var users []UserTable
-	var selectQuery *bun.SelectQuery
-
-	if r.tx != nil && !r.tx.IsClosed() {
-		selectQuery = r.tx.Tx.NewSelect()
-	} else {
-		selectQuery = r.db.NewSelect()
-	}
-
-	selectQuery = selectQuery.Model(&users)
-	selectQuery = applyFilters(selectQuery, params.Filters)
-
-	err := selectQuery.Scan(context.Background())
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return &[]user_core.User{}, nil
-		}
-
-		return nil, err
-	}
-
-	var userEntities []user_core.User
-
-	for _, user := range users {
-		userEntities = append(userEntities, *user.ToEntity())
-	}
-
-	return &userEntities, nil
 }
 
 func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersParams) (*core.PaginationOutput[user_core.User], error) {
@@ -233,17 +197,13 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 
 	selectQuery = selectQuery.Model(&users)
 	selectQuery = applyFilters(selectQuery, params.Filters)
-
 	countBeforePagination, err := selectQuery.Count(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-
 	err = selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &core.PaginationOutput[user_core.User]{
@@ -258,7 +218,6 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 	}
 
 	var userEntities []user_core.User
-
 	for _, user := range users {
 		userEntities = append(userEntities, *user.ToEntity())
 	}
@@ -271,7 +230,7 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 	}, nil
 }
 
-func (r *UserPostgresRepository) StoreUser(user *user_core.User) (*user_core.User, error) {
+func (r *UserPostgresRepository) StoreUser(params user_core.StoreUserParams) (*user_core.User, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -288,57 +247,52 @@ func (r *UserPostgresRepository) StoreUser(user *user_core.User) (*user_core.Use
 	}
 
 	userTable := &UserTable{
-		InternalId: user.Identity.Internal.String(),
-		PublicId:   user.Identity.Public,
-		Status:     string(user.Status),
-		CreatedAt:  *user.Timestamps.CreatedAt,
-		UpdatedAt:  user.Timestamps.UpdatedAt,
-		DeletedAt:  user.DeletedAt,
+		InternalId: params.User.Identity.Internal.String(),
+		PublicId:   params.User.Identity.Public,
+		Status:     string(params.User.Status),
+		CreatedAt:  *params.User.Timestamps.CreatedAt,
+		UpdatedAt:  params.User.Timestamps.UpdatedAt,
+		DeletedAt:  params.User.DeletedAt,
 	}
 
 	_, err := tx.NewInsert().Model(userTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	userCredentialsTable := &UserCredentialsTable{
 		UserInternalId: userTable.InternalId,
-		Name:           user.Credentials.Name,
-		Email:          user.Credentials.Email,
-		Password:       user.Credentials.Password,
-		PhoneNumber:    user.Credentials.PhoneNumber,
+		Name:           params.User.Credentials.Name,
+		Email:          params.User.Credentials.Email,
+		Password:       params.User.Credentials.Password,
+		PhoneNumber:    params.User.Credentials.PhoneNumber,
 	}
 
 	_, err = tx.NewInsert().Model(userCredentialsTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	var profilePictureInternalId *string
-
-	if user.Data.ProfilePictureIdentity != nil {
-		internalId := user.Data.ProfilePictureIdentity.Internal.String()
+	if params.User.Data.ProfilePictureIdentity != nil {
+		internalId := params.User.Data.ProfilePictureIdentity.Internal.String()
 		profilePictureInternalId = &internalId
 	}
 
 	userDataTable := &UserDataTable{
 		UserInternalId:           userTable.InternalId,
-		DisplayName:              user.Data.DisplayName,
-		About:                    user.Data.About,
+		DisplayName:              params.User.Data.DisplayName,
+		About:                    params.User.Data.About,
 		ProfilePictureInternalId: profilePictureInternalId,
 	}
 
 	_, err = tx.NewInsert().Model(userDataTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	if shouldCommit {
 		err = tx.Commit()
-
 		if err != nil {
 			return nil, err
 		}
@@ -347,7 +301,7 @@ func (r *UserPostgresRepository) StoreUser(user *user_core.User) (*user_core.Use
 	return userTable.ToEntity(), nil
 }
 
-func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
+func (r *UserPostgresRepository) UpdateUser(params user_core.UpdateUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -364,16 +318,15 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 	}
 
 	userTable := &UserTable{
-		InternalId: user.Identity.Internal.String(),
-		PublicId:   user.Identity.Public,
-		Status:     string(user.Status),
-		CreatedAt:  *user.Timestamps.CreatedAt,
-		UpdatedAt:  user.Timestamps.UpdatedAt,
-		DeletedAt:  user.DeletedAt,
+		InternalId: params.User.Identity.Internal.String(),
+		PublicId:   params.User.Identity.Public,
+		Status:     string(params.User.Status),
+		CreatedAt:  *params.User.Timestamps.CreatedAt,
+		UpdatedAt:  params.User.Timestamps.UpdatedAt,
+		DeletedAt:  params.User.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(userTable).Where("internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewUpdate().Model(userTable).Where("internal_id = ?", params.User.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -382,17 +335,16 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 		return err
 	}
 
-	if user.Credentials != nil {
+	if params.User.Credentials != nil {
 		userCredentialsTable := &UserCredentialsTable{
 			UserInternalId: userTable.InternalId,
-			Name:           user.Credentials.Name,
-			Email:          user.Credentials.Email,
-			Password:       user.Credentials.Password,
-			PhoneNumber:    user.Credentials.PhoneNumber,
+			Name:           params.User.Credentials.Name,
+			Email:          params.User.Credentials.Email,
+			Password:       params.User.Credentials.Password,
+			PhoneNumber:    params.User.Credentials.PhoneNumber,
 		}
 
-		_, err = tx.NewUpdate().Model(userCredentialsTable).Where("user_internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
-
+		_, err = tx.NewUpdate().Model(userCredentialsTable).Where("user_internal_id = ?", params.User.Identity.Internal.String()).Exec(context.Background())
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return nil
@@ -402,23 +354,21 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 		}
 	}
 
-	if user.Data != nil {
+	if params.User.Data != nil {
 		var profilePictureInternalId *string
-
-		if user.Data.ProfilePictureIdentity != nil {
-			internalId := user.Data.ProfilePictureIdentity.Internal.String()
+		if params.User.Data.ProfilePictureIdentity != nil {
+			internalId := params.User.Data.ProfilePictureIdentity.Internal.String()
 			profilePictureInternalId = &internalId
 		}
 
 		userDataTable := &UserDataTable{
 			UserInternalId:           userTable.InternalId,
-			DisplayName:              user.Data.DisplayName,
-			About:                    user.Data.About,
+			DisplayName:              params.User.Data.DisplayName,
+			About:                    params.User.Data.About,
 			ProfilePictureInternalId: profilePictureInternalId,
 		}
 
-		_, err = tx.NewUpdate().Model(userDataTable).Where("user_internal_id = ?", user.Identity.Internal.String()).Exec(context.Background())
-
+		_, err = tx.NewUpdate().Model(userDataTable).Where("user_internal_id = ?", params.User.Identity.Internal.String()).Exec(context.Background())
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return nil
@@ -430,7 +380,6 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 
 	if shouldCommit {
 		err = tx.Commit()
-
 		if err != nil {
 			return err
 		}
@@ -439,7 +388,7 @@ func (r *UserPostgresRepository) UpdateUser(user *user_core.User) error {
 	return nil
 }
 
-func (r *UserPostgresRepository) DeleteUser(userIdentity core.Identity) error {
+func (r *UserPostgresRepository) DeleteUser(params user_core.DeleteUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -455,8 +404,7 @@ func (r *UserPostgresRepository) DeleteUser(userIdentity core.Identity) error {
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&UserTable{}).Where("internal_id = ?", userIdentity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewDelete().Model(&UserTable{}).Where("internal_id = ?", params.UserIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -467,7 +415,6 @@ func (r *UserPostgresRepository) DeleteUser(userIdentity core.Identity) error {
 
 	if shouldCommit {
 		err = tx.Commit()
-
 		if err != nil {
 			return err
 		}

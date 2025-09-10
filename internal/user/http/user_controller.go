@@ -39,12 +39,13 @@ type GetMeResponse = core_http.HttpSuccessResponseWithData[user_core.UserDto]
 
 // GetMe godoc
 // @Summary Get me
-// @Schemes
-// @Description Get me
+// @Description Returns the authenticated user.
 // @Tags User
 // @Accept json
 // @Produce json
 // @Success 200 {object} GetMeResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /me [get]
@@ -64,6 +65,22 @@ func (c *UserController) GetMe(ctx *gin.Context) {
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
+type ChangeUserPasswordResponse = core_http.EmptyHttpSuccessResponse
+
+// ChangeUserPassword godoc
+// @Summary Change user password
+// @Description Change the authenticated user password.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.ChangeUserPasswordRequest true "Request body"
+// @Success 200 {object} ChangeUserPasswordResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /me/password [patch]
 func (c *UserController) ChangeUserPassword(ctx *gin.Context) {
 	var request user_http_requests.ChangeUserPasswordRequest
 
@@ -85,6 +102,22 @@ func (c *UserController) ChangeUserPassword(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type UpdateUserCredentialsResponse = core_http.EmptyHttpSuccessResponse
+
+// UpdateUserCredentials godoc
+// @Summary Update user credentials
+// @Description Update the authenticated user credentials.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body user_http_requests.UpdateUserCredentialsRequest true "Request body"
+// @Success 200 {object} UpdateUserCredentialsResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /me/credentials [put]
 func (c *UserController) UpdateUserCredentials(ctx *gin.Context) {
 	var request user_http_requests.UpdateUserCredentialsRequest
 
@@ -106,6 +139,22 @@ func (c *UserController) UpdateUserCredentials(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type UpdateUserDataResponse = core_http.EmptyHttpSuccessResponse
+
+// UpdateUserData godoc
+// @Summary Update user data
+// @Description Update the authenticated user data.
+// @Tags User
+// @Accept mpfd
+// @Produce json
+// @Param request body user_http_requests.UpdateUserDataRequest true "Request body"
+// @Success 200 {object} UpdateUserDataResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /me/data [put]
 func (c *UserController) UpdateUserData(ctx *gin.Context) {
 	var request user_http_requests.UpdateUserDataRequest
 
@@ -127,6 +176,21 @@ func (c *UserController) UpdateUserData(ctx *gin.Context) {
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
+type DeleteUserResponse = core_http.EmptyHttpSuccessResponse
+
+// DeleteUser godoc
+// @Summary Delete user
+// @Description Deletes the authenticated user.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} DeleteUserResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /me [delete]
 func (c *UserController) DeleteUser(ctx *gin.Context) {
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 

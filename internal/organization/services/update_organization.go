@@ -58,10 +58,7 @@ func (s *UpdateOrganizationService) Execute(input UpdateOrganizationInput) error
 
 	s.OrganizationRepository.SetTransaction(tx)
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{
-		Identity: input.OrganizationIdentity,
-	})
-
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -80,7 +77,7 @@ func (s *UpdateOrganizationService) Execute(input UpdateOrganizationInput) error
 		}
 	}
 
-	err = s.OrganizationRepository.UpdateOrganization(organization)
+	err = s.OrganizationRepository.UpdateOrganization(organization_core.UpdateOrganizationParams{Organization: organization})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

@@ -36,11 +36,7 @@ func (s *DeleteUserService) Execute(input DeleteUserInput) error {
 
 	s.UserRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: input.UserIdentity,
-		Include:  map[string]any{},
-	})
-
+	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -53,8 +49,7 @@ func (s *DeleteUserService) Execute(input DeleteUserInput) error {
 
 	user.Delete()
 
-	err = s.UserRepository.UpdateUser(user)
-
+	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

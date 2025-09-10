@@ -3,6 +3,7 @@ package organization_http_middlewares
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_database_postgres "github.com/gabrielmrtt/taski/internal/organization/database/postgres"
 	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
 	"github.com/gin-gonic/gin"
@@ -22,8 +23,10 @@ func BlockIfUserIsNotPartOfOrganization() gin.HandlerFunc {
 
 		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
 
-		orgUser, err := repo.GetOrganizationUserByIdentity(organizationIdentity, authenticatedUserIdentity)
-
+		orgUser, err := repo.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+			OrganizationIdentity: organizationIdentity,
+			UserIdentity:         authenticatedUserIdentity,
+		})
 		if err != nil {
 			core_http.NewHttpErrorResponse(ctx, err)
 			ctx.Abort()
@@ -55,11 +58,10 @@ func BlockIfUserIsNotSameOrganizationUser() gin.HandlerFunc {
 
 		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
 
-		orgUser, err := repo.GetOrganizationUserByIdentity(
-			organizationIdentity,
-			authenticatedUserIdentity,
-		)
-
+		orgUser, err := repo.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+			OrganizationIdentity: organizationIdentity,
+			UserIdentity:         authenticatedUserIdentity,
+		})
 		if err != nil {
 			core_http.NewHttpErrorResponse(ctx, err)
 			ctx.Abort()

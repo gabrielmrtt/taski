@@ -35,12 +35,11 @@ type RegisterUserResponse = core_http.HttpSuccessResponseWithData[user_core.User
 
 // RegisterUser godoc
 // @Summary Register a new user
-// @Schemes
-// @Description Register a new user
+// @Description Register a new user and creates a new user registration token. To activate the user, you need to verify the user registration using their user registration token.
 // @Tags User Registration
 // @Accept json
 // @Produce json
-// @Param request body user_http_requests.RegisterUserRequest true "Register User Request"
+// @Param request body user_http_requests.RegisterUserRequest true "Request body"
 // @Success 200 {object} RegisterUserResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
@@ -67,16 +66,16 @@ type VerifyUserRegistrationResponse = core_http.EmptyHttpSuccessResponse
 
 // VerifyUserRegistration godoc
 // @Summary Verify user registration
-// @Schemes
-// @Description Verify user registration
+// @Description Verifies an user registration using an user registration token. After verifying, the user will be activated and ready to use other services.
 // @Tags User Registration
 // @Accept json
 // @Produce json
-// @Param request body user_http_requests.VerifyUserRegistrationRequest true "Verify User Registration Request"
+// @Param request body user_http_requests.VerifyUserRegistrationRequest true "Request body"
 // @Success 200 {object} VerifyUserRegistrationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
-// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 409 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /user-registration/verify [post]
 func (c *UserRegistrationController) VerifyUserRegistration(ctx *gin.Context) {
 	var request user_http_requests.VerifyUserRegistrationRequest
@@ -99,16 +98,16 @@ type ForgotUserPasswordResponse = core_http.EmptyHttpSuccessResponse
 
 // ForgotUserPassword godoc
 // @Summary Forgot user password
-// @Schemes
-// @Description Forgot user password
+// @Description Creates a new password recovery token.
 // @Tags User Registration
 // @Accept json
 // @Produce json
-// @Param request body user_http_requests.ForgotUserPasswordRequest true "Forgot User Password Request"
+// @Param request body user_http_requests.ForgotUserPasswordRequest true "Request body"
 // @Success 200 {object} ForgotUserPasswordResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
-// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 409 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /user-registration/forgot-password [post]
 func (c *UserRegistrationController) ForgotUserPassword(ctx *gin.Context) {
 	var request user_http_requests.ForgotUserPasswordRequest
@@ -131,16 +130,16 @@ type RecoverUserPasswordResponse = core_http.EmptyHttpSuccessResponse
 
 // RecoverUserPassword godoc
 // @Summary Recover user password
-// @Schemes
-// @Description Recover user password
+// @Description Recovers an user password using a password recovery token.
 // @Tags User Registration
 // @Accept json
 // @Produce json
-// @Param request body user_http_requests.RecoverUserPasswordRequest true "Recover User Password Request"
+// @Param request body user_http_requests.RecoverUserPasswordRequest true "Request body"
 // @Success 200 {object} RecoverUserPasswordResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
-// @Failure 500 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 409 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /user-registration/recover-password [post]
 func (c *UserRegistrationController) RecoverUserPassword(ctx *gin.Context) {
 	var request user_http_requests.RecoverUserPasswordRequest

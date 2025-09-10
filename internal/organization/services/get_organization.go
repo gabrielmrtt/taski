@@ -30,9 +30,7 @@ func (s *GetOrganizationService) Execute(input GetOrganizationInput) (*organizat
 		return nil, err
 	}
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{
-		Identity: input.OrganizationIdentity,
-	})
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

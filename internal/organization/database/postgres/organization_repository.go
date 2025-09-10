@@ -110,10 +110,8 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organization).Where("internal_id = ?", params.Identity.Internal.String())
-
+	selectQuery = selectQuery.Model(&organization).Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -123,36 +121,6 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 	}
 
 	return organization.ToEntity(), nil
-}
-
-func (r *OrganizationPostgresRepository) ListOrganizationsBy(params organization_core.ListOrganizationsParams) (*[]organization_core.Organization, error) {
-	var organizations []OrganizationTable
-	var selectQuery *bun.SelectQuery
-
-	if r.tx != nil && !r.tx.IsClosed() {
-		selectQuery = r.tx.Tx.NewSelect()
-	} else {
-		selectQuery = r.db.NewSelect()
-	}
-
-	selectQuery = selectQuery.Model(&organizations)
-	selectQuery = r.applyFilters(selectQuery, params.Filters)
-
-	err := selectQuery.Scan(context.Background())
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return &[]organization_core.Organization{}, nil
-		}
-	}
-
-	var organizationEntities []organization_core.Organization
-
-	for _, organization := range organizations {
-		organizationEntities = append(organizationEntities, *organization.ToEntity())
-	}
-
-	return &organizationEntities, nil
 }
 
 func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organization_core.PaginateOrganizationsParams) (*core.PaginationOutput[organization_core.Organization], error) {
@@ -183,13 +151,11 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-
 	err = selectQuery.Scan(context.Background(), &organizations)
 
 	if err != nil {
@@ -205,8 +171,7 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 		return nil, err
 	}
 
-	var organizationEntities []organization_core.Organization = []organization_core.Organization{}
-
+	var organizationEntities []organization_core.Organization = make([]organization_core.Organization, 0)
 	for _, organization := range organizations {
 		organizationEntities = append(organizationEntities, *organization.ToEntity())
 	}
@@ -219,7 +184,7 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	}, nil
 }
 
-func (r *OrganizationPostgresRepository) StoreOrganization(organization *organization_core.Organization) (*organization_core.Organization, error) {
+func (r *OrganizationPostgresRepository) StoreOrganization(params organization_core.StoreOrganizationParams) (*organization_core.Organization, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -236,31 +201,30 @@ func (r *OrganizationPostgresRepository) StoreOrganization(organization *organiz
 	}
 
 	var userCreatorInternalId *string
-	if organization.UserCreatorIdentity != nil {
-		identity := organization.UserCreatorIdentity.Internal.String()
+	if params.Organization.UserCreatorIdentity != nil {
+		identity := params.Organization.UserCreatorIdentity.Internal.String()
 		userCreatorInternalId = &identity
 	}
 
 	var userEditorInternalId *string
-	if organization.UserEditorIdentity != nil {
-		identity := organization.UserEditorIdentity.Internal.String()
+	if params.Organization.UserEditorIdentity != nil {
+		identity := params.Organization.UserEditorIdentity.Internal.String()
 		userEditorInternalId = &identity
 	}
 
 	organizationTable := &OrganizationTable{
-		InternalId:            organization.Identity.Internal.String(),
-		PublicId:              organization.Identity.Public,
-		Name:                  organization.Name,
-		Status:                string(organization.Status),
+		InternalId:            params.Organization.Identity.Internal.String(),
+		PublicId:              params.Organization.Identity.Public,
+		Name:                  params.Organization.Name,
+		Status:                string(params.Organization.Status),
 		UserCreatorInternalId: userCreatorInternalId,
 		UserEditorInternalId:  userEditorInternalId,
-		CreatedAt:             *organization.Timestamps.CreatedAt,
-		UpdatedAt:             organization.Timestamps.UpdatedAt,
-		DeletedAt:             organization.DeletedAt,
+		CreatedAt:             *params.Organization.Timestamps.CreatedAt,
+		UpdatedAt:             params.Organization.Timestamps.UpdatedAt,
+		DeletedAt:             params.Organization.DeletedAt,
 	}
 
 	_, err := tx.NewInsert().Model(organizationTable).Exec(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +236,7 @@ func (r *OrganizationPostgresRepository) StoreOrganization(organization *organiz
 	return organizationTable.ToEntity(), nil
 }
 
-func (r *OrganizationPostgresRepository) UpdateOrganization(organization *organization_core.Organization) error {
+func (r *OrganizationPostgresRepository) UpdateOrganization(params organization_core.UpdateOrganizationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -289,31 +253,30 @@ func (r *OrganizationPostgresRepository) UpdateOrganization(organization *organi
 	}
 
 	var userCreatorInternalId *string
-	if organization.UserCreatorIdentity != nil {
-		identity := organization.UserCreatorIdentity.Internal.String()
+	if params.Organization.UserCreatorIdentity != nil {
+		identity := params.Organization.UserCreatorIdentity.Internal.String()
 		userCreatorInternalId = &identity
 	}
 
 	var userEditorInternalId *string
-	if organization.UserEditorIdentity != nil {
-		identity := organization.UserEditorIdentity.Internal.String()
+	if params.Organization.UserEditorIdentity != nil {
+		identity := params.Organization.UserEditorIdentity.Internal.String()
 		userEditorInternalId = &identity
 	}
 
 	organizationTable := &OrganizationTable{
-		InternalId:            organization.Identity.Internal.String(),
-		PublicId:              organization.Identity.Public,
-		Name:                  organization.Name,
-		Status:                string(organization.Status),
+		InternalId:            params.Organization.Identity.Internal.String(),
+		PublicId:              params.Organization.Identity.Public,
+		Name:                  params.Organization.Name,
+		Status:                string(params.Organization.Status),
 		UserCreatorInternalId: userCreatorInternalId,
 		UserEditorInternalId:  userEditorInternalId,
-		CreatedAt:             *organization.Timestamps.CreatedAt,
-		UpdatedAt:             organization.Timestamps.UpdatedAt,
-		DeletedAt:             organization.DeletedAt,
+		CreatedAt:             *params.Organization.Timestamps.CreatedAt,
+		UpdatedAt:             params.Organization.Timestamps.UpdatedAt,
+		DeletedAt:             params.Organization.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(organizationTable).Where("internal_id = ?", organization.Identity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewUpdate().Model(organizationTable).Where("internal_id = ?", params.Organization.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -327,7 +290,7 @@ func (r *OrganizationPostgresRepository) UpdateOrganization(organization *organi
 	return nil
 }
 
-func (r *OrganizationPostgresRepository) DeleteOrganization(organizationIdentity core.Identity) error {
+func (r *OrganizationPostgresRepository) DeleteOrganization(params organization_core.DeleteOrganizationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -343,8 +306,7 @@ func (r *OrganizationPostgresRepository) DeleteOrganization(organizationIdentity
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&OrganizationTable{}).Where("internal_id = ?", organizationIdentity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewDelete().Model(&OrganizationTable{}).Where("internal_id = ?", params.OrganizationIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

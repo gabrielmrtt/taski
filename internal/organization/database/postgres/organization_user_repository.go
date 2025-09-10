@@ -49,6 +49,8 @@ func (r *OrganizationUserPostgresRepository) SetTransaction(tx core.Transaction)
 }
 
 func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters organization_core.OrganizationUserFilters) *bun.SelectQuery {
+	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+
 	if filters.Name != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.name", filters.Name)
 	}
@@ -72,7 +74,7 @@ func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.Selec
 	return selectQuery
 }
 
-func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(organizationIdentity core.Identity, userIdentity core.Identity) (*organization_core.OrganizationUser, error) {
+func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(params organization_core.GetOrganizationUserByIdentityParams) (*organization_core.OrganizationUser, error) {
 	var organizationUser OrganizationUserTable
 	var selectQuery *bun.SelectQuery
 
@@ -82,7 +84,7 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(organ
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUser).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&organizationUser).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 
@@ -97,37 +99,7 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(organ
 	return organizationUser.ToEntity(), nil
 }
 
-func (r *OrganizationUserPostgresRepository) ListOrganizationUsersBy(params organization_core.ListOrganizationUsersParams) (*[]organization_core.OrganizationUser, error) {
-	var organizationUsers []OrganizationUserTable
-	var selectQuery *bun.SelectQuery
-
-	if r.tx != nil && !r.tx.IsClosed() {
-		selectQuery = r.tx.Tx.NewSelect()
-	} else {
-		selectQuery = r.db.NewSelect()
-	}
-
-	selectQuery = selectQuery.Model(&organizationUsers).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
-	selectQuery = r.applyFilters(selectQuery, params.Filters)
-
-	err := selectQuery.Scan(context.Background())
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return &[]organization_core.OrganizationUser{}, nil
-		}
-	}
-
-	var organizationUserEntities []organization_core.OrganizationUser
-
-	for _, organizationUser := range organizationUsers {
-		organizationUserEntities = append(organizationUserEntities, *organizationUser.ToEntity())
-	}
-
-	return &organizationUserEntities, nil
-}
-
-func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organizationIdentity core.Identity, params organization_core.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
+func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params organization_core.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
 	var organizationUsers []OrganizationUserTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -148,17 +120,13 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organiz
 	}
 
 	selectQuery = selectQuery.Model(&organizationUsers).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
-	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ?", organizationIdentity.Internal.String())
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
-
 	countBeforePagination, err := selectQuery.Count(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-
 	err = selectQuery.Scan(context.Background())
 
 	if err != nil {
@@ -175,7 +143,6 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organiz
 	}
 
 	var organizationUserEntities []organization_core.OrganizationUser = make([]organization_core.OrganizationUser, 0)
-
 	for _, organizationUser := range organizationUsers {
 		organizationUserEntities = append(organizationUserEntities, *organizationUser.ToEntity())
 	}
@@ -188,7 +155,7 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(organiz
 	}, nil
 }
 
-func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(organizationUser *organization_core.OrganizationUser) (*organization_core.OrganizationUser, error) {
+func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organization_core.CreateOrganizationUserParams) (*organization_core.OrganizationUser, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -205,14 +172,13 @@ func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(organization
 	}
 
 	organizationUserTable := &OrganizationUserTable{
-		OrganizationInternalId: organizationUser.OrganizationIdentity.Internal.String(),
-		UserInternalId:         organizationUser.User.Identity.Internal.String(),
-		RoleInternalId:         organizationUser.Role.Identity.Internal.String(),
-		Status:                 string(organizationUser.Status),
+		OrganizationInternalId: params.OrganizationUser.OrganizationIdentity.Internal.String(),
+		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
+		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
+		Status:                 string(params.OrganizationUser.Status),
 	}
 
 	_, err := tx.NewInsert().Model(organizationUserTable).Exec(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -225,10 +191,10 @@ func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(organization
 		err = tx.Commit()
 	}
 
-	return organizationUser, nil
+	return organizationUserTable.ToEntity(), nil
 }
 
-func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(organizationUser *organization_core.OrganizationUser) error {
+func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organization_core.UpdateOrganizationUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -245,14 +211,13 @@ func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(organization
 	}
 
 	organizationUserTable := &OrganizationUserTable{
-		OrganizationInternalId: organizationUser.OrganizationIdentity.Internal.String(),
-		UserInternalId:         organizationUser.User.Identity.Internal.String(),
-		RoleInternalId:         organizationUser.Role.Identity.Internal.String(),
-		Status:                 string(organizationUser.Status),
+		OrganizationInternalId: params.OrganizationUser.OrganizationIdentity.Internal.String(),
+		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
+		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
+		Status:                 string(params.OrganizationUser.Status),
 	}
 
-	_, err := tx.NewUpdate().Model(organizationUserTable).Where("internal_id = ?", organizationUser.User.Identity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewUpdate().Model(organizationUserTable).Where("internal_id = ?", params.OrganizationUser.User.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -266,7 +231,7 @@ func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(organization
 	return nil
 }
 
-func (r *OrganizationUserPostgresRepository) DeleteOrganizationUser(organizationIdentity core.Identity, userIdentity core.Identity) error {
+func (r *OrganizationUserPostgresRepository) DeleteOrganizationUser(params organization_core.DeleteOrganizationUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -282,8 +247,7 @@ func (r *OrganizationUserPostgresRepository) DeleteOrganizationUser(organization
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&OrganizationUserTable{}).Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", organizationIdentity.Internal.String(), userIdentity.Internal.String()).Exec(context.Background())
-
+	_, err := tx.NewDelete().Model(&OrganizationUserTable{}).Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

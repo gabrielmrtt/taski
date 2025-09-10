@@ -92,7 +92,7 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 	}
 
 	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
-		Identity: input.UserCreatorIdentity,
+		UserIdentity: input.UserCreatorIdentity,
 	})
 	if err != nil {
 		tx.Rollback()
@@ -115,20 +115,19 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, err
 	}
 
-	organization, err = s.OrganizationRepository.StoreOrganization(organization)
+	organization, err = s.OrganizationRepository.StoreOrganization(organization_core.StoreOrganizationParams{Organization: organization})
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organizationUser)
+	organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_core.CreateOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
 	err = tx.Commit()
-
 	if err != nil {
 		tx.Rollback()
 		return nil, err

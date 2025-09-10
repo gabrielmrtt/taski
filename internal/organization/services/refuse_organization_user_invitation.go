@@ -49,7 +49,10 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(input.OrganizationIdentity, input.UserIdentity)
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+		OrganizationIdentity: input.OrganizationIdentity,
+		UserIdentity:         input.UserIdentity,
+	})
 	if err != nil {
 		return err
 	}
@@ -60,7 +63,7 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 
 	organizationUser.RefuseInvitation()
 
-	err = s.OrganizationUserRepository.UpdateOrganizationUser(organizationUser)
+	err = s.OrganizationUserRepository.UpdateOrganizationUser(organization_core.UpdateOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {
 		return err
 	}

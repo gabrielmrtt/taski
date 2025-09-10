@@ -15,10 +15,7 @@ func NewDeleteFileByIdentityService(uploadedFileRepository storage_core.Uploaded
 }
 
 func (e *DeleteFileByIdentityService) Execute(identity core.Identity) error {
-	uploadedFile, err := e.UploadedFileRepository.GetUploadedFileByIdentity(storage_core.GetUploadedFileByIdentityParams{
-		Identity: identity,
-	})
-
+	uploadedFile, err := e.UploadedFileRepository.GetUploadedFileByIdentity(storage_core.GetUploadedFileByIdentityParams{FileIdentity: identity})
 	if err != nil {
 		return err
 	}
@@ -28,13 +25,11 @@ func (e *DeleteFileByIdentityService) Execute(identity core.Identity) error {
 	}
 
 	err = e.StorageRepository.DeleteFile(*uploadedFile.FileDirectory, *uploadedFile.File)
-
 	if err != nil {
 		return err
 	}
 
-	err = e.UploadedFileRepository.DeleteUploadedFile(identity)
-
+	err = e.UploadedFileRepository.DeleteUploadedFile(storage_core.DeleteUploadedFileParams{FileIdentity: identity})
 	if err != nil {
 		return err
 	}

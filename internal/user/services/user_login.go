@@ -53,10 +53,7 @@ func (s *UserLoginService) Execute(input UserLoginInput) (*user_core.UserLoginDt
 		return nil, err
 	}
 
-	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
-		Email: input.Email,
-	})
-
+	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

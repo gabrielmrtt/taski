@@ -22,7 +22,6 @@ type ListOrganizationsInput struct {
 	ShowDeleted bool
 	Pagination  *core.PaginationInput
 	SortInput   *core.SortInput
-	Include     map[string]any
 }
 
 func (i ListOrganizationsInput) Validate() error {
@@ -37,7 +36,6 @@ func (s *ListOrganizationsService) Execute(input ListOrganizationsInput) (*core.
 	organizations, err := s.OrganizationRepository.PaginateOrganizationsBy(organization_core.PaginateOrganizationsParams{
 		Filters:     input.Filters,
 		ShowDeleted: input.ShowDeleted,
-		Include:     input.Include,
 		SortInput:   input.SortInput,
 		Pagination:  input.Pagination,
 	})

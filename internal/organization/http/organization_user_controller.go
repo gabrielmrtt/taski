@@ -5,6 +5,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
 	organization_http_requests "github.com/gabrielmrtt/taski/internal/organization/http/requests"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
@@ -36,6 +37,23 @@ func NewOrganizationUserController(
 	}
 }
 
+type ListOrganizationUsersResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationUserDto]
+
+// ListOrganizationUsers godoc
+// @Summary List organization users
+// @Description Lists all users in an organization.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param request query organization_http_requests.ListOrganizationUsersRequest true "Query parameters"
+// @Produce json
+// @Success 200 {object} ListOrganizationUsersResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user [get]
 func (c *OrganizationUserController) ListOrganizationUsers(ctx *gin.Context) {
 	var request organization_http_requests.ListOrganizationUsersRequest
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
@@ -57,6 +75,23 @@ func (c *OrganizationUserController) ListOrganizationUsers(ctx *gin.Context) {
 	return
 }
 
+type InviteUserToOrganizationResponse = core_http.EmptyHttpSuccessResponse
+
+// InviteUserToOrganization godoc
+// @Summary Invite user to organization
+// @Description Invites a user to an organization.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param request body organization_http_requests.InviteUserToOrganizationRequest true "Request body"
+// @Produce json
+// @Success 200 {object} InviteUserToOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user [post]
 func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) {
 	var request organization_http_requests.InviteUserToOrganizationRequest
 
@@ -80,6 +115,23 @@ func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) 
 	return
 }
 
+type RemoveUserFromOrganizationResponse = core_http.EmptyHttpSuccessResponse
+
+// RemoveUserFromOrganization godoc
+// @Summary Remove user from organization
+// @Description Removes a user from an organization.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param user_id path string true "User ID"
+// @Produce json
+// @Success 200 {object} RemoveUserFromOrganizationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user/:user_id [delete]
 func (c *OrganizationUserController) RemoveUserFromOrganization(ctx *gin.Context) {
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
@@ -99,6 +151,23 @@ func (c *OrganizationUserController) RemoveUserFromOrganization(ctx *gin.Context
 	return
 }
 
+type AcceptOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
+
+// AcceptOrganizationUserInvitation godoc
+// @Summary Accept organization user invitation
+// @Description Accepts an organization user invitation. Only the user itself can accept the invitation.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param user_id path string true "User ID"
+// @Produce json
+// @Success 200 {object} AcceptOrganizationUserInvitationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user/:user_id/accept-invitation [patch]
 func (c *OrganizationUserController) AcceptOrganizationUserInvitation(ctx *gin.Context) {
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
@@ -118,6 +187,23 @@ func (c *OrganizationUserController) AcceptOrganizationUserInvitation(ctx *gin.C
 	return
 }
 
+type RefuseOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
+
+// RefuseOrganizationUserInvitation godoc
+// @Summary Refuse organization user invitation
+// @Description Refuses an organization user invitation. Only the user itself can refuse the invitation.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param user_id path string true "User ID"
+// @Produce json
+// @Success 200 {object} RefuseOrganizationUserInvitationResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user/:user_id/refuse-invitation [patch]
 func (c *OrganizationUserController) RefuseOrganizationUserInvitation(ctx *gin.Context) {
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
