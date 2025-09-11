@@ -86,17 +86,6 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 	s.RoleRepository.SetTransaction(tx)
 	s.PermissionRepository.SetTransaction(tx)
 
-	organizationHasUser, err := s.RoleRepository.CheckIfOrganizatonHasUser(input.OrganizationIdentity, input.UserEditorIdentity)
-	if err != nil {
-		tx.Rollback()
-		return core.NewInternalError(err.Error())
-	}
-
-	if !organizationHasUser {
-		tx.Rollback()
-		return core.NewUnauthorizedError("user is not part of the organization")
-	}
-
 	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_repositories.GetRoleByIdentityAndOrganizationIdentityParams{
 		RoleIdentity:         input.RoleIdentity,
 		OrganizationIdentity: input.OrganizationIdentity,

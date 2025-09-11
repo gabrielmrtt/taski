@@ -23,7 +23,6 @@ func NewDeleteRoleService(
 type DeleteRoleInput struct {
 	RoleIdentity         core.Identity
 	OrganizationIdentity core.Identity
-	UserDeleterIdentity  core.Identity
 }
 
 func (i DeleteRoleInput) Validate() error {
@@ -41,17 +40,6 @@ func (s *DeleteRoleService) Execute(input DeleteRoleInput) error {
 	}
 
 	s.RoleRepository.SetTransaction(tx)
-
-	organizationHasUser, err := s.RoleRepository.CheckIfOrganizatonHasUser(input.OrganizationIdentity, input.UserDeleterIdentity)
-	if err != nil {
-		tx.Rollback()
-		return core.NewInternalError(err.Error())
-	}
-
-	if !organizationHasUser {
-		tx.Rollback()
-		return core.NewUnauthorizedError("user is not part of the organization")
-	}
 
 	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_repositories.GetRoleByIdentityAndOrganizationIdentityParams{
 		RoleIdentity:         input.RoleIdentity,

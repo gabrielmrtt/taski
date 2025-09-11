@@ -141,3 +141,7 @@ func (o *OrganizationUser) AcceptInvitation() {
 func (o *OrganizationUser) RefuseInvitation() {
 	o.Status = OrganizationUserStatusRefused
 }
+
+func (o *OrganizationUser) ChangeRole(role *role_core.Role) {
+	o.Role = role
+}

@@ -35,15 +35,6 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 		return nil, err
 	}
 
-	organizationHasUser, err := s.RoleRepository.CheckIfOrganizatonHasUser(input.OrganizationIdentity, input.LoggedUserIdentity)
-	if err != nil {
-		return nil, err
-	}
-
-	if !organizationHasUser {
-		return nil, core.NewUnauthorizedError("user is not part of the organization")
-	}
-
 	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
 	roles, err := s.RoleRepository.PaginateRolesBy(role_repositories.PaginateRolesParams{

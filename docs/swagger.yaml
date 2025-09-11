@@ -118,7 +118,7 @@ definitions:
         type: string
       display_name:
         type: string
-      profile_picture:
+      profile_picture_file_id:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_user.UserDto:
@@ -253,6 +253,19 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_organization_http.GetOrganizationUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   internal_organization_http.InviteUserToOrganizationResponse:
     properties:
       message:
@@ -313,6 +326,17 @@ definitions:
         type: string
     type: object
   internal_organization_http.UpdateOrganizationResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_organization_http.UpdateOrganizationUserResponse:
     properties:
       message:
         type: string
@@ -1345,6 +1369,96 @@ paths:
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
       summary: Remove user from organization
+      tags:
+      - Organization User
+    get:
+      consumes:
+      - application/json
+      description: Returns an organization user.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_organization_http.GetOrganizationUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get organization user
+      tags:
+      - Organization User
+    put:
+      consumes:
+      - application/json
+      description: Updates an organization user.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_organization_http.UpdateOrganizationUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update organization user
       tags:
       - Organization User
   /organization/:organization_id/user/:user_id/accept-invitation:

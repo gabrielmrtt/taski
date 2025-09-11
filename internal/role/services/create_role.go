@@ -83,15 +83,6 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 	s.RoleRepository.SetTransaction(tx)
 	s.PermissionRepository.SetTransaction(tx)
 
-	organizationHasUser, err := s.RoleRepository.CheckIfOrganizatonHasUser(input.OrganizationIdentity, input.UserCreatorIdentity)
-	if err != nil {
-		return nil, err
-	}
-
-	if !organizationHasUser {
-		return nil, core.NewUnauthorizedError("user is not part of the organization")
-	}
-
 	permissions := make([]role_core.Permission, 0)
 	for _, permissionSlug := range input.Permissions {
 		permission, err := s.PermissionRepository.GetPermissionBySlug(role_repositories.GetPermissionBySlugParams{

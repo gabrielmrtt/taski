@@ -59,8 +59,6 @@ type RoleRepository interface {
 	PaginateRolesBy(params PaginateRolesParams) (*core.PaginationOutput[role_core.Role], error)
 	ChangeRoleUsersToDefault(params ChangeRoleUsersToDefaultParams) error
 
-	CheckIfOrganizatonHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error)
-
 	StoreRole(params StoreRoleParams) (*role_core.Role, error)
 	UpdateRole(params UpdateRoleParams) error
 	DeleteRole(params DeleteRoleParams) error

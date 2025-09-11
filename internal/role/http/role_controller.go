@@ -135,14 +135,12 @@ type DeleteRoleResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /organization/:organization_id/role/:role_id [delete]
 func (c *RoleController) DeleteRole(ctx *gin.Context) {
-	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	roleIdentity := core.NewIdentityFromPublic(ctx.Param("role_id"))
 
 	input := role_services.DeleteRoleInput{
 		RoleIdentity:         roleIdentity,
 		OrganizationIdentity: organizationIdentity,
-		UserDeleterIdentity:  authenticatedUserIdentity,
 	}
 
 	err := c.DeleteRoleService.Execute(input)

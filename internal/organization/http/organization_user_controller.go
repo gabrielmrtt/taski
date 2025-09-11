@@ -19,6 +19,8 @@ type OrganizationUserController struct {
 	RemoveUserFromOrganizationService       *organization_services.RemoveUserFromOrganizationService
 	AcceptOrganizationUserInvitationService *organization_services.AcceptOrganizationUserInvitationService
 	RefuseOrganizationUserInvitationService *organization_services.RefuseOrganizationUserInvitationService
+	GetOrganizationUserService              *organization_services.GetOrganizationUserService
+	UpdateOrganizationUserService           *organization_services.UpdateOrganizationUserService
 }
 
 func NewOrganizationUserController(
@@ -27,6 +29,8 @@ func NewOrganizationUserController(
 	removeUserFromOrganizationService *organization_services.RemoveUserFromOrganizationService,
 	acceptOrganizationUserInvitationService *organization_services.AcceptOrganizationUserInvitationService,
 	refuseOrganizationUserInvitationService *organization_services.RefuseOrganizationUserInvitationService,
+	getOrganizationUserService *organization_services.GetOrganizationUserService,
+	updateOrganizationUserService *organization_services.UpdateOrganizationUserService,
 ) *OrganizationUserController {
 	return &OrganizationUserController{
 		ListOrganizationUsersService:            listOrganizationUsersService,
@@ -34,6 +38,8 @@ func NewOrganizationUserController(
 		RemoveUserFromOrganizationService:       removeUserFromOrganizationService,
 		AcceptOrganizationUserInvitationService: acceptOrganizationUserInvitationService,
 		RefuseOrganizationUserInvitationService: refuseOrganizationUserInvitationService,
+		GetOrganizationUserService:              getOrganizationUserService,
+		UpdateOrganizationUserService:           updateOrganizationUserService,
 	}
 }
 
@@ -223,14 +229,93 @@ func (c *OrganizationUserController) RefuseOrganizationUserInvitation(ctx *gin.C
 	return
 }
 
+type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationUserDto]
+
+// GetOrganizationUser godoc
+// @Summary Get organization user
+// @Description Returns an organization user.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param user_id path string true "User ID"
+// @Produce json
+// @Success 200 {object} GetOrganizationUserResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user/:user_id [get]
+func (c *OrganizationUserController) GetOrganizationUser(ctx *gin.Context) {
+	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
+
+	input := organization_services.GetOrganizationUserInput{
+		OrganizationIdentity: organizationIdentity,
+		UserIdentity:         userIdentity,
+	}
+
+	response, err := c.GetOrganizationUserService.Execute(input)
+	if err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
+	return
+}
+
+type UpdateOrganizationUserResponse = core_http.EmptyHttpSuccessResponse
+
+// UpdateOrganizationUser godoc
+// @Summary Update organization user
+// @Description Updates an organization user.
+// @Tags Organization User
+// @Accept json
+// @Param organization_id path string true "Organization ID"
+// @Param user_id path string true "User ID"
+// @Produce json
+// @Success 200 {object} UpdateOrganizationUserResponse
+// @Failure 400 {object} core_http.HttpErrorResponse
+// @Failure 401 {object} core_http.HttpErrorResponse
+// @Failure 403 {object} core_http.HttpErrorResponse
+// @Failure 404 {object} core_http.HttpErrorResponse
+// @Failure 500 {object} core_http.HttpErrorResponse
+// @Router /organization/:organization_id/user/:user_id [put]
+func (c *OrganizationUserController) UpdateOrganizationUser(ctx *gin.Context) {
+	var request organization_http_requests.UpdateOrganizationUserRequest
+
+	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	input := request.ToInput()
+	input.OrganizationIdentity = organizationIdentity
+	input.UserIdentity = userIdentity
+
+	err := c.UpdateOrganizationUserService.Execute(input)
+	if err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
+	return
+}
+
 func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
 	g := group.Group("/organization/:organization_id/user")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
 		g.GET("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.ListOrganizationUsers)
-
+		g.GET("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.GetOrganizationUser)
 		g.POST("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.InviteUserToOrganization)
+		g.PUT("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.UpdateOrganizationUser)
 		g.DELETE("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.RemoveUserFromOrganization)
 
 		g.PATCH("/:user_id/accept-invitation", organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser(), c.AcceptOrganizationUserInvitation)
