@@ -3,14 +3,15 @@ package organization_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 )
 
 type GetOrganizationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
+	OrganizationRepository organization_repositories.OrganizationRepository
 }
 
 func NewGetOrganizationService(
-	organizationRepository organization_core.OrganizationRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
 ) *GetOrganizationService {
 	return &GetOrganizationService{
 		OrganizationRepository: organizationRepository,
@@ -30,7 +31,7 @@ func (s *GetOrganizationService) Execute(input GetOrganizationInput) (*organizat
 		return nil, err
 	}
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_repositories.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

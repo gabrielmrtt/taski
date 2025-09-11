@@ -4,14 +4,15 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_http_middlewares "github.com/gabrielmrtt/taski/internal/user/http/middlewares"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type UserLoginService struct {
-	UserRepository user_core.UserRepository
+	UserRepository user_repositories.UserRepository
 }
 
 func NewUserLoginService(
-	userRepository user_core.UserRepository,
+	userRepository user_repositories.UserRepository,
 ) *UserLoginService {
 	return &UserLoginService{
 		UserRepository: userRepository,
@@ -53,7 +54,7 @@ func (s *UserLoginService) Execute(input UserLoginInput) (*user_core.UserLoginDt
 		return nil, err
 	}
 
-	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
+	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

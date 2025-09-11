@@ -3,15 +3,16 @@ package seeders
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RolesSeeder struct {
-	RoleRepository       role_core.RoleRepository
-	PermissionRepository role_core.PermissionRepository
+	RoleRepository       role_repositories.RoleRepository
+	PermissionRepository role_repositories.PermissionRepository
 }
 
-func NewRolesSeeder(roleRepository role_core.RoleRepository, permissionRepository role_core.PermissionRepository) *RolesSeeder {
+func NewRolesSeeder(roleRepository role_repositories.RoleRepository, permissionRepository role_repositories.PermissionRepository) *RolesSeeder {
 	return &RolesSeeder{
 		RoleRepository:       roleRepository,
 		PermissionRepository: permissionRepository,
@@ -19,8 +20,8 @@ func NewRolesSeeder(roleRepository role_core.RoleRepository, permissionRepositor
 }
 
 func (s *RolesSeeder) Run() error {
-	permissions, err := s.PermissionRepository.ListPermissionsBy(role_core.ListPermissionsParams{
-		Filters: role_core.PermissionFilters{},
+	permissions, err := s.PermissionRepository.ListPermissionsBy(role_repositories.ListPermissionsParams{
+		Filters: role_repositories.PermissionFilters{},
 		Include: map[string]any{},
 	})
 	if err != nil {
@@ -65,7 +66,7 @@ func (s *RolesSeeder) Run() error {
 	}
 
 	for _, role := range roles {
-		exists, err := s.RoleRepository.GetSystemDefaultRole(role_core.GetDefaultRoleParams{
+		exists, err := s.RoleRepository.GetSystemDefaultRole(role_repositories.GetDefaultRoleParams{
 			Slug: role.Slug,
 		})
 		if err != nil {
@@ -81,12 +82,12 @@ func (s *RolesSeeder) Run() error {
 			exists.DeletedAt = role.DeletedAt
 			exists.Timestamps = role.Timestamps
 
-			err = s.RoleRepository.UpdateRole(exists)
+			err = s.RoleRepository.UpdateRole(role_repositories.UpdateRoleParams{Role: exists})
 			if err != nil {
 				return err
 			}
 		} else {
-			_, err := s.RoleRepository.StoreRole(&role)
+			_, err := s.RoleRepository.StoreRole(role_repositories.StoreRoleParams{Role: &role})
 			if err != nil {
 				return err
 			}

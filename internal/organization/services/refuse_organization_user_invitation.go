@@ -2,21 +2,21 @@ package organization_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	organization_core "github.com/gabrielmrtt/taski/internal/organization"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type RefuseOrganizationUserInvitationService struct {
-	OrganizationRepository     organization_core.OrganizationRepository
-	OrganizationUserRepository organization_core.OrganizationUserRepository
-	UserRepository             user_core.UserRepository
+	OrganizationRepository     organization_repositories.OrganizationRepository
+	OrganizationUserRepository organization_repositories.OrganizationUserRepository
+	UserRepository             user_repositories.UserRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewRefuseOrganizationUserInvitationService(
-	organizationRepository organization_core.OrganizationRepository,
-	organizationUserRepository organization_core.OrganizationUserRepository,
-	userRepository user_core.UserRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
+	organizationUserRepository organization_repositories.OrganizationUserRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *RefuseOrganizationUserInvitationService {
 	return &RefuseOrganizationUserInvitationService{
@@ -49,7 +49,7 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_repositories.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
 		UserIdentity:         input.UserIdentity,
 	})
@@ -63,7 +63,7 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 
 	organizationUser.RefuseInvitation()
 
-	err = s.OrganizationUserRepository.UpdateOrganizationUser(organization_core.UpdateOrganizationUserParams{OrganizationUser: organizationUser})
+	err = s.OrganizationUserRepository.UpdateOrganizationUser(organization_repositories.UpdateOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {
 		return err
 	}

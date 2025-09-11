@@ -3,23 +3,24 @@ package organization_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type InviteUserToOrganizationService struct {
-	OrganizationRepository     organization_core.OrganizationRepository
-	OrganizationUserRepository organization_core.OrganizationUserRepository
-	UserRepository             user_core.UserRepository
-	RoleRepository             role_core.RoleRepository
+	OrganizationRepository     organization_repositories.OrganizationRepository
+	OrganizationUserRepository organization_repositories.OrganizationUserRepository
+	UserRepository             user_repositories.UserRepository
+	RoleRepository             role_repositories.RoleRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewInviteUserToOrganizationService(
-	organizationRepository organization_core.OrganizationRepository,
-	organizationUserRepository organization_core.OrganizationUserRepository,
-	userRepository user_core.UserRepository,
-	roleRepository role_core.RoleRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
+	organizationUserRepository organization_repositories.OrganizationUserRepository,
+	userRepository user_repositories.UserRepository,
+	roleRepository role_repositories.RoleRepository,
 	transactionRepository core.TransactionRepository,
 ) *InviteUserToOrganizationService {
 	return &InviteUserToOrganizationService{
@@ -54,7 +55,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_repositories.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		return err
 	}
@@ -63,7 +64,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		return core.NewNotFoundError("organization not found")
 	}
 
-	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{
+	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{
 		Email: input.Email,
 	})
 
@@ -71,7 +72,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		return core.NewNotFoundError("user not found")
 	}
 
-	role, err := s.RoleRepository.GetRoleByIdentity(role_core.GetRoleByIdentityParams{RoleIdentity: input.RoleIdentity})
+	role, err := s.RoleRepository.GetRoleByIdentity(role_repositories.GetRoleByIdentityParams{RoleIdentity: input.RoleIdentity})
 	if err != nil {
 		return err
 	}
@@ -81,7 +82,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	}
 
 	var organizationUser *organization_core.OrganizationUser = nil
-	organizationUser, err = s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_core.GetOrganizationUserByIdentityParams{
+	organizationUser, err = s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_repositories.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
 		UserIdentity:         user.Identity,
 	})
@@ -100,7 +101,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 			return err
 		}
 
-		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_core.CreateOrganizationUserParams{OrganizationUser: organizationUser})
+		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_repositories.CreateOrganizationUserParams{OrganizationUser: organizationUser})
 		if err != nil {
 			return err
 		}

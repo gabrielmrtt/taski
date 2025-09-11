@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 	role_database_postgres "github.com/gabrielmrtt/taski/internal/role/database/postgres"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	"github.com/google/uuid"
@@ -48,7 +49,7 @@ func (r *OrganizationUserPostgresRepository) SetTransaction(tx core.Transaction)
 	return nil
 }
 
-func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters organization_core.OrganizationUserFilters) *bun.SelectQuery {
+func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters organization_repositories.OrganizationUserFilters) *bun.SelectQuery {
 	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
 
 	if filters.Name != nil {
@@ -74,7 +75,7 @@ func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.Selec
 	return selectQuery
 }
 
-func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(params organization_core.GetOrganizationUserByIdentityParams) (*organization_core.OrganizationUser, error) {
+func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(params organization_repositories.GetOrganizationUserByIdentityParams) (*organization_core.OrganizationUser, error) {
 	var organizationUser OrganizationUserTable
 	var selectQuery *bun.SelectQuery
 
@@ -99,7 +100,7 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(param
 	return organizationUser.ToEntity(), nil
 }
 
-func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params organization_core.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
+func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params organization_repositories.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
 	var organizationUsers []OrganizationUserTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -155,7 +156,7 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 	}, nil
 }
 
-func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organization_core.CreateOrganizationUserParams) (*organization_core.OrganizationUser, error) {
+func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organization_repositories.CreateOrganizationUserParams) (*organization_core.OrganizationUser, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -194,7 +195,7 @@ func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organ
 	return organizationUserTable.ToEntity(), nil
 }
 
-func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organization_core.UpdateOrganizationUserParams) error {
+func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organization_repositories.UpdateOrganizationUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -231,7 +232,7 @@ func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organ
 	return nil
 }
 
-func (r *OrganizationUserPostgresRepository) DeleteOrganizationUser(params organization_core.DeleteOrganizationUserParams) error {
+func (r *OrganizationUserPostgresRepository) DeleteOrganizationUser(params organization_repositories.DeleteOrganizationUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 

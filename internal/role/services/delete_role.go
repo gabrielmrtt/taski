@@ -2,16 +2,16 @@ package role_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 )
 
 type DeleteRoleService struct {
-	RoleRepository        role_core.RoleRepository
+	RoleRepository        role_repositories.RoleRepository
 	TransactionRepository core.TransactionRepository
 }
 
 func NewDeleteRoleService(
-	roleRepository role_core.RoleRepository,
+	roleRepository role_repositories.RoleRepository,
 	transactionRepository core.TransactionRepository,
 ) *DeleteRoleService {
 	return &DeleteRoleService{
@@ -53,7 +53,7 @@ func (s *DeleteRoleService) Execute(input DeleteRoleInput) error {
 		return core.NewUnauthorizedError("user is not part of the organization")
 	}
 
-	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_core.GetRoleByIdentityAndOrganizationIdentityParams{
+	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_repositories.GetRoleByIdentityAndOrganizationIdentityParams{
 		RoleIdentity:         input.RoleIdentity,
 		OrganizationIdentity: input.OrganizationIdentity,
 	})
@@ -69,13 +69,13 @@ func (s *DeleteRoleService) Execute(input DeleteRoleInput) error {
 
 	role.Delete()
 
-	err = s.RoleRepository.UpdateRole(role_core.UpdateRoleParams{Role: role})
+	err = s.RoleRepository.UpdateRole(role_repositories.UpdateRoleParams{Role: role})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.RoleRepository.ChangeRoleUsersToDefault(role_core.ChangeRoleUsersToDefaultParams{
+	err = s.RoleRepository.ChangeRoleUsersToDefault(role_repositories.ChangeRoleUsersToDefaultParams{
 		RoleIdentity:    input.RoleIdentity,
 		DefaultRoleSlug: "default",
 	})

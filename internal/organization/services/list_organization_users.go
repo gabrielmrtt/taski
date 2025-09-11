@@ -3,14 +3,15 @@ package organization_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 )
 
 type ListOrganizationUsersService struct {
-	OrganizationUserRepository organization_core.OrganizationUserRepository
+	OrganizationUserRepository organization_repositories.OrganizationUserRepository
 }
 
 func NewListOrganizationUsersService(
-	organizationUserRepository organization_core.OrganizationUserRepository,
+	organizationUserRepository organization_repositories.OrganizationUserRepository,
 ) *ListOrganizationUsersService {
 	return &ListOrganizationUsersService{
 		OrganizationUserRepository: organizationUserRepository,
@@ -19,7 +20,7 @@ func NewListOrganizationUsersService(
 
 type ListOrganizationUsersInput struct {
 	OrganizationIdentity core.Identity
-	Filters              organization_core.OrganizationUserFilters
+	Filters              organization_repositories.OrganizationUserFilters
 	Pagination           *core.PaginationInput
 	SortInput            *core.SortInput
 }
@@ -33,7 +34,7 @@ func (s *ListOrganizationUsersService) Execute(input ListOrganizationUsersInput)
 		return nil, err
 	}
 
-	organizationUsers, err := s.OrganizationUserRepository.PaginateOrganizationUsersBy(organization_core.PaginateOrganizationUsersParams{
+	organizationUsers, err := s.OrganizationUserRepository.PaginateOrganizationUsersBy(organization_repositories.PaginateOrganizationUsersParams{
 		Filters:    input.Filters,
 		SortInput:  input.SortInput,
 		Pagination: input.Pagination,

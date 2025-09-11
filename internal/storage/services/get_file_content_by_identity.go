@@ -2,17 +2,17 @@ package storage_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	storage_repositories "github.com/gabrielmrtt/taski/internal/storage/repositories"
 )
 
 type GetFileContentByIdentityService struct {
-	FileRepository    storage_core.UploadedFileRepository
-	StorageRepository storage_core.StorageRepository
+	FileRepository    storage_repositories.UploadedFileRepository
+	StorageRepository storage_repositories.StorageRepository
 }
 
 func NewGetFileContentByIdentityService(
-	fileRepository storage_core.UploadedFileRepository,
-	storageRepository storage_core.StorageRepository,
+	fileRepository storage_repositories.UploadedFileRepository,
+	storageRepository storage_repositories.StorageRepository,
 ) *GetFileContentByIdentityService {
 	return &GetFileContentByIdentityService{
 		FileRepository:    fileRepository,
@@ -25,7 +25,7 @@ type GetFileContentByIdentityInput struct {
 }
 
 func (s *GetFileContentByIdentityService) Execute(input GetFileContentByIdentityInput) (*core.FileInput, error) {
-	file, err := s.FileRepository.GetUploadedFileByIdentity(storage_core.GetUploadedFileByIdentityParams{FileIdentity: input.FileIdentity})
+	file, err := s.FileRepository.GetUploadedFileByIdentity(storage_repositories.GetUploadedFileByIdentityParams{FileIdentity: input.FileIdentity})
 	if err != nil {
 		return nil, err
 	}

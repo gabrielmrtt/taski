@@ -3,6 +3,7 @@ package organization_http_requests
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
@@ -49,7 +50,7 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 	}
 
 	return organization_services.ListOrganizationsInput{
-		Filters: organization_core.OrganizationFilters{
+		Filters: organization_repositories.OrganizationFilters{
 			Name:   nameFilter,
 			Status: statusFilter,
 		},

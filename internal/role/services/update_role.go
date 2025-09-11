@@ -2,18 +2,18 @@ package role_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 )
 
 type UpdateRoleService struct {
-	RoleRepository        role_core.RoleRepository
-	PermissionRepository  role_core.PermissionRepository
+	RoleRepository        role_repositories.RoleRepository
+	PermissionRepository  role_repositories.PermissionRepository
 	TransactionRepository core.TransactionRepository
 }
 
 func NewUpdateRoleService(
-	roleRepository role_core.RoleRepository,
-	permissionRepository role_core.PermissionRepository,
+	roleRepository role_repositories.RoleRepository,
+	permissionRepository role_repositories.PermissionRepository,
 	transactionRepository core.TransactionRepository,
 ) *UpdateRoleService {
 	return &UpdateRoleService{
@@ -97,7 +97,7 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 		return core.NewUnauthorizedError("user is not part of the organization")
 	}
 
-	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_core.GetRoleByIdentityAndOrganizationIdentityParams{
+	role, err := s.RoleRepository.GetRoleByIdentityAndOrganizationIdentity(role_repositories.GetRoleByIdentityAndOrganizationIdentityParams{
 		RoleIdentity:         input.RoleIdentity,
 		OrganizationIdentity: input.OrganizationIdentity,
 	})
@@ -123,7 +123,7 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 		role.ClearPermissions(&input.UserEditorIdentity)
 
 		for _, permission := range input.Permissions {
-			permission, err := s.PermissionRepository.GetPermissionBySlug(role_core.GetPermissionBySlugParams{
+			permission, err := s.PermissionRepository.GetPermissionBySlug(role_repositories.GetPermissionBySlugParams{
 				Slug: permission,
 			})
 			if err != nil {
@@ -140,7 +140,7 @@ func (s *UpdateRoleService) Execute(input UpdateRoleInput) error {
 		}
 	}
 
-	err = s.RoleRepository.UpdateRole(role_core.UpdateRoleParams{Role: role})
+	err = s.RoleRepository.UpdateRole(role_repositories.UpdateRoleParams{Role: role})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

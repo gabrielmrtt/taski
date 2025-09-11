@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	storage_repositories "github.com/gabrielmrtt/taski/internal/storage/repositories"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	"github.com/google/uuid"
@@ -54,7 +55,7 @@ func (r *UploadedFilePostgresRepository) SetTransaction(tx core.Transaction) err
 	return nil
 }
 
-func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storage_core.GetUploadedFileByIdentityParams) (*storage_core.UploadedFile, error) {
+func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storage_repositories.GetUploadedFileByIdentityParams) (*storage_core.UploadedFile, error) {
 	var uploadedFile UploadedFileTable
 	var selectQuery *bun.SelectQuery
 
@@ -79,7 +80,7 @@ func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storag
 	return uploadedFile.ToEntity(), nil
 }
 
-func (r *UploadedFilePostgresRepository) StoreUploadedFile(params storage_core.StoreUploadedFileParams) (*storage_core.UploadedFile, error) {
+func (r *UploadedFilePostgresRepository) StoreUploadedFile(params storage_repositories.StoreUploadedFileParams) (*storage_core.UploadedFile, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -119,7 +120,7 @@ func (r *UploadedFilePostgresRepository) StoreUploadedFile(params storage_core.S
 	return uploadedFileTable.ToEntity(), nil
 }
 
-func (r *UploadedFilePostgresRepository) DeleteUploadedFile(params storage_core.DeleteUploadedFileParams) error {
+func (r *UploadedFilePostgresRepository) DeleteUploadedFile(params storage_repositories.DeleteUploadedFileParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 

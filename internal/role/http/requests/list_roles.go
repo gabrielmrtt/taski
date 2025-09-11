@@ -2,7 +2,7 @@ package role_http_requests
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 	role_services "github.com/gabrielmrtt/taski/internal/role/services"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
@@ -44,7 +44,7 @@ func (r *ListRolesRequest) ToInput() role_services.ListRolesInput {
 	}
 
 	return role_services.ListRolesInput{
-		Filters: role_core.RoleFilters{
+		Filters: role_repositories.RoleFilters{
 			Name:        nameFilter,
 			Description: descriptionFilter,
 		},

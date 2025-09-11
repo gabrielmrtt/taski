@@ -8,6 +8,7 @@ import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	storage_core "github.com/gabrielmrtt/taski/internal/storage"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -97,7 +98,7 @@ func (r *UserPostgresRepository) SetTransaction(tx core.Transaction) error {
 	return nil
 }
 
-func applyFilters(selectQuery *bun.SelectQuery, filters user_core.UserFilters) *bun.SelectQuery {
+func applyFilters(selectQuery *bun.SelectQuery, filters user_repositories.UserFilters) *bun.SelectQuery {
 	if filters.Email != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.email", filters.Email)
 	}
@@ -129,7 +130,7 @@ func applyFilters(selectQuery *bun.SelectQuery, filters user_core.UserFilters) *
 	return selectQuery
 }
 
-func (r *UserPostgresRepository) GetUserByIdentity(params user_core.GetUserByIdentityParams) (*user_core.User, error) {
+func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetUserByIdentityParams) (*user_core.User, error) {
 	var user UserTable
 	var selectQuery *bun.SelectQuery
 
@@ -152,7 +153,7 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_core.GetUserByIde
 	return user.ToEntity(), nil
 }
 
-func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailParams) (*user_core.User, error) {
+func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUserByEmailParams) (*user_core.User, error) {
 	var user UserTable
 	var selectQuery *bun.SelectQuery
 
@@ -175,7 +176,7 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_core.GetUserByEmailP
 	return user.ToEntity(), nil
 }
 
-func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersParams) (*core.PaginationOutput[user_core.User], error) {
+func (r *UserPostgresRepository) PaginateUsersBy(params user_repositories.PaginateUsersParams) (*core.PaginationOutput[user_core.User], error) {
 	var users []UserTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -230,7 +231,7 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_core.PaginateUsersP
 	}, nil
 }
 
-func (r *UserPostgresRepository) StoreUser(params user_core.StoreUserParams) (*user_core.User, error) {
+func (r *UserPostgresRepository) StoreUser(params user_repositories.StoreUserParams) (*user_core.User, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -301,7 +302,7 @@ func (r *UserPostgresRepository) StoreUser(params user_core.StoreUserParams) (*u
 	return userTable.ToEntity(), nil
 }
 
-func (r *UserPostgresRepository) UpdateUser(params user_core.UpdateUserParams) error {
+func (r *UserPostgresRepository) UpdateUser(params user_repositories.UpdateUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -388,7 +389,7 @@ func (r *UserPostgresRepository) UpdateUser(params user_core.UpdateUserParams) e
 	return nil
 }
 
-func (r *UserPostgresRepository) DeleteUser(params user_core.DeleteUserParams) error {
+func (r *UserPostgresRepository) DeleteUser(params user_repositories.DeleteUserParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 

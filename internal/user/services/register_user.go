@@ -5,17 +5,18 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type RegisterUserService struct {
-	UserRepository             user_core.UserRepository
-	UserRegistrationRepository user_core.UserRegistrationRepository
+	UserRepository             user_repositories.UserRepository
+	UserRegistrationRepository user_repositories.UserRegistrationRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewRegisterUserService(
-	userRepository user_core.UserRepository,
-	userRegistrationRepository user_core.UserRegistrationRepository,
+	userRepository user_repositories.UserRepository,
+	userRegistrationRepository user_repositories.UserRegistrationRepository,
 	transactionRepository core.TransactionRepository,
 ) *RegisterUserService {
 	return &RegisterUserService{
@@ -79,7 +80,7 @@ func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserD
 	s.UserRepository.SetTransaction(tx)
 	s.UserRegistrationRepository.SetTransaction(tx)
 
-	userAlreadyExists, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
+	userAlreadyExists, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
@@ -101,7 +102,7 @@ func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserD
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	_, err = s.UserRepository.StoreUser(user_core.StoreUserParams{User: user})
+	_, err = s.UserRepository.StoreUser(user_repositories.StoreUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())
@@ -113,7 +114,7 @@ func (s *RegisterUserService) Execute(input RegisterUserInput) (*user_core.UserD
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	_, err = s.UserRegistrationRepository.StoreUserRegistration(user_core.StoreUserRegistrationParams{UserRegistration: userRegistration})
+	_, err = s.UserRegistrationRepository.StoreUserRegistration(user_repositories.StoreUserRegistrationParams{UserRegistration: userRegistration})
 	if err != nil {
 		tx.Rollback()
 		return nil, core.NewInternalError(err.Error())

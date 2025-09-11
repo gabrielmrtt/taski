@@ -3,17 +3,18 @@ package user_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type RecoverUserPasswordService struct {
-	UserRepository             user_core.UserRepository
-	PasswordRecoveryRepository user_core.PasswordRecoveryRepository
+	UserRepository             user_repositories.UserRepository
+	PasswordRecoveryRepository user_repositories.PasswordRecoveryRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewRecoverUserPasswordService(
-	userRepository user_core.UserRepository,
-	passwordRecoveryRepository user_core.PasswordRecoveryRepository,
+	userRepository user_repositories.UserRepository,
+	passwordRecoveryRepository user_repositories.PasswordRecoveryRepository,
 	transactionRepository core.TransactionRepository,
 ) *RecoverUserPasswordService {
 	return &RecoverUserPasswordService{
@@ -67,7 +68,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 	s.UserRepository.SetTransaction(tx)
 	s.PasswordRecoveryRepository.SetTransaction(tx)
 
-	passwordRecovery, err := s.PasswordRecoveryRepository.GetPasswordRecoveryByToken(user_core.GetPasswordRecoveryByTokenParams{Token: input.PasswordRecoveryToken})
+	passwordRecovery, err := s.PasswordRecoveryRepository.GetPasswordRecoveryByToken(user_repositories.GetPasswordRecoveryByTokenParams{Token: input.PasswordRecoveryToken})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -88,7 +89,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 		return core.NewAlreadyExistsError("password recovery expired")
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: passwordRecovery.UserIdentity})
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: passwordRecovery.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -105,7 +106,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
+	err = s.UserRepository.UpdateUser(user_repositories.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -113,7 +114,7 @@ func (s *RecoverUserPasswordService) Execute(input RecoverUserPasswordInput) err
 
 	passwordRecovery.Use()
 
-	err = s.PasswordRecoveryRepository.UpdatePasswordRecovery(user_core.UpdatePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
+	err = s.PasswordRecoveryRepository.UpdatePasswordRecovery(user_repositories.UpdatePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

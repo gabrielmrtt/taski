@@ -3,14 +3,15 @@ package role_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 )
 
 type ListRolesService struct {
-	RoleRepository role_core.RoleRepository
+	RoleRepository role_repositories.RoleRepository
 }
 
 func NewListRolesService(
-	roleRepository role_core.RoleRepository,
+	roleRepository role_repositories.RoleRepository,
 ) *ListRolesService {
 	return &ListRolesService{
 		RoleRepository: roleRepository,
@@ -19,7 +20,7 @@ func NewListRolesService(
 
 type ListRolesInput struct {
 	OrganizationIdentity core.Identity
-	Filters              role_core.RoleFilters
+	Filters              role_repositories.RoleFilters
 	SortInput            *core.SortInput
 	Pagination           *core.PaginationInput
 	LoggedUserIdentity   core.Identity
@@ -45,7 +46,7 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 
 	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
-	roles, err := s.RoleRepository.PaginateRolesBy(role_core.PaginateRolesParams{
+	roles, err := s.RoleRepository.PaginateRolesBy(role_repositories.PaginateRolesParams{
 		Filters:    input.Filters,
 		SortInput:  input.SortInput,
 		Pagination: input.Pagination,

@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -49,7 +50,7 @@ func (r *UserRegistrationPostgresRepository) SetTransaction(tx core.Transaction)
 	return nil
 }
 
-func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params user_core.GetUserRegistrationByTokenParams) (*user_core.UserRegistration, error) {
+func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params user_repositories.GetUserRegistrationByTokenParams) (*user_core.UserRegistration, error) {
 	var userRegistration UserRegistrationTable
 	var selectQuery *bun.SelectQuery
 
@@ -72,7 +73,7 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 	return userRegistration.ToEntity(), nil
 }
 
-func (r *UserRegistrationPostgresRepository) StoreUserRegistration(params user_core.StoreUserRegistrationParams) (*user_core.UserRegistration, error) {
+func (r *UserRegistrationPostgresRepository) StoreUserRegistration(params user_repositories.StoreUserRegistrationParams) (*user_core.UserRegistration, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -114,7 +115,7 @@ func (r *UserRegistrationPostgresRepository) StoreUserRegistration(params user_c
 	return userRegistrationTable.ToEntity(), nil
 }
 
-func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(params user_core.UpdateUserRegistrationParams) error {
+func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(params user_repositories.UpdateUserRegistrationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -159,7 +160,7 @@ func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(params user_
 	return nil
 }
 
-func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(params user_core.DeleteUserRegistrationParams) error {
+func (r *UserRegistrationPostgresRepository) DeleteUserRegistration(params user_repositories.DeleteUserRegistrationParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 

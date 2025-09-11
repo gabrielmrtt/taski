@@ -3,23 +3,24 @@ package organization_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type CreateOrganizationService struct {
-	OrganizationRepository     organization_core.OrganizationRepository
-	OrganizationUserRepository organization_core.OrganizationUserRepository
-	RoleRepository             role_core.RoleRepository
-	UserRepository             user_core.UserRepository
+	OrganizationRepository     organization_repositories.OrganizationRepository
+	OrganizationUserRepository organization_repositories.OrganizationUserRepository
+	RoleRepository             role_repositories.RoleRepository
+	UserRepository             user_repositories.UserRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewCreateOrganizationService(
-	organizationRepository organization_core.OrganizationRepository,
-	organizationUserRepository organization_core.OrganizationUserRepository,
-	roleRepository role_core.RoleRepository,
-	userRepository user_core.UserRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
+	organizationUserRepository organization_repositories.OrganizationUserRepository,
+	roleRepository role_repositories.RoleRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateOrganizationService {
 	return &CreateOrganizationService{
@@ -78,7 +79,7 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, err
 	}
 
-	adminRole, err := s.RoleRepository.GetSystemDefaultRole(role_core.GetDefaultRoleParams{
+	adminRole, err := s.RoleRepository.GetSystemDefaultRole(role_repositories.GetDefaultRoleParams{
 		Slug: "admin",
 	})
 	if err != nil {
@@ -91,7 +92,7 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, core.NewNotFoundError("admin role not found")
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{
 		UserIdentity: input.UserCreatorIdentity,
 	})
 	if err != nil {
@@ -115,13 +116,13 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, err
 	}
 
-	organization, err = s.OrganizationRepository.StoreOrganization(organization_core.StoreOrganizationParams{Organization: organization})
+	organization, err = s.OrganizationRepository.StoreOrganization(organization_repositories.StoreOrganizationParams{Organization: organization})
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_core.CreateOrganizationUserParams{OrganizationUser: organizationUser})
+	organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_repositories.CreateOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {
 		tx.Rollback()
 		return nil, err

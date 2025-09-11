@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -43,7 +44,7 @@ func (r *PermissionPostgresRepository) SetTransaction(tx core.Transaction) error
 	return nil
 }
 
-func (r *PermissionPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters role_core.PermissionFilters) *bun.SelectQuery {
+func (r *PermissionPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters role_repositories.PermissionFilters) *bun.SelectQuery {
 	if filters.Name != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "name", filters.Name)
 	}
@@ -55,7 +56,7 @@ func (r *PermissionPostgresRepository) applyFilters(selectQuery *bun.SelectQuery
 	return selectQuery
 }
 
-func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_core.GetPermissionBySlugParams) (*role_core.Permission, error) {
+func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_repositories.GetPermissionBySlugParams) (*role_core.Permission, error) {
 	var permission PermissionTable
 	var selectQuery *bun.SelectQuery
 
@@ -78,7 +79,32 @@ func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_core.GetP
 	return permission.ToEntity(), nil
 }
 
-func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_core.PaginatePermissionsParams) (*core.PaginationOutput[role_core.Permission], error) {
+func (r *PermissionPostgresRepository) ListPermissionsBy(params role_repositories.ListPermissionsParams) (*[]role_core.Permission, error) {
+	var permissions []PermissionTable
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&permissions)
+	selectQuery = r.applyFilters(selectQuery, params.Filters)
+	err := selectQuery.Scan(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	var permissionEntities []role_core.Permission
+	for _, permission := range permissions {
+		permissionEntities = append(permissionEntities, *permission.ToEntity())
+	}
+
+	return &permissionEntities, nil
+}
+
+func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_repositories.PaginatePermissionsParams) (*core.PaginationOutput[role_core.Permission], error) {
 	var permissions []PermissionTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -124,7 +150,7 @@ func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_core.Pa
 	}, nil
 }
 
-func (r *PermissionPostgresRepository) StorePermission(params role_core.StorePermissionParams) (*role_core.Permission, error) {
+func (r *PermissionPostgresRepository) StorePermission(params role_repositories.StorePermissionParams) (*role_core.Permission, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -159,7 +185,7 @@ func (r *PermissionPostgresRepository) StorePermission(params role_core.StorePer
 	return permissionTable.ToEntity(), nil
 }
 
-func (r *PermissionPostgresRepository) UpdatePermission(params role_core.UpdatePermissionParams) error {
+func (r *PermissionPostgresRepository) UpdatePermission(params role_repositories.UpdatePermissionParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -201,7 +227,7 @@ func (r *PermissionPostgresRepository) UpdatePermission(params role_core.UpdateP
 	return nil
 }
 
-func (r *PermissionPostgresRepository) DeletePermission(params role_core.DeletePermissionParams) error {
+func (r *PermissionPostgresRepository) DeletePermission(params role_repositories.DeletePermissionParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 

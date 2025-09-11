@@ -6,14 +6,15 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	storage_repositories "github.com/gabrielmrtt/taski/internal/storage/repositories"
 )
 
 type UploadFileService struct {
-	UploadedFileRepository storage_core.UploadedFileRepository
-	StorageRepository      storage_core.StorageRepository
+	UploadedFileRepository storage_repositories.UploadedFileRepository
+	StorageRepository      storage_repositories.StorageRepository
 }
 
-func NewUploadFileService(uploadedFileRepository storage_core.UploadedFileRepository, storageRepository storage_core.StorageRepository) *UploadFileService {
+func NewUploadFileService(uploadedFileRepository storage_repositories.UploadedFileRepository, storageRepository storage_repositories.StorageRepository) *UploadFileService {
 	return &UploadFileService{
 		UploadedFileRepository: uploadedFileRepository,
 		StorageRepository:      storageRepository,
@@ -42,7 +43,7 @@ func (e *UploadFileService) Execute(input UploadFileInput) (*storage_core.Upload
 		return nil, err
 	}
 
-	uploadedFile, err = e.UploadedFileRepository.StoreUploadedFile(storage_core.StoreUploadedFileParams{UploadedFile: uploadedFile})
+	uploadedFile, err = e.UploadedFileRepository.StoreUploadedFile(storage_repositories.StoreUploadedFileParams{UploadedFile: uploadedFile})
 	if err != nil {
 		return nil, err
 	}

@@ -5,17 +5,18 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type ForgotUserPasswordService struct {
-	UserRepository             user_core.UserRepository
-	PasswordRecoveryRepository user_core.PasswordRecoveryRepository
+	UserRepository             user_repositories.UserRepository
+	PasswordRecoveryRepository user_repositories.PasswordRecoveryRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewForgotUserPasswordService(
-	userRepository user_core.UserRepository,
-	passwordRecoveryRepository user_core.PasswordRecoveryRepository,
+	userRepository user_repositories.UserRepository,
+	passwordRecoveryRepository user_repositories.PasswordRecoveryRepository,
 	transactionRepository core.TransactionRepository,
 ) *ForgotUserPasswordService {
 	return &ForgotUserPasswordService{
@@ -56,7 +57,7 @@ func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error
 	s.UserRepository.SetTransaction(tx)
 	s.PasswordRecoveryRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByEmail(user_core.GetUserByEmailParams{Email: input.Email})
+	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{Email: input.Email})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -73,7 +74,7 @@ func (s *ForgotUserPasswordService) Execute(input ForgotUserPasswordInput) error
 		return core.NewInternalError(err.Error())
 	}
 
-	_, err = s.PasswordRecoveryRepository.StorePasswordRecovery(user_core.StorePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
+	_, err = s.PasswordRecoveryRepository.StorePasswordRecovery(user_repositories.StorePasswordRecoveryParams{PasswordRecovery: passwordRecovery})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

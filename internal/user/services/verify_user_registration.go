@@ -3,17 +3,18 @@ package user_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type VerifyUserRegistrationService struct {
-	UserRegistrationRepository user_core.UserRegistrationRepository
-	UserRepository             user_core.UserRepository
+	UserRegistrationRepository user_repositories.UserRegistrationRepository
+	UserRepository             user_repositories.UserRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewVerifyUserRegistrationService(
-	userRegistrationRepository user_core.UserRegistrationRepository,
-	userRepository user_core.UserRepository,
+	userRegistrationRepository user_repositories.UserRegistrationRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *VerifyUserRegistrationService {
 	return &VerifyUserRegistrationService{
@@ -56,7 +57,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	s.UserRegistrationRepository.SetTransaction(tx)
 
-	userRegistration, err := s.UserRegistrationRepository.GetUserRegistrationByToken(user_core.GetUserRegistrationByTokenParams{Token: input.Token})
+	userRegistration, err := s.UserRegistrationRepository.GetUserRegistrationByToken(user_repositories.GetUserRegistrationByTokenParams{Token: input.Token})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -72,7 +73,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 		return core.NewAlreadyExistsError("user registration expired")
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: userRegistration.UserIdentity})
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: userRegistration.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -85,7 +86,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	user.Status = user_core.UserStatusActive
 
-	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
+	err = s.UserRepository.UpdateUser(user_repositories.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -93,7 +94,7 @@ func (s *VerifyUserRegistrationService) Execute(input VerifyUserRegistrationInpu
 
 	userRegistration.Verify()
 
-	err = s.UserRegistrationRepository.UpdateUserRegistration(user_core.UpdateUserRegistrationParams{UserRegistration: userRegistration})
+	err = s.UserRegistrationRepository.UpdateUserRegistration(user_repositories.UpdateUserRegistrationParams{UserRegistration: userRegistration})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

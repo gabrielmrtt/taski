@@ -9,6 +9,7 @@ import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -101,7 +102,7 @@ func (r *RolePostgresRepository) SetTransaction(tx core.Transaction) error {
 	return nil
 }
 
-func (r *RolePostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters role_core.RoleFilters) *bun.SelectQuery {
+func (r *RolePostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters role_repositories.RoleFilters) *bun.SelectQuery {
 	selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
 
 	if filters.Name != nil {
@@ -127,7 +128,7 @@ func (r *RolePostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filt
 	return selectQuery
 }
 
-func (r *RolePostgresRepository) GetRoleByIdentity(params role_core.GetRoleByIdentityParams) (*role_core.Role, error) {
+func (r *RolePostgresRepository) GetRoleByIdentity(params role_repositories.GetRoleByIdentityParams) (*role_core.Role, error) {
 	var role RoleTable
 	var selectQuery *bun.SelectQuery
 
@@ -152,7 +153,7 @@ func (r *RolePostgresRepository) GetRoleByIdentity(params role_core.GetRoleByIde
 	return role.ToEntity(), nil
 }
 
-func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params role_core.GetRoleByIdentityAndOrganizationIdentityParams) (*role_core.Role, error) {
+func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params role_repositories.GetRoleByIdentityAndOrganizationIdentityParams) (*role_core.Role, error) {
 	var role RoleTable
 	var selectQuery *bun.SelectQuery
 
@@ -173,7 +174,7 @@ func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params
 	return role.ToEntity(), nil
 }
 
-func (r *RolePostgresRepository) GetSystemDefaultRole(params role_core.GetDefaultRoleParams) (*role_core.Role, error) {
+func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.GetDefaultRoleParams) (*role_core.Role, error) {
 	var role RoleTable
 	var selectQuery *bun.SelectQuery
 
@@ -194,7 +195,7 @@ func (r *RolePostgresRepository) GetSystemDefaultRole(params role_core.GetDefaul
 	return role.ToEntity(), nil
 }
 
-func (r *RolePostgresRepository) ListRolesBy(params role_core.PaginateRolesParams) (*[]role_core.Role, error) {
+func (r *RolePostgresRepository) ListRolesBy(params role_repositories.PaginateRolesParams) (*[]role_core.Role, error) {
 	var roles []RoleTable
 	var selectQuery *bun.SelectQuery
 
@@ -221,7 +222,7 @@ func (r *RolePostgresRepository) ListRolesBy(params role_core.PaginateRolesParam
 	return &roleEntities, nil
 }
 
-func (r *RolePostgresRepository) PaginateRolesBy(params role_core.PaginateRolesParams) (*core.PaginationOutput[role_core.Role], error) {
+func (r *RolePostgresRepository) PaginateRolesBy(params role_repositories.PaginateRolesParams) (*core.PaginationOutput[role_core.Role], error) {
 	var roles []RoleTable
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
@@ -276,7 +277,7 @@ func (r *RolePostgresRepository) PaginateRolesBy(params role_core.PaginateRolesP
 	}, nil
 }
 
-func (r *RolePostgresRepository) StoreRole(params role_core.StoreRoleParams) (*role_core.Role, error) {
+func (r *RolePostgresRepository) StoreRole(params role_repositories.StoreRoleParams) (*role_core.Role, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -352,7 +353,7 @@ func (r *RolePostgresRepository) StoreRole(params role_core.StoreRoleParams) (*r
 	return roleTable.ToEntity(), nil
 }
 
-func (r *RolePostgresRepository) UpdateRole(params role_core.UpdateRoleParams) error {
+func (r *RolePostgresRepository) UpdateRole(params role_repositories.UpdateRoleParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -437,7 +438,7 @@ func (r *RolePostgresRepository) UpdateRole(params role_core.UpdateRoleParams) e
 	return nil
 }
 
-func (r *RolePostgresRepository) DeleteRole(params role_core.DeleteRoleParams) error {
+func (r *RolePostgresRepository) DeleteRole(params role_repositories.DeleteRoleParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -472,7 +473,7 @@ func (r *RolePostgresRepository) DeleteRole(params role_core.DeleteRoleParams) e
 	return nil
 }
 
-func (r *RolePostgresRepository) ChangeRoleUsersToDefault(params role_core.ChangeRoleUsersToDefaultParams) error {
+func (r *RolePostgresRepository) ChangeRoleUsersToDefault(params role_repositories.ChangeRoleUsersToDefaultParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -488,7 +489,7 @@ func (r *RolePostgresRepository) ChangeRoleUsersToDefault(params role_core.Chang
 		}
 	}
 
-	defaultRole, err := r.GetSystemDefaultRole(role_core.GetDefaultRoleParams{
+	defaultRole, err := r.GetSystemDefaultRole(role_repositories.GetDefaultRoleParams{
 		Slug: params.DefaultRoleSlug,
 	})
 	if err != nil {

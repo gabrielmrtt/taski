@@ -6,22 +6,23 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	storage_core "github.com/gabrielmrtt/taski/internal/storage"
+	storage_repositories "github.com/gabrielmrtt/taski/internal/storage/repositories"
 	storage_services "github.com/gabrielmrtt/taski/internal/storage/services"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type UpdateUserDataService struct {
-	UserRepository         user_core.UserRepository
+	UserRepository         user_repositories.UserRepository
 	TransactionRepository  core.TransactionRepository
-	UploadedFileRepository storage_core.UploadedFileRepository
-	StorageRepository      storage_core.StorageRepository
+	UploadedFileRepository storage_repositories.UploadedFileRepository
+	StorageRepository      storage_repositories.StorageRepository
 }
 
 func NewUpdateUserDataService(
-	userRepository user_core.UserRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
-	uploadedFileRepository storage_core.UploadedFileRepository,
-	storageRepository storage_core.StorageRepository,
+	uploadedFileRepository storage_repositories.UploadedFileRepository,
+	storageRepository storage_repositories.StorageRepository,
 ) *UpdateUserDataService {
 	return &UpdateUserDataService{
 		UserRepository:         userRepository,
@@ -91,7 +92,7 @@ func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 
 	s.UserRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -139,7 +140,7 @@ func (s *UpdateUserDataService) Execute(input UpdateUserDataInput) error {
 		storage_services.NewDeleteFileByIdentityService(s.UploadedFileRepository, s.StorageRepository).Execute(input.UserIdentity)
 	}
 
-	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
+	err = s.UserRepository.UpdateUser(user_repositories.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

@@ -3,17 +3,18 @@ package role_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 )
 
 type CreateRoleService struct {
-	RoleRepository        role_core.RoleRepository
-	PermissionRepository  role_core.PermissionRepository
+	RoleRepository        role_repositories.RoleRepository
+	PermissionRepository  role_repositories.PermissionRepository
 	TransactionRepository core.TransactionRepository
 }
 
 func NewCreateRoleService(
-	roleRepository role_core.RoleRepository,
-	permissionRepository role_core.PermissionRepository,
+	roleRepository role_repositories.RoleRepository,
+	permissionRepository role_repositories.PermissionRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateRoleService {
 	return &CreateRoleService{
@@ -93,7 +94,7 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 
 	permissions := make([]role_core.Permission, 0)
 	for _, permissionSlug := range input.Permissions {
-		permission, err := s.PermissionRepository.GetPermissionBySlug(role_core.GetPermissionBySlugParams{
+		permission, err := s.PermissionRepository.GetPermissionBySlug(role_repositories.GetPermissionBySlugParams{
 			Slug: permissionSlug,
 		})
 		if err != nil {
@@ -117,7 +118,7 @@ func (s *CreateRoleService) Execute(input CreateRoleInput) (*role_core.RoleDto, 
 		return nil, err
 	}
 
-	role, err = s.RoleRepository.StoreRole(role_core.StoreRoleParams{Role: role})
+	role, err = s.RoleRepository.StoreRole(role_repositories.StoreRoleParams{Role: role})
 	if err != nil {
 		return nil, err
 	}

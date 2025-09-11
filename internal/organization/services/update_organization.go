@@ -2,16 +2,16 @@ package organization_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	organization_core "github.com/gabrielmrtt/taski/internal/organization"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 )
 
 type UpdateOrganizationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
+	OrganizationRepository organization_repositories.OrganizationRepository
 	TransactionRepository  core.TransactionRepository
 }
 
 func NewUpdateOrganizationService(
-	organizationRepository organization_core.OrganizationRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
 	transactionRepository core.TransactionRepository,
 ) *UpdateOrganizationService {
 	return &UpdateOrganizationService{
@@ -58,7 +58,7 @@ func (s *UpdateOrganizationService) Execute(input UpdateOrganizationInput) error
 
 	s.OrganizationRepository.SetTransaction(tx)
 
-	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_core.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_repositories.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -77,7 +77,7 @@ func (s *UpdateOrganizationService) Execute(input UpdateOrganizationInput) error
 		}
 	}
 
-	err = s.OrganizationRepository.UpdateOrganization(organization_core.UpdateOrganizationParams{Organization: organization})
+	err = s.OrganizationRepository.UpdateOrganization(organization_repositories.UpdateOrganizationParams{Organization: organization})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

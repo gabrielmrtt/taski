@@ -5,13 +5,14 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
+	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
 )
 
 type PermissionSeeder struct {
-	PermissionRepository role_core.PermissionRepository
+	PermissionRepository role_repositories.PermissionRepository
 }
 
-func NewPermissionSeeder(permissionRepository role_core.PermissionRepository) *PermissionSeeder {
+func NewPermissionSeeder(permissionRepository role_repositories.PermissionRepository) *PermissionSeeder {
 	return &PermissionSeeder{
 		PermissionRepository: permissionRepository,
 	}
@@ -106,7 +107,7 @@ func (s *PermissionSeeder) Run() error {
 	}
 
 	for _, permission := range permissions {
-		existingPermission, err := s.PermissionRepository.GetPermissionBySlug(role_core.GetPermissionBySlugParams{
+		existingPermission, err := s.PermissionRepository.GetPermissionBySlug(role_repositories.GetPermissionBySlugParams{
 			Slug: permission.Slug,
 		})
 		if err != nil {
@@ -117,12 +118,12 @@ func (s *PermissionSeeder) Run() error {
 			existingPermission.Name = permission.Name
 			existingPermission.Description = permission.Description
 			existingPermission.Slug = permission.Slug
-			err = s.PermissionRepository.UpdatePermission(existingPermission)
+			err = s.PermissionRepository.UpdatePermission(role_repositories.UpdatePermissionParams{Permission: existingPermission})
 			if err != nil {
 				return err
 			}
 		} else {
-			_, err = s.PermissionRepository.StorePermission(&permission)
+			_, err = s.PermissionRepository.StorePermission(role_repositories.StorePermissionParams{Permission: &permission})
 			if err != nil {
 				return err
 			}

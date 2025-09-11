@@ -2,19 +2,19 @@ package organization_services
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	organization_core "github.com/gabrielmrtt/taski/internal/organization"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type AcceptOrganizationUserInvitationService struct {
-	OrganizationRepository organization_core.OrganizationRepository
-	UserRepository         user_core.UserRepository
+	OrganizationRepository organization_repositories.OrganizationRepository
+	UserRepository         user_repositories.UserRepository
 	TransactionRepository  core.TransactionRepository
 }
 
 func NewAcceptOrganizationUserInvitationService(
-	organizationRepository organization_core.OrganizationRepository,
-	userRepository user_core.UserRepository,
+	organizationRepository organization_repositories.OrganizationRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *AcceptOrganizationUserInvitationService {
 	return &AcceptOrganizationUserInvitationService{

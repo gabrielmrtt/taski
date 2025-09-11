@@ -3,15 +3,16 @@ package user_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 )
 
 type ChangeUserPasswordService struct {
-	UserRepository        user_core.UserRepository
+	UserRepository        user_repositories.UserRepository
 	TransactionRepository core.TransactionRepository
 }
 
 func NewChangeUserPasswordService(
-	userRepository user_core.UserRepository,
+	userRepository user_repositories.UserRepository,
 	transactionRepository core.TransactionRepository,
 ) *ChangeUserPasswordService {
 	return &ChangeUserPasswordService{
@@ -55,7 +56,7 @@ func (s *ChangeUserPasswordService) Execute(input ChangeUserPasswordInput) error
 
 	s.UserRepository.SetTransaction(tx)
 
-	user, err := s.UserRepository.GetUserByIdentity(user_core.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.UserIdentity})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())
@@ -72,7 +73,7 @@ func (s *ChangeUserPasswordService) Execute(input ChangeUserPasswordInput) error
 		return core.NewInternalError(err.Error())
 	}
 
-	err = s.UserRepository.UpdateUser(user_core.UpdateUserParams{User: user})
+	err = s.UserRepository.UpdateUser(user_repositories.UpdateUserParams{User: user})
 	if err != nil {
 		tx.Rollback()
 		return core.NewInternalError(err.Error())

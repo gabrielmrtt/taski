@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -49,7 +50,7 @@ func (r *PasswordRecoveryPostgresRepository) SetTransaction(tx core.Transaction)
 	return nil
 }
 
-func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params user_core.GetPasswordRecoveryByTokenParams) (*user_core.PasswordRecovery, error) {
+func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params user_repositories.GetPasswordRecoveryByTokenParams) (*user_core.PasswordRecovery, error) {
 	var passwordRecovery PasswordRecoveryTable
 	var selectQuery *bun.SelectQuery
 
@@ -72,7 +73,7 @@ func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params u
 	return passwordRecovery.ToEntity(), nil
 }
 
-func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(params user_core.StorePasswordRecoveryParams) (*user_core.PasswordRecovery, error) {
+func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(params user_repositories.StorePasswordRecoveryParams) (*user_core.PasswordRecovery, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -113,7 +114,7 @@ func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(params user_c
 	return passwordRecoveryTable.ToEntity(), nil
 }
 
-func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(params user_core.UpdatePasswordRecoveryParams) error {
+func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(params user_repositories.UpdatePasswordRecoveryParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -158,7 +159,7 @@ func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(params user_
 	return nil
 }
 
-func (r *PasswordRecoveryPostgresRepository) DeletePasswordRecovery(params user_core.DeletePasswordRecoveryParams) error {
+func (r *PasswordRecoveryPostgresRepository) DeletePasswordRecovery(params user_repositories.DeletePasswordRecoveryParams) error {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
