@@ -222,11 +222,11 @@ func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.Ro
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
-		g.GET("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.ListOrganizations)
-		g.GET("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.GetOrganization)
-		g.POST("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.CreateOrganization)
-		g.PUT("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.UpdateOrganization)
-		g.DELETE("/:organization_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.DeleteOrganization)
+		g.GET("", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.ListOrganizations)
+		g.GET("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.GetOrganization)
+		g.POST("", organization_http_middlewares.UserMustHavePermission("organizations:create"), c.CreateOrganization)
+		g.PUT("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:update"), c.UpdateOrganization)
+		g.DELETE("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
 	}
 
 	return g

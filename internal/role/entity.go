@@ -7,19 +7,17 @@ import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
-const RoleIdentityPrefix = "rol"
-
 type Permission struct {
 	Identity    core.Identity
 	Name        string
 	Description string
-	Slug        string
+	Slug        PermissionSlugs
 }
 
 type NewPermissionInput struct {
 	Name        string
 	Description string
-	Slug        string
+	Slug        PermissionSlugs
 }
 
 func NewPermission(input NewPermissionInput) (*Permission, error) {
@@ -97,8 +95,10 @@ func (r *Role) ChangeDescription(description string, userEditorIdentity *core.Id
 	return nil
 }
 
-func (r *Role) HasPermission(permission Permission) bool {
-	return slices.Contains(r.Permissions, permission)
+func (r *Role) HasPermission(permissionSlug PermissionSlugs) bool {
+	return slices.ContainsFunc(r.Permissions, func(p Permission) bool {
+		return p.Slug == permissionSlug
+	})
 }
 
 func (r *Role) ClearPermissions(userEditorIdentity *core.Identity) {

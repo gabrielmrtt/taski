@@ -20,7 +20,7 @@ type RoleDto struct {
 func RoleToDto(role *Role) *RoleDto {
 	var permissions []string = make([]string, 0)
 	for _, permission := range role.Permissions {
-		permissions = append(permissions, permission.Slug)
+		permissions = append(permissions, string(permission.Slug))
 	}
 
 	createdAt := datetimeutils.EpochToRFC3339(*role.Timestamps.CreatedAt)
@@ -70,6 +70,6 @@ func PermissionToDto(permission *Permission) *PermissionDto {
 	return &PermissionDto{
 		Name:        permission.Name,
 		Description: permission.Description,
-		Slug:        permission.Slug,
+		Slug:        string(permission.Slug),
 	}
 }

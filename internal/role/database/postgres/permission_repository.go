@@ -26,7 +26,7 @@ func (p *PermissionTable) ToEntity() *role_core.Permission {
 		Identity:    core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), "permission"),
 		Name:        p.Name,
 		Description: p.Description,
-		Slug:        p.Slug,
+		Slug:        role_core.PermissionSlugs(p.Slug),
 	}
 }
 
@@ -168,7 +168,7 @@ func (r *PermissionPostgresRepository) StorePermission(params role_repositories.
 
 	permissionTable := &PermissionTable{
 		InternalId:  params.Permission.Identity.Internal.String(),
-		Slug:        params.Permission.Slug,
+		Slug:        string(params.Permission.Slug),
 		Name:        params.Permission.Name,
 		Description: params.Permission.Description,
 	}
@@ -203,7 +203,7 @@ func (r *PermissionPostgresRepository) UpdatePermission(params role_repositories
 
 	permissionTable := &PermissionTable{
 		InternalId:  params.Permission.Identity.Internal.String(),
-		Slug:        params.Permission.Slug,
+		Slug:        string(params.Permission.Slug),
 		Name:        params.Permission.Name,
 		Description: params.Permission.Description,
 	}

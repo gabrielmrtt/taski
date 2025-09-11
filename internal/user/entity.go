@@ -10,16 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserStatuses string
-
-const (
-	UserStatusActive     UserStatuses = "active"
-	UserStatusUnverified UserStatuses = "unverified"
-	UserStatusInactive   UserStatuses = "inactive"
-)
-
-const UserIdentityPrefix = "usr"
-
 type User struct {
 	Identity    core.Identity
 	Status      UserStatuses
@@ -283,14 +273,6 @@ func (u *User) CheckPassword(password string) bool {
 	return hashutils.ComparePassword(password, u.Credentials.Password)
 }
 
-type PasswordRecoveryStatuses string
-
-const (
-	PasswordRecoveryStatusNew     PasswordRecoveryStatuses = "new"
-	PasswordRecoveryStatusUsed    PasswordRecoveryStatuses = "used"
-	PasswordRecoveryStatusExpired PasswordRecoveryStatuses = "expired"
-)
-
 type PasswordRecovery struct {
 	Identity     core.Identity
 	UserIdentity core.Identity
@@ -334,14 +316,6 @@ func (p *PasswordRecovery) Use() {
 	now := datetimeutils.EpochNow()
 	p.RecoveredAt = &now
 }
-
-type UserRegistrationStatuses string
-
-const (
-	UserRegistrationStatusPending  UserRegistrationStatuses = "pending"
-	UserRegistrationStatusVerified UserRegistrationStatuses = "verified"
-	UserRegistrationStatusExpired  UserRegistrationStatuses = "expired"
-)
 
 type UserRegistration struct {
 	Identity     core.Identity

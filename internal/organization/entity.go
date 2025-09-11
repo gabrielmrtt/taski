@@ -7,15 +7,6 @@ import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
-type OrganizationStatuses string
-
-const (
-	OrganizationStatusActive   OrganizationStatuses = "active"
-	OrganizationStatusInactive OrganizationStatuses = "inactive"
-)
-
-const OrganizationIdentityPrefix = "org"
-
 type Organization struct {
 	Identity            core.Identity
 	Name                string
@@ -78,15 +69,6 @@ func (o *Organization) IsInactive() bool {
 	return o.Status == OrganizationStatusInactive
 }
 
-type OrganizationUserStatuses string
-
-const (
-	OrganizationUserStatusActive   OrganizationUserStatuses = "active"
-	OrganizationUserStatusInactive OrganizationUserStatuses = "inactive"
-	OrganizationUserStatusInvited  OrganizationUserStatuses = "invited"
-	OrganizationUserStatusRefused  OrganizationUserStatuses = "refused"
-)
-
 type OrganizationUser struct {
 	OrganizationIdentity core.Identity
 	User                 *user_core.User
@@ -144,4 +126,12 @@ func (o *OrganizationUser) RefuseInvitation() {
 
 func (o *OrganizationUser) ChangeRole(role *role_core.Role) {
 	o.Role = role
+}
+
+func (o *OrganizationUser) CanExecuteAction(permissionSlug role_core.PermissionSlugs) bool {
+	if o.Role == nil {
+		return false
+	}
+
+	return o.Role.HasPermission(permissionSlug)
 }

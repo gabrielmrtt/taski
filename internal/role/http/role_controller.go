@@ -196,12 +196,11 @@ func (c *RoleController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGrou
 	g := group.Group("/organization/:organization_id/role")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
-		g.Use(organization_http_middlewares.BlockIfUserIsNotPartOfOrganization())
 
-		g.GET("", c.ListRoles)
-		g.POST("", c.CreateRole)
-		g.PUT("/:role_id", c.UpdateRole)
-		g.DELETE("/:role_id", c.DeleteRole)
+		g.GET("", organization_http_middlewares.UserMustHavePermission("roles:view"), c.ListRoles)
+		g.POST("", organization_http_middlewares.UserMustHavePermission("roles:create"), c.CreateRole)
+		g.PUT("/:role_id", organization_http_middlewares.UserMustHavePermission("roles:update"), c.UpdateRole)
+		g.DELETE("/:role_id", organization_http_middlewares.UserMustHavePermission("roles:delete"), c.DeleteRole)
 	}
 
 	return g

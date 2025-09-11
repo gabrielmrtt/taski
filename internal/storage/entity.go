@@ -7,8 +7,6 @@ import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
-const UploadedFileIdentityPrefix = "fil"
-
 type UploadedFile struct {
 	Identity               core.Identity
 	File                   *string

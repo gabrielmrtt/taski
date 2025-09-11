@@ -84,7 +84,7 @@ func (r *RolePermissionTable) ToEntity() *role_core.Permission {
 	return &role_core.Permission{
 		Name:        r.Permission.Name,
 		Description: r.Permission.Description,
-		Slug:        r.Permission.Slug,
+		Slug:        role_core.PermissionSlugs(r.Permission.Slug),
 	}
 }
 

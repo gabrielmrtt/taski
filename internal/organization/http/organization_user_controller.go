@@ -312,14 +312,14 @@ func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gi
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
-		g.GET("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.ListOrganizationUsers)
-		g.GET("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.GetOrganizationUser)
-		g.POST("", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.InviteUserToOrganization)
-		g.PUT("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.UpdateOrganizationUser)
-		g.DELETE("/:user_id", organization_http_middlewares.BlockIfUserIsNotPartOfOrganization(), c.RemoveUserFromOrganization)
+		g.GET("", organization_http_middlewares.UserMustHavePermission("organizations:users:view"), c.ListOrganizationUsers)
+		g.GET("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:view"), c.GetOrganizationUser)
+		g.POST("", organization_http_middlewares.UserMustHavePermission("organizations:users:create"), c.InviteUserToOrganization)
+		g.PUT("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:update"), c.UpdateOrganizationUser)
+		g.DELETE("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:delete"), c.RemoveUserFromOrganization)
 
-		g.PATCH("/:user_id/accept-invitation", organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser(), c.AcceptOrganizationUserInvitation)
-		g.PATCH("/:user_id/refuse-invitation", organization_http_middlewares.BlockIfUserIsNotSameOrganizationUser(), c.RefuseOrganizationUserInvitation)
+		g.PATCH("/:user_id/accept-invitation", organization_http_middlewares.UserMustBeSame(), c.AcceptOrganizationUserInvitation)
+		g.PATCH("/:user_id/refuse-invitation", organization_http_middlewares.UserMustBeSame(), c.RefuseOrganizationUserInvitation)
 	}
 
 	return g
