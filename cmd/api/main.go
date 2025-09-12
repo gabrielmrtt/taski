@@ -5,6 +5,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/config"
 	"github.com/gabrielmrtt/taski/docs"
+	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_http "github.com/gabrielmrtt/taski/internal/organization/http"
 	role_http "github.com/gabrielmrtt/taski/internal/role/http"
 	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
@@ -14,7 +15,14 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+func shutdownApplication() {
+	fmt.Println("Shutting down application...")
+	core_database_postgres.DB.Close()
+}
+
 func bootstrapApplication() {
+	defer shutdownApplication()
+
 	engine := gin.New()
 
 	apiVersion := config.Instance.ApiVersion

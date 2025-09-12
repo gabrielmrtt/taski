@@ -11,6 +11,8 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
+var DB *bun.DB = connectToPostgres()
+
 func connectToPostgres() *bun.DB {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithDSN(
@@ -37,5 +39,3 @@ func connectToPostgres() *bun.DB {
 
 	return db
 }
-
-var DB *bun.DB = connectToPostgres()

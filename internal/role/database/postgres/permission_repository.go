@@ -57,7 +57,7 @@ func (r *PermissionPostgresRepository) applyFilters(selectQuery *bun.SelectQuery
 }
 
 func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_repositories.GetPermissionBySlugParams) (*role_core.Permission, error) {
-	var permission PermissionTable
+	var permission *PermissionTable = new(PermissionTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -74,6 +74,10 @@ func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_repositor
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
+	}
+
+	if permission.InternalId == "" {
+		return nil, nil
 	}
 
 	return permission.ToEntity(), nil

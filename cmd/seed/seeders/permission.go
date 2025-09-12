@@ -36,7 +36,7 @@ func (s *PermissionSeeder) Run() error {
 
 	for _, i := range role_core.PermissionSlugsArray {
 		permissions = append(permissions, role_core.Permission{
-			Identity:    core.NewIdentity("perm"),
+			Identity:    core.NewIdentityWithoutPublic(),
 			Name:        i.Name,
 			Description: i.Description,
 			Slug:        i.Slug,
@@ -59,7 +59,6 @@ func (s *PermissionSeeder) Run() error {
 		if existingPermission != nil {
 			existingPermission.Name = permission.Name
 			existingPermission.Description = permission.Description
-			existingPermission.Slug = permission.Slug
 			err = s.PermissionRepository.UpdatePermission(role_repositories.UpdatePermissionParams{Permission: existingPermission})
 			if err != nil {
 				return err
