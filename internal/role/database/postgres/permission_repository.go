@@ -105,7 +105,7 @@ func (r *PermissionPostgresRepository) ListPermissionsBy(params role_repositorie
 }
 
 func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_repositories.PaginatePermissionsParams) (*core.PaginationOutput[role_core.Permission], error) {
-	var permissions []PermissionTable
+	var permissions []PermissionTable = make([]PermissionTable, 0)
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
 	var page int = 1
@@ -132,12 +132,12 @@ func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_reposit
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-	err = selectQuery.Scan(context.Background(), &permissions)
+	err = selectQuery.Scan(context.Background(), permissions)
 	if err != nil {
 		return nil, err
 	}
 
-	var permissionEntities []role_core.Permission
+	var permissionEntities []role_core.Permission = make([]role_core.Permission, 0)
 	for _, permission := range permissions {
 		permissionEntities = append(permissionEntities, *permission.ToEntity())
 	}
@@ -182,7 +182,7 @@ func (r *PermissionPostgresRepository) StorePermission(params role_repositories.
 		err = tx.Commit()
 	}
 
-	return permissionTable.ToEntity(), nil
+	return params.Permission, nil
 }
 
 func (r *PermissionPostgresRepository) UpdatePermission(params role_repositories.UpdatePermissionParams) error {

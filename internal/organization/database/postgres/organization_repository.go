@@ -102,7 +102,7 @@ func (r *OrganizationPostgresRepository) applyFilters(selectQuery *bun.SelectQue
 }
 
 func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organization_repositories.GetOrganizationByIdentityParams) (*organization_core.Organization, error) {
-	var organization OrganizationTable
+	var organization *OrganizationTable = new(OrganizationTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -111,7 +111,7 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organization)
+	selectQuery = selectQuery.Model(organization)
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
@@ -123,11 +123,15 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 		return nil, err
 	}
 
+	if organization.InternalId == "" {
+		return nil, nil
+	}
+
 	return organization.ToEntity(), nil
 }
 
 func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organization_repositories.PaginateOrganizationsParams) (*core.PaginationOutput[organization_core.Organization], error) {
-	var organizations []OrganizationTable
+	var organizations []OrganizationTable = make([]OrganizationTable, 0)
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
 	var page int = 1
@@ -161,8 +165,7 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-	err = selectQuery.Scan(context.Background(), &organizations)
-
+	err = selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &core.PaginationOutput[organization_core.Organization]{
@@ -173,6 +176,53 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 			}, nil
 		}
 
+		return nil, err
+	}
+
+	var organizationEntities []organization_core.Organization = make([]organization_core.Organization, 0)
+	for _, organization := range organizations {
+		organizationEntities = append(organizationEntities, *organization.ToEntity())
+	}
+
+	return &core.PaginationOutput[organization_core.Organization]{
+		Data:    organizationEntities,
+		Page:    page,
+		HasMore: core.HasMorePages(page, countBeforePagination, perPage),
+		Total:   countBeforePagination,
+	}, nil
+}
+
+func (r *OrganizationPostgresRepository) PaginateInvitedOrganizationsBy(params organization_repositories.PaginateInvitedOrganizationsParams) (*core.PaginationOutput[organization_core.Organization], error) {
+	var organizations []OrganizationTable = make([]OrganizationTable, 0)
+	var selectQuery *bun.SelectQuery
+	var perPage int = 10
+	var page int = 1
+
+	if params.Pagination.PerPage != nil {
+		perPage = *params.Pagination.PerPage
+	}
+
+	if params.Pagination.Page != nil {
+		page = *params.Pagination.Page
+	}
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&organizations)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("organization.internal_id IN (SELECT organization_user.organization_internal_id FROM organization_user WHERE organization_user.user_internal_id = ? AND organization_user.status = ?)", params.LoggedUserIdentity.Internal.String(), organization_core.OrganizationUserStatusInvited)
+	countBeforePagination, err := selectQuery.Count(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
+	err = selectQuery.Scan(context.Background())
+	if err != nil {
 		return nil, err
 	}
 
@@ -238,7 +288,7 @@ func (r *OrganizationPostgresRepository) StoreOrganization(params organization_r
 		err = tx.Commit()
 	}
 
-	return organizationTable.ToEntity(), nil
+	return params.Organization, nil
 }
 
 func (r *OrganizationPostgresRepository) UpdateOrganization(params organization_repositories.UpdateOrganizationParams) error {

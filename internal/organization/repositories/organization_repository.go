@@ -27,6 +27,13 @@ type PaginateOrganizationsParams struct {
 	RelationsInput core.RelationsInput
 }
 
+type PaginateInvitedOrganizationsParams struct {
+	LoggedUserIdentity core.Identity
+	SortInput          *core.SortInput
+	Pagination         *core.PaginationInput
+	RelationsInput     core.RelationsInput
+}
+
 type StoreOrganizationParams struct {
 	Organization *organization_core.Organization
 }
@@ -44,6 +51,7 @@ type OrganizationRepository interface {
 
 	GetOrganizationByIdentity(params GetOrganizationByIdentityParams) (*organization_core.Organization, error)
 	PaginateOrganizationsBy(params PaginateOrganizationsParams) (*core.PaginationOutput[organization_core.Organization], error)
+	PaginateInvitedOrganizationsBy(params PaginateInvitedOrganizationsParams) (*core.PaginationOutput[organization_core.Organization], error)
 
 	StoreOrganization(params StoreOrganizationParams) (*organization_core.Organization, error)
 	UpdateOrganization(params UpdateOrganizationParams) error

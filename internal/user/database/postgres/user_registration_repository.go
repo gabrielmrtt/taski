@@ -51,7 +51,7 @@ func (r *UserRegistrationPostgresRepository) SetTransaction(tx core.Transaction)
 }
 
 func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params user_repositories.GetUserRegistrationByTokenParams) (*user_core.UserRegistration, error) {
-	var userRegistration UserRegistrationTable
+	var userRegistration *UserRegistrationTable = new(UserRegistrationTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -60,7 +60,7 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&userRegistration).Where("token = ?", params.Token)
+	selectQuery = selectQuery.Model(userRegistration).Where("token = ?", params.Token)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -68,6 +68,10 @@ func (r *UserRegistrationPostgresRepository) GetUserRegistrationByToken(params u
 		}
 
 		return nil, err
+	}
+
+	if userRegistration.InternalId == "" {
+		return nil, nil
 	}
 
 	return userRegistration.ToEntity(), nil
@@ -112,7 +116,7 @@ func (r *UserRegistrationPostgresRepository) StoreUserRegistration(params user_r
 		}
 	}
 
-	return userRegistrationTable.ToEntity(), nil
+	return params.UserRegistration, nil
 }
 
 func (r *UserRegistrationPostgresRepository) UpdateUserRegistration(params user_repositories.UpdateUserRegistrationParams) error {

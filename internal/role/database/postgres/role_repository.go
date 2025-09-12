@@ -129,7 +129,7 @@ func (r *RolePostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filt
 }
 
 func (r *RolePostgresRepository) GetRoleByIdentity(params role_repositories.GetRoleByIdentityParams) (*role_core.Role, error) {
-	var role RoleTable
+	var role *RoleTable = new(RoleTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -138,13 +138,12 @@ func (r *RolePostgresRepository) GetRoleByIdentity(params role_repositories.GetR
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role)
+	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.RoleIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -153,11 +152,15 @@ func (r *RolePostgresRepository) GetRoleByIdentity(params role_repositories.GetR
 		return nil, err
 	}
 
+	if role.InternalId == "" {
+		return nil, nil
+	}
+
 	return role.ToEntity(), nil
 }
 
 func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params role_repositories.GetRoleByIdentityAndOrganizationIdentityParams) (*role_core.Role, error) {
-	var role RoleTable
+	var role *RoleTable = new(RoleTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -166,7 +169,7 @@ func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role)
+	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ? AND organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
@@ -177,11 +180,15 @@ func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params
 		}
 	}
 
+	if role.InternalId == "" {
+		return nil, nil
+	}
+
 	return role.ToEntity(), nil
 }
 
 func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.GetDefaultRoleParams) (*role_core.Role, error) {
-	var role *RoleTable
+	var role *RoleTable = new(RoleTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -203,11 +210,15 @@ func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.G
 		return nil, err
 	}
 
+	if role.InternalId == "" {
+		return nil, nil
+	}
+
 	return role.ToEntity(), nil
 }
 
 func (r *RolePostgresRepository) PaginateRolesBy(params role_repositories.PaginateRolesParams) (*core.PaginationOutput[role_core.Role], error) {
-	var roles []RoleTable
+	var roles []RoleTable = make([]RoleTable, 0)
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
 	var page int = 1
@@ -250,7 +261,7 @@ func (r *RolePostgresRepository) PaginateRolesBy(params role_repositories.Pagina
 		return nil, err
 	}
 
-	var roleEntities []role_core.Role
+	var roleEntities []role_core.Role = make([]role_core.Role, 0)
 	for _, role := range roles {
 		roleEntities = append(roleEntities, *role.ToEntity())
 	}
@@ -336,7 +347,7 @@ func (r *RolePostgresRepository) StoreRole(params role_repositories.StoreRolePar
 		}
 	}
 
-	return roleTable.ToEntity(), nil
+	return params.Role, nil
 }
 
 func (r *RolePostgresRepository) UpdateRole(params role_repositories.UpdateRoleParams) error {
@@ -499,20 +510,4 @@ func (r *RolePostgresRepository) ChangeRoleUsersToDefault(params role_repositori
 	}
 
 	return nil
-}
-
-func (r *RolePostgresRepository) CheckIfOrganizatonHasUser(organizationIdentity core.Identity, userIdentity core.Identity) (bool, error) {
-	var count int
-
-	err := r.db.NewRaw(
-		"SELECT COUNT(*) FROM organization_user WHERE organization_internal_id = ? and user_internal_id = ?",
-		organizationIdentity.Internal.String(),
-		userIdentity.Internal.String(),
-	).Scan(context.Background(), &count)
-
-	if err != nil {
-		return false, err
-	}
-
-	return count > 0, nil
 }

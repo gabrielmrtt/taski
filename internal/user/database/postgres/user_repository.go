@@ -131,7 +131,7 @@ func (r *UserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filt
 }
 
 func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetUserByIdentityParams) (*user_core.User, error) {
-	var user UserTable
+	var user *UserTable = new(UserTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -140,7 +140,7 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetU
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user)
+	selectQuery = selectQuery.Model(user)
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("users.internal_id = ?", params.UserIdentity.Internal)
 	err := selectQuery.Scan(context.Background())
@@ -152,11 +152,15 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetU
 		return nil, err
 	}
 
+	if user.InternalId == "" {
+		return nil, nil
+	}
+
 	return user.ToEntity(), nil
 }
 
 func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUserByEmailParams) (*user_core.User, error) {
-	var user UserTable
+	var user *UserTable = new(UserTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -165,7 +169,7 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUser
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Join("JOIN user_credentials ON user_credentials.user_internal_id = users.internal_id")
+	selectQuery = selectQuery.Model(user).Join("JOIN user_credentials ON user_credentials.user_internal_id = users.internal_id")
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("user_credentials.email = ?", params.Email)
 	err := selectQuery.Scan(context.Background())
@@ -177,11 +181,15 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUser
 		return nil, err
 	}
 
+	if user.InternalId == "" {
+		return nil, nil
+	}
+
 	return user.ToEntity(), nil
 }
 
 func (r *UserPostgresRepository) PaginateUsersBy(params user_repositories.PaginateUsersParams) (*core.PaginationOutput[user_core.User], error) {
-	var users []UserTable
+	var users []UserTable = make([]UserTable, 0)
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
 	var page int = 1
@@ -224,7 +232,7 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_repositories.Pagina
 		return nil, err
 	}
 
-	var userEntities []user_core.User
+	var userEntities []user_core.User = make([]user_core.User, 0)
 	for _, user := range users {
 		userEntities = append(userEntities, *user.ToEntity())
 	}
@@ -305,7 +313,7 @@ func (r *UserPostgresRepository) StoreUser(params user_repositories.StoreUserPar
 		}
 	}
 
-	return userTable.ToEntity(), nil
+	return params.User, nil
 }
 
 func (r *UserPostgresRepository) UpdateUser(params user_repositories.UpdateUserParams) error {

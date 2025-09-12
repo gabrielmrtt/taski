@@ -28,7 +28,7 @@ type PaginateOrganizationUsersParams struct {
 	RelationsInput core.RelationsInput
 }
 
-type CreateOrganizationUserParams struct {
+type StoreOrganizationUserParams struct {
 	OrganizationUser *organization_core.OrganizationUser
 }
 
@@ -47,7 +47,7 @@ type OrganizationUserRepository interface {
 	GetOrganizationUserByIdentity(params GetOrganizationUserByIdentityParams) (*organization_core.OrganizationUser, error)
 	PaginateOrganizationUsersBy(params PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error)
 
-	CreateOrganizationUser(params CreateOrganizationUserParams) (*organization_core.OrganizationUser, error)
+	StoreOrganizationUser(params StoreOrganizationUserParams) (*organization_core.OrganizationUser, error)
 	UpdateOrganizationUser(params UpdateOrganizationUserParams) error
 	DeleteOrganizationUser(params DeleteOrganizationUserParams) error
 }

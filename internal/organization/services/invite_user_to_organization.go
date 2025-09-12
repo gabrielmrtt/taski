@@ -101,7 +101,7 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 			return err
 		}
 
-		organizationUser, err = s.OrganizationUserRepository.CreateOrganizationUser(organization_repositories.CreateOrganizationUserParams{OrganizationUser: organizationUser})
+		organizationUser, err = s.OrganizationUserRepository.StoreOrganizationUser(organization_repositories.StoreOrganizationUserParams{OrganizationUser: organizationUser})
 		if err != nil {
 			return err
 		}

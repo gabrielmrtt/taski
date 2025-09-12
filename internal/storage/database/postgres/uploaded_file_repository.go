@@ -56,7 +56,7 @@ func (r *UploadedFilePostgresRepository) SetTransaction(tx core.Transaction) err
 }
 
 func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storage_repositories.GetUploadedFileByIdentityParams) (*storage_core.UploadedFile, error) {
-	var uploadedFile UploadedFileTable
+	var uploadedFile *UploadedFileTable = new(UploadedFileTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -65,16 +65,18 @@ func (r *UploadedFilePostgresRepository) GetUploadedFileByIdentity(params storag
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&uploadedFile).Where("internal_id = ?", params.FileIdentity.Internal.String())
-
+	selectQuery = selectQuery.Model(uploadedFile).Where("internal_id = ?", params.FileIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 
 		return nil, err
+	}
+
+	if uploadedFile.InternalId == "" {
+		return nil, nil
 	}
 
 	return uploadedFile.ToEntity(), nil
@@ -117,7 +119,7 @@ func (r *UploadedFilePostgresRepository) StoreUploadedFile(params storage_reposi
 		err = tx.Commit()
 	}
 
-	return uploadedFileTable.ToEntity(), nil
+	return params.UploadedFile, nil
 }
 
 func (r *UploadedFilePostgresRepository) DeleteUploadedFile(params storage_repositories.DeleteUploadedFileParams) error {

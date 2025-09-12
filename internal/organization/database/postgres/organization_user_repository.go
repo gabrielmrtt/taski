@@ -76,7 +76,7 @@ func (r *OrganizationUserPostgresRepository) applyFilters(selectQuery *bun.Selec
 }
 
 func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(params organization_repositories.GetOrganizationUserByIdentityParams) (*organization_core.OrganizationUser, error) {
-	var organizationUser OrganizationUserTable
+	var organizationUser *OrganizationUserTable = new(OrganizationUserTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -85,13 +85,12 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(param
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUser)
+	selectQuery = selectQuery.Model(organizationUser)
 	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -100,11 +99,15 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(param
 		return nil, err
 	}
 
+	if organizationUser.OrganizationInternalId == "" {
+		return nil, nil
+	}
+
 	return organizationUser.ToEntity(), nil
 }
 
 func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params organization_repositories.PaginateOrganizationUsersParams) (*core.PaginationOutput[organization_core.OrganizationUser], error) {
-	var organizationUsers []OrganizationUserTable
+	var organizationUsers []OrganizationUserTable = make([]OrganizationUserTable, 0)
 	var selectQuery *bun.SelectQuery
 	var perPage int = 10
 	var page int = 1
@@ -134,7 +137,6 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &core.PaginationOutput[organization_core.OrganizationUser]{
@@ -161,7 +163,7 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 	}, nil
 }
 
-func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organization_repositories.CreateOrganizationUserParams) (*organization_core.OrganizationUser, error) {
+func (r *OrganizationUserPostgresRepository) StoreOrganizationUser(params organization_repositories.StoreOrganizationUserParams) (*organization_core.OrganizationUser, error) {
 	var tx bun.Tx
 	var shouldCommit bool = false
 
@@ -197,7 +199,7 @@ func (r *OrganizationUserPostgresRepository) CreateOrganizationUser(params organ
 		err = tx.Commit()
 	}
 
-	return organizationUserTable.ToEntity(), nil
+	return params.OrganizationUser, nil
 }
 
 func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organization_repositories.UpdateOrganizationUserParams) error {

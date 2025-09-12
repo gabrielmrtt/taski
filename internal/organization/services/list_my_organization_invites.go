@@ -7,12 +7,12 @@ import (
 )
 
 type ListMyOrganizationInvitesService struct {
-	OrganizationUserRepository organization_repositories.OrganizationUserRepository
+	OrganizationRepository organization_repositories.OrganizationRepository
 }
 
-func NewListMyOrganizationInvitesService(organizationUserRepository organization_repositories.OrganizationUserRepository) *ListMyOrganizationInvitesService {
+func NewListMyOrganizationInvitesService(organizationRepository organization_repositories.OrganizationRepository) *ListMyOrganizationInvitesService {
 	return &ListMyOrganizationInvitesService{
-		OrganizationUserRepository: organizationUserRepository,
+		OrganizationRepository: organizationRepository,
 	}
 }
 
@@ -27,38 +27,30 @@ func (i ListMyOrganizationInvitesInput) Validate() error {
 	return nil
 }
 
-func (s *ListMyOrganizationInvitesService) Execute(input ListMyOrganizationInvitesInput) (*core.PaginationOutput[organization_core.OrganizationUserDto], error) {
+func (s *ListMyOrganizationInvitesService) Execute(input ListMyOrganizationInvitesInput) (*core.PaginationOutput[organization_core.OrganizationDto], error) {
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
 
-	invitedStatus := organization_core.OrganizationUserStatusInvited
-	organizationUsers, err := s.OrganizationUserRepository.PaginateOrganizationUsersBy(organization_repositories.PaginateOrganizationUsersParams{
-		Filters: organization_repositories.OrganizationUserFilters{
-			UserPublicId: &core.ComparableFilter[string]{
-				Equals: &input.AuthenticatedUserIdentity.Public,
-			},
-			Status: &core.ComparableFilter[organization_core.OrganizationUserStatuses]{
-				Equals: &invitedStatus,
-			},
-		},
-		SortInput:      input.SortInput,
-		Pagination:     input.Pagination,
-		RelationsInput: input.RelationsInput,
+	organizations, err := s.OrganizationRepository.PaginateInvitedOrganizationsBy(organization_repositories.PaginateInvitedOrganizationsParams{
+		LoggedUserIdentity: input.AuthenticatedUserIdentity,
+		SortInput:          input.SortInput,
+		Pagination:         input.Pagination,
+		RelationsInput:     input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var organizationUsersDto []organization_core.OrganizationUserDto = make([]organization_core.OrganizationUserDto, 0)
-	for _, organizationUser := range organizationUsers.Data {
-		organizationUsersDto = append(organizationUsersDto, *organization_core.OrganizationUserToDto(&organizationUser))
+	var organizationsDto []organization_core.OrganizationDto = make([]organization_core.OrganizationDto, 0)
+	for _, organization := range organizations.Data {
+		organizationsDto = append(organizationsDto, *organization_core.OrganizationToDto(&organization))
 	}
 
-	return &core.PaginationOutput[organization_core.OrganizationUserDto]{
-		Data:    organizationUsersDto,
-		Page:    organizationUsers.Page,
-		HasMore: organizationUsers.HasMore,
-		Total:   organizationUsers.Total,
+	return &core.PaginationOutput[organization_core.OrganizationDto]{
+		Data:    organizationsDto,
+		Page:    organizations.Page,
+		HasMore: organizations.HasMore,
+		Total:   organizations.Total,
 	}, nil
 }

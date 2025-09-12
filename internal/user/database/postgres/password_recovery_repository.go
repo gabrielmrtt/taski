@@ -51,7 +51,7 @@ func (r *PasswordRecoveryPostgresRepository) SetTransaction(tx core.Transaction)
 }
 
 func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params user_repositories.GetPasswordRecoveryByTokenParams) (*user_core.PasswordRecovery, error) {
-	var passwordRecovery PasswordRecoveryTable
+	var passwordRecovery *PasswordRecoveryTable = new(PasswordRecoveryTable)
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -60,7 +60,7 @@ func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params u
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&passwordRecovery).Where("token = ?", params.Token)
+	selectQuery = selectQuery.Model(passwordRecovery).Where("token = ?", params.Token)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -68,6 +68,10 @@ func (r *PasswordRecoveryPostgresRepository) GetPasswordRecoveryByToken(params u
 		}
 
 		return nil, err
+	}
+
+	if passwordRecovery.InternalId == "" {
+		return nil, nil
 	}
 
 	return passwordRecovery.ToEntity(), nil
@@ -111,7 +115,7 @@ func (r *PasswordRecoveryPostgresRepository) StorePasswordRecovery(params user_r
 		}
 	}
 
-	return passwordRecoveryTable.ToEntity(), nil
+	return params.PasswordRecovery, nil
 }
 
 func (r *PasswordRecoveryPostgresRepository) UpdatePasswordRecovery(params user_repositories.UpdatePasswordRecoveryParams) error {
