@@ -5,6 +5,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
+	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
 	organization_http_requests "github.com/gabrielmrtt/taski/internal/organization/http/requests"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
@@ -30,14 +31,16 @@ func NewOrganizationInvitesController(
 	}
 }
 
+type ListMyOrganizationInvitesResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
+
 // ListMyOrganizationInvites godoc
 // @Summary List my organization invites
-// @Description List my organization invites
+// @Description Returns organizations the authenticated user has been invited to.
 // @Tags Organization Invites
 // @Accept json
 // @Param request query organization_http_requests.ListMyOrganizationInvitesRequest true "Query parameters"
 // @Produce json
-// @Success 200 {object} core_http.HttpSuccessResponseWithData[organization_core.OrganizationUserDto]
+// @Success 200 {object} ListMyOrganizationInvitesResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 401 {object} core_http.HttpErrorResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
@@ -64,6 +67,8 @@ func (c *OrganizationInvitesController) ListMyOrganizationInvites(ctx *gin.Conte
 	return
 }
 
+type AcceptOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
+
 // AcceptOrganizationUserInvitation godoc
 // @Summary Accept organization user invitation
 // @Description Accept organization user invitation
@@ -72,7 +77,7 @@ func (c *OrganizationInvitesController) ListMyOrganizationInvites(ctx *gin.Conte
 // @Param organization_id path string true "Organization ID"
 // @Param user_id path string true "User ID"
 // @Produce json
-// @Success 200 {object} core_http.EmptyHttpSuccessResponse
+// @Success 200 {object} AcceptOrganizationUserInvitationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 401 {object} core_http.HttpErrorResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
@@ -103,6 +108,8 @@ func (c *OrganizationInvitesController) AcceptOrganizationUserInvitation(ctx *gi
 	return
 }
 
+type RefuseOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
+
 // RefuseOrganizationUserInvitation godoc
 // @Summary Refuse organization user invitation
 // @Description Refuse organization user invitation
@@ -111,7 +118,7 @@ func (c *OrganizationInvitesController) AcceptOrganizationUserInvitation(ctx *gi
 // @Param organization_id path string true "Organization ID"
 // @Param user_id path string true "User ID"
 // @Produce json
-// @Success 200 {object} core_http.EmptyHttpSuccessResponse
+// @Success 200 {object} RefuseOrganizationUserInvitationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 401 {object} core_http.HttpErrorResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
