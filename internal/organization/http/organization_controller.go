@@ -251,12 +251,5 @@ func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.Ro
 		g.DELETE("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
 	}
 
-	invitesGroup := group.Group("/organization-invites")
-	{
-		invitesGroup.Use(user_http_middlewares.AuthMiddleware())
-
-		invitesGroup.GET("", c.ListMyOrganizationInvites)
-	}
-
 	return g
 }

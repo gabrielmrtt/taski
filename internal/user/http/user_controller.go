@@ -50,11 +50,16 @@ type GetMeResponse = core_http.HttpSuccessResponseWithData[user_core.UserDto]
 // @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /me [get]
 func (c *UserController) GetMe(ctx *gin.Context) {
-	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
+	var request user_http_requests.GetMeRequest
 
-	input := user_services.GetMeInput{
-		LoggedUserIdentity: authenticatedUserIdentity,
+	if err := request.FromQuery(ctx); err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
+	input := request.ToInput()
+	input.LoggedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.GetMeService.Execute(input)
 	if err != nil {

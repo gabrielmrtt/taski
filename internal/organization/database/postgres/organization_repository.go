@@ -111,7 +111,9 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organization).Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&organization)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -145,12 +147,14 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	}
 
 	selectQuery = selectQuery.Model(&organizations)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
 		selectQuery = selectQuery.Where("deleted_at IS NULL")
 	}
 
+	selectQuery = core_database_postgres.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err

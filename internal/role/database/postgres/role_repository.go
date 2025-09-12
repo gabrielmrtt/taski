@@ -31,7 +31,7 @@ type RoleTable struct {
 	UpdatedAt              *int64  `bun:"updated_at,type:bigint"`
 	DeletedAt              *int64  `bun:"deleted_at,type:bigint"`
 
-	RolePermission []*RolePermissionTable `bun:"rel:has-many,join:internal_id=role_internal_id"`
+	RolePermissions []*RolePermissionTable `bun:"rel:has-many,join:internal_id=role_internal_id"`
 }
 
 func (r *RoleTable) ToEntity() *role_core.Role {
@@ -138,7 +138,10 @@ func (r *RolePostgresRepository) GetRoleByIdentity(params role_repositories.GetR
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role).Relation("RolePermission.Permission").Where("internal_id = ?", params.RoleIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&role)
+	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("internal_id = ?", params.RoleIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 
@@ -163,7 +166,10 @@ func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role).Relation("RolePermission.Permission").Where("internal_id = ? AND organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&role)
+	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("internal_id = ? AND organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -175,7 +181,7 @@ func (r *RolePostgresRepository) GetRoleByIdentityAndOrganizationIdentity(params
 }
 
 func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.GetDefaultRoleParams) (*role_core.Role, error) {
-	var role RoleTable
+	var role *RoleTable
 	var selectQuery *bun.SelectQuery
 
 	if r.tx != nil && !r.tx.IsClosed() {
@@ -184,42 +190,20 @@ func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.G
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role).Where("slug = ? AND is_system_default = TRUE", string(params.Slug))
+	selectQuery = selectQuery.Model(role)
+	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("slug = ? AND is_system_default = TRUE", string(params.Slug))
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
+
+		return nil, err
 	}
 
 	return role.ToEntity(), nil
-}
-
-func (r *RolePostgresRepository) ListRolesBy(params role_repositories.PaginateRolesParams) (*[]role_core.Role, error) {
-	var roles []RoleTable
-	var selectQuery *bun.SelectQuery
-
-	if r.tx != nil && !r.tx.IsClosed() {
-		selectQuery = r.tx.Tx.NewSelect()
-	} else {
-		selectQuery = r.db.NewSelect()
-	}
-
-	selectQuery = selectQuery.Model(&roles).Relation("RolePermission.Permission")
-	selectQuery = r.applyFilters(selectQuery, params.Filters)
-	err := selectQuery.Scan(context.Background())
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return &[]role_core.Role{}, nil
-		}
-	}
-
-	var roleEntities []role_core.Role
-	for _, role := range roles {
-		roleEntities = append(roleEntities, *role.ToEntity())
-	}
-
-	return &roleEntities, nil
 }
 
 func (r *RolePostgresRepository) PaginateRolesBy(params role_repositories.PaginateRolesParams) (*core.PaginationOutput[role_core.Role], error) {
@@ -242,7 +226,9 @@ func (r *RolePostgresRepository) PaginateRolesBy(params role_repositories.Pagina
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&roles).Relation("RolePermission.Permission")
+	selectQuery = selectQuery.Model(&roles)
+	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

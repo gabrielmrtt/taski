@@ -23,6 +23,7 @@ type ListOrganizationUsersInput struct {
 	Filters              organization_repositories.OrganizationUserFilters
 	Pagination           *core.PaginationInput
 	SortInput            *core.SortInput
+	RelationsInput       core.RelationsInput
 }
 
 func (i ListOrganizationUsersInput) Validate() error {
@@ -35,9 +36,10 @@ func (s *ListOrganizationUsersService) Execute(input ListOrganizationUsersInput)
 	}
 
 	organizationUsers, err := s.OrganizationUserRepository.PaginateOrganizationUsersBy(organization_repositories.PaginateOrganizationUsersParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

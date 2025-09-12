@@ -35,3 +35,5 @@ type ComparableFilter[T any] struct {
 type ServiceInput interface {
 	Validate() error
 }
+
+type RelationsInput = []string

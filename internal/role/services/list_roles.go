@@ -23,7 +23,7 @@ type ListRolesInput struct {
 	Filters              role_repositories.RoleFilters
 	SortInput            *core.SortInput
 	Pagination           *core.PaginationInput
-	LoggedUserIdentity   core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i ListRolesInput) Validate() error {
@@ -38,9 +38,10 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
 	roles, err := s.RoleRepository.PaginateRolesBy(role_repositories.PaginateRolesParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

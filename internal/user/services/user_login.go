@@ -54,7 +54,10 @@ func (s *UserLoginService) Execute(input UserLoginInput) (*user_core.UserLoginDt
 		return nil, err
 	}
 
-	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{Email: input.Email})
+	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{
+		Email:          input.Email,
+		RelationsInput: []string{"Credentials", "Data"},
+	})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

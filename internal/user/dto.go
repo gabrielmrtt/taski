@@ -7,23 +7,23 @@ import (
 type UserDto struct {
 	Id          string              `json:"id"`
 	Status      string              `json:"status"`
-	Credentials *UserCredentialsDto `json:"credentials"`
-	Data        *UserDataDto        `json:"data"`
+	Credentials *UserCredentialsDto `json:"credentials,omitempty"`
+	Data        *UserDataDto        `json:"data,omitempty"`
 
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt *string `json:"updated_at"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt *string `json:"updatedAt"`
 }
 
 type UserCredentialsDto struct {
 	Name        string  `json:"name"`
 	Email       string  `json:"email"`
-	PhoneNumber *string `json:"phone_number"`
+	PhoneNumber *string `json:"phoneNumber"`
 }
 
 type UserDataDto struct {
-	DisplayName          string  `json:"display_name"`
+	DisplayName          string  `json:"displayName"`
 	About                *string `json:"about"`
-	ProfilePictureFileId *string `json:"profile_picture_file_id"`
+	ProfilePictureFileId *string `json:"profilePictureFileId"`
 }
 
 func UserToDto(user *User) *UserDto {

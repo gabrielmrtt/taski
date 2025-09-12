@@ -85,7 +85,10 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(param
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUser).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData").Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String())
+	selectQuery = selectQuery.Model(&organizationUser)
+	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 
@@ -120,7 +123,9 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&organizationUsers).Relation("Role").Relation("User.UserCredentials").Relation("User.UserData")
+	selectQuery = selectQuery.Model(&organizationUsers)
+	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

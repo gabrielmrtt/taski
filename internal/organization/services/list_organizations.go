@@ -19,10 +19,11 @@ func NewListOrganizationsService(
 }
 
 type ListOrganizationsInput struct {
-	Filters     organization_repositories.OrganizationFilters
-	ShowDeleted bool
-	Pagination  *core.PaginationInput
-	SortInput   *core.SortInput
+	Filters        organization_repositories.OrganizationFilters
+	ShowDeleted    bool
+	Pagination     *core.PaginationInput
+	SortInput      *core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListOrganizationsInput) Validate() error {
@@ -35,10 +36,11 @@ func (s *ListOrganizationsService) Execute(input ListOrganizationsInput) (*core.
 	}
 
 	organizations, err := s.OrganizationRepository.PaginateOrganizationsBy(organization_repositories.PaginateOrganizationsParams{
-		Filters:     input.Filters,
-		ShowDeleted: input.ShowDeleted,
-		SortInput:   input.SortInput,
-		Pagination:  input.Pagination,
+		Filters:        input.Filters,
+		ShowDeleted:    input.ShowDeleted,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

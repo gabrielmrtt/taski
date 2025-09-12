@@ -6,6 +6,9 @@ import (
 	math_rand "math/rand"
 	"strings"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type RandomStringOptions string
@@ -56,4 +59,8 @@ func GenerateUniqueString(length int) string {
 		}
 		return -1
 	}, s)[:length]
+}
+
+func CamelCaseToPascalCase(s string) string {
+	return cases.Title(language.English).String(s)
 }

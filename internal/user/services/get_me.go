@@ -20,10 +20,19 @@ func NewGetMeService(
 
 type GetMeInput struct {
 	LoggedUserIdentity core.Identity
+	RelationsInput     core.RelationsInput
+}
+
+func (i GetMeInput) Validate() error {
+	return nil
 }
 
 func (s *GetMeService) Execute(input GetMeInput) (*user_core.UserDto, error) {
-	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity})
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity, RelationsInput: input.RelationsInput})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

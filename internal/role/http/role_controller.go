@@ -171,7 +171,6 @@ type ListRolesResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDto
 // @Router /organization/:organization_id/role [get]
 func (c *RoleController) ListRoles(ctx *gin.Context) {
 	var request role_http_requests.ListRolesRequest
-	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 
 	if err := request.FromQuery(ctx); err != nil {
@@ -181,7 +180,6 @@ func (c *RoleController) ListRoles(ctx *gin.Context) {
 
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
-	input.LoggedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListRolesService.Execute(input)
 	if err != nil {

@@ -1,10 +1,13 @@
 package organization_http_requests
 
 import (
+	"strings"
+
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
+	"github.com/gabrielmrtt/taski/pkg/stringutils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
@@ -16,6 +19,7 @@ type ListOrganizationsRequest struct {
 	PerPage       *int    `schema:"per_page"`
 	SortBy        *string `schema:"sort_by"`
 	SortDirection *string `schema:"sort_direction"`
+	Relations     *string `schema:"relations"`
 }
 
 func (r *ListOrganizationsRequest) FromQuery(ctx *gin.Context) error {
@@ -49,6 +53,11 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 		}
 	}
 
+	var relationsInput core.RelationsInput = make([]string, 0)
+	if r.Relations != nil {
+		relationsInput = strings.Split(stringutils.CamelCaseToPascalCase(*r.Relations), ",")
+	}
+
 	return organization_services.ListOrganizationsInput{
 		Filters: organization_repositories.OrganizationFilters{
 			Name:   nameFilter,
@@ -63,5 +72,6 @@ func (r *ListOrganizationsRequest) ToInput() organization_services.ListOrganizat
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
+		RelationsInput: relationsInput,
 	}
 }

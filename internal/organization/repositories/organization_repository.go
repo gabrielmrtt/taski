@@ -16,13 +16,15 @@ type OrganizationFilters struct {
 
 type GetOrganizationByIdentityParams struct {
 	OrganizationIdentity core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 type PaginateOrganizationsParams struct {
-	Filters     OrganizationFilters
-	ShowDeleted bool
-	SortInput   *core.SortInput
-	Pagination  *core.PaginationInput
+	Filters        OrganizationFilters
+	ShowDeleted    bool
+	SortInput      *core.SortInput
+	Pagination     *core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreOrganizationParams struct {

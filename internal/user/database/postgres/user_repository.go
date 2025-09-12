@@ -23,34 +23,34 @@ type UserTable struct {
 	UpdatedAt  *int64 `bun:"updated_at,type:bigint"`
 	DeletedAt  *int64 `bun:"deleted_at,type:bigint"`
 
-	UserCredentials *UserCredentialsTable `bun:"rel:has-one,join:internal_id=user_internal_id"`
-	UserData        *UserDataTable        `bun:"rel:has-one,join:internal_id=user_internal_id"`
+	Credentials *UserCredentialsTable `bun:"rel:has-one,join:internal_id=user_internal_id"`
+	Data        *UserDataTable        `bun:"rel:has-one,join:internal_id=user_internal_id"`
 }
 
 func (u *UserTable) ToEntity() *user_core.User {
 	var userCredentials *user_core.UserCredentials
 	var userData *user_core.UserData
 
-	if u.UserCredentials != nil {
+	if u.Credentials != nil {
 		userCredentials = &user_core.UserCredentials{
-			Name:        u.UserCredentials.Name,
-			Email:       u.UserCredentials.Email,
-			Password:    u.UserCredentials.Password,
-			PhoneNumber: u.UserCredentials.PhoneNumber,
+			Name:        u.Credentials.Name,
+			Email:       u.Credentials.Email,
+			Password:    u.Credentials.Password,
+			PhoneNumber: u.Credentials.PhoneNumber,
 		}
 	}
 
-	if u.UserData != nil {
+	if u.Data != nil {
 		var profilePictureIdentity *core.Identity
 
-		if u.UserData.ProfilePictureInternalId != nil {
-			identity := core.NewIdentityFromInternal(uuid.MustParse(*u.UserData.ProfilePictureInternalId), storage_core.UploadedFileIdentityPrefix)
+		if u.Data.ProfilePictureInternalId != nil {
+			identity := core.NewIdentityFromInternal(uuid.MustParse(*u.Data.ProfilePictureInternalId), storage_core.UploadedFileIdentityPrefix)
 			profilePictureIdentity = &identity
 		}
 
 		userData = &user_core.UserData{
-			DisplayName:            u.UserData.DisplayName,
-			About:                  u.UserData.About,
+			DisplayName:            u.Data.DisplayName,
+			About:                  u.Data.About,
 			ProfilePictureIdentity: profilePictureIdentity,
 		}
 	}
@@ -98,7 +98,7 @@ func (r *UserPostgresRepository) SetTransaction(tx core.Transaction) error {
 	return nil
 }
 
-func applyFilters(selectQuery *bun.SelectQuery, filters user_repositories.UserFilters) *bun.SelectQuery {
+func (r *UserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters user_repositories.UserFilters) *bun.SelectQuery {
 	if filters.Email != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.email", filters.Email)
 	}
@@ -140,7 +140,9 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetU
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("users.internal_id = ?", params.UserIdentity.Internal)
+	selectQuery = selectQuery.Model(&user)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("users.internal_id = ?", params.UserIdentity.Internal)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -163,7 +165,9 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUser
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&user).Relation("UserCredentials").Relation("UserData").Where("user_credentials.email = ?", params.Email)
+	selectQuery = selectQuery.Model(&user).Join("JOIN user_credentials ON user_credentials.user_internal_id = users.internal_id")
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("user_credentials.email = ?", params.Email)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -197,7 +201,9 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_repositories.Pagina
 	}
 
 	selectQuery = selectQuery.Model(&users)
-	selectQuery = applyFilters(selectQuery, params.Filters)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = r.applyFilters(selectQuery, params.Filters)
+	selectQuery = core_database_postgres.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err

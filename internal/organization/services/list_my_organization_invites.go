@@ -20,6 +20,7 @@ type ListMyOrganizationInvitesInput struct {
 	AuthenticatedUserIdentity core.Identity
 	Pagination                *core.PaginationInput
 	SortInput                 *core.SortInput
+	RelationsInput            core.RelationsInput
 }
 
 func (i ListMyOrganizationInvitesInput) Validate() error {
@@ -41,8 +42,9 @@ func (s *ListMyOrganizationInvitesService) Execute(input ListMyOrganizationInvit
 				Equals: &invitedStatus,
 			},
 		},
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err
