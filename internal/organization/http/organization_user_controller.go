@@ -14,32 +14,26 @@ import (
 )
 
 type OrganizationUserController struct {
-	ListOrganizationUsersService            *organization_services.ListOrganizationUsersService
-	InviteUserToOrganizationService         *organization_services.InviteUserToOrganizationService
-	RemoveUserFromOrganizationService       *organization_services.RemoveUserFromOrganizationService
-	AcceptOrganizationUserInvitationService *organization_services.AcceptOrganizationUserInvitationService
-	RefuseOrganizationUserInvitationService *organization_services.RefuseOrganizationUserInvitationService
-	GetOrganizationUserService              *organization_services.GetOrganizationUserService
-	UpdateOrganizationUserService           *organization_services.UpdateOrganizationUserService
+	ListOrganizationUsersService      *organization_services.ListOrganizationUsersService
+	InviteUserToOrganizationService   *organization_services.InviteUserToOrganizationService
+	RemoveUserFromOrganizationService *organization_services.RemoveUserFromOrganizationService
+	GetOrganizationUserService        *organization_services.GetOrganizationUserService
+	UpdateOrganizationUserService     *organization_services.UpdateOrganizationUserService
 }
 
 func NewOrganizationUserController(
 	listOrganizationUsersService *organization_services.ListOrganizationUsersService,
 	inviteUserToOrganizationService *organization_services.InviteUserToOrganizationService,
 	removeUserFromOrganizationService *organization_services.RemoveUserFromOrganizationService,
-	acceptOrganizationUserInvitationService *organization_services.AcceptOrganizationUserInvitationService,
-	refuseOrganizationUserInvitationService *organization_services.RefuseOrganizationUserInvitationService,
 	getOrganizationUserService *organization_services.GetOrganizationUserService,
 	updateOrganizationUserService *organization_services.UpdateOrganizationUserService,
 ) *OrganizationUserController {
 	return &OrganizationUserController{
-		ListOrganizationUsersService:            listOrganizationUsersService,
-		InviteUserToOrganizationService:         inviteUserToOrganizationService,
-		RemoveUserFromOrganizationService:       removeUserFromOrganizationService,
-		AcceptOrganizationUserInvitationService: acceptOrganizationUserInvitationService,
-		RefuseOrganizationUserInvitationService: refuseOrganizationUserInvitationService,
-		GetOrganizationUserService:              getOrganizationUserService,
-		UpdateOrganizationUserService:           updateOrganizationUserService,
+		ListOrganizationUsersService:      listOrganizationUsersService,
+		InviteUserToOrganizationService:   inviteUserToOrganizationService,
+		RemoveUserFromOrganizationService: removeUserFromOrganizationService,
+		GetOrganizationUserService:        getOrganizationUserService,
+		UpdateOrganizationUserService:     updateOrganizationUserService,
 	}
 }
 
@@ -157,78 +151,6 @@ func (c *OrganizationUserController) RemoveUserFromOrganization(ctx *gin.Context
 	return
 }
 
-type AcceptOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
-
-// AcceptOrganizationUserInvitation godoc
-// @Summary Accept organization user invitation
-// @Description Accepts an organization user invitation. Only the user itself can accept the invitation.
-// @Tags Organization User
-// @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
-// @Produce json
-// @Success 200 {object} AcceptOrganizationUserInvitationResponse
-// @Failure 400 {object} core_http.HttpErrorResponse
-// @Failure 401 {object} core_http.HttpErrorResponse
-// @Failure 403 {object} core_http.HttpErrorResponse
-// @Failure 404 {object} core_http.HttpErrorResponse
-// @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user/:user_id/accept-invitation [patch]
-func (c *OrganizationUserController) AcceptOrganizationUserInvitation(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
-
-	input := organization_services.AcceptOrganizationUserInvitationInput{
-		OrganizationIdentity: organizationIdentity,
-		UserIdentity:         userIdentity,
-	}
-
-	err := c.AcceptOrganizationUserInvitationService.Execute(input)
-	if err != nil {
-		core_http.NewHttpErrorResponse(ctx, err)
-		return
-	}
-
-	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
-}
-
-type RefuseOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
-
-// RefuseOrganizationUserInvitation godoc
-// @Summary Refuse organization user invitation
-// @Description Refuses an organization user invitation. Only the user itself can refuse the invitation.
-// @Tags Organization User
-// @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
-// @Produce json
-// @Success 200 {object} RefuseOrganizationUserInvitationResponse
-// @Failure 400 {object} core_http.HttpErrorResponse
-// @Failure 401 {object} core_http.HttpErrorResponse
-// @Failure 403 {object} core_http.HttpErrorResponse
-// @Failure 404 {object} core_http.HttpErrorResponse
-// @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user/:user_id/refuse-invitation [patch]
-func (c *OrganizationUserController) RefuseOrganizationUserInvitation(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
-
-	input := organization_services.RefuseOrganizationUserInvitationInput{
-		OrganizationIdentity: organizationIdentity,
-		UserIdentity:         userIdentity,
-	}
-
-	err := c.RefuseOrganizationUserInvitationService.Execute(input)
-	if err != nil {
-		core_http.NewHttpErrorResponse(ctx, err)
-		return
-	}
-
-	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
-}
-
 type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationUserDto]
 
 // GetOrganizationUser godoc
@@ -317,9 +239,6 @@ func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gi
 		g.POST("", organization_http_middlewares.UserMustHavePermission("organizations:users:create"), c.InviteUserToOrganization)
 		g.PUT("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:update"), c.UpdateOrganizationUser)
 		g.DELETE("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:delete"), c.RemoveUserFromOrganization)
-
-		g.PATCH("/:user_id/accept-invitation", organization_http_middlewares.UserMustBeSame(), c.AcceptOrganizationUserInvitation)
-		g.PATCH("/:user_id/refuse-invitation", organization_http_middlewares.UserMustBeSame(), c.RefuseOrganizationUserInvitation)
 	}
 
 	return g

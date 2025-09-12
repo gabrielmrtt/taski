@@ -24,7 +24,7 @@ type GetRoleByIdentityAndOrganizationIdentityParams struct {
 }
 
 type GetDefaultRoleParams struct {
-	Slug string
+	Slug role_core.DefaultRoleSlugs
 }
 
 type PaginateRolesParams struct {
@@ -47,7 +47,7 @@ type DeleteRoleParams struct {
 
 type ChangeRoleUsersToDefaultParams struct {
 	RoleIdentity    core.Identity
-	DefaultRoleSlug string
+	DefaultRoleSlug role_core.DefaultRoleSlugs
 }
 
 type RoleRepository interface {

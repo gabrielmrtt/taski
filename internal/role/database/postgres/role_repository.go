@@ -184,7 +184,7 @@ func (r *RolePostgresRepository) GetSystemDefaultRole(params role_repositories.G
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&role).Where("slug = ? AND is_system_default = TRUE", params.Slug)
+	selectQuery = selectQuery.Model(&role).Where("slug = ? AND is_system_default = TRUE", string(params.Slug))
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {

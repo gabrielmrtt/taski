@@ -1,6 +1,8 @@
 package seeders
 
 import (
+	"slices"
+
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
 	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
@@ -22,7 +24,6 @@ func NewRolesSeeder(roleRepository role_repositories.RoleRepository, permissionR
 func (s *RolesSeeder) Run() error {
 	permissions, err := s.PermissionRepository.ListPermissionsBy(role_repositories.ListPermissionsParams{
 		Filters: role_repositories.PermissionFilters{},
-		Include: map[string]any{},
 	})
 	if err != nil {
 		return err
@@ -30,14 +31,22 @@ func (s *RolesSeeder) Run() error {
 
 	now := datetimeutils.EpochNow()
 
-	roles := []role_core.Role{
-		{
+	var roles []role_core.Role = make([]role_core.Role, 0)
+	for _, defaultRole := range role_core.DefaultRoleSlugsArray {
+		var defaultRolePermissions []role_core.Permission = make([]role_core.Permission, 0)
+		for _, p := range *permissions {
+			if slices.Contains(defaultRole.Permissions, p.Slug) {
+				defaultRolePermissions = append(defaultRolePermissions, p)
+			}
+		}
+
+		roles = append(roles, role_core.Role{
 			Identity:        core.NewIdentity(role_core.RoleIdentityPrefix),
-			Name:            "Admin",
-			Slug:            "admin",
+			Name:            defaultRole.Name,
+			Slug:            string(defaultRole.Slug),
 			IsSystemDefault: true,
-			Description:     "Admin role",
-			Permissions:     *permissions,
+			Description:     defaultRole.Description,
+			Permissions:     defaultRolePermissions,
 			Timestamps: core.Timestamps{
 				CreatedAt: &now,
 				UpdatedAt: nil,
@@ -46,28 +55,12 @@ func (s *RolesSeeder) Run() error {
 			UserEditorIdentity:   nil,
 			OrganizationIdentity: nil,
 			DeletedAt:            nil,
-		},
-		{
-			Identity:        core.NewIdentity(role_core.RoleIdentityPrefix),
-			Name:            "Default",
-			Slug:            "default",
-			IsSystemDefault: true,
-			Description:     "Default role",
-			Permissions:     *permissions,
-			Timestamps: core.Timestamps{
-				CreatedAt: &now,
-				UpdatedAt: nil,
-			},
-			UserCreatorIdentity:  nil,
-			UserEditorIdentity:   nil,
-			OrganizationIdentity: nil,
-			DeletedAt:            nil,
-		},
+		})
 	}
 
 	for _, role := range roles {
 		exists, err := s.RoleRepository.GetSystemDefaultRole(role_repositories.GetDefaultRoleParams{
-			Slug: role.Slug,
+			Slug: role_core.DefaultRoleSlugs(role.Slug),
 		})
 		if err != nil {
 			return err

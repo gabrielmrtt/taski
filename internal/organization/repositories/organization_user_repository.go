@@ -11,6 +11,7 @@ type OrganizationUserFilters struct {
 	Email                *core.ComparableFilter[string]
 	DisplayName          *core.ComparableFilter[string]
 	RolePublicId         *core.ComparableFilter[string]
+	UserPublicId         *core.ComparableFilter[string]
 	Status               *core.ComparableFilter[organization_core.OrganizationUserStatuses]
 }
 

@@ -12,8 +12,14 @@ import (
 
 func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		organizationId := ctx.Param("organization_id")
+		var permission role_core.PermissionSlugs = role_core.PermissionSlugs(permissionSlug)
+		if permission == "" {
+			core_http.NewHttpErrorResponse(ctx, core.NewInternalError("invalid permission slug"))
+			ctx.Abort()
+			return
+		}
 
+		organizationId := ctx.Param("organization_id")
 		if organizationId == "" {
 			ctx.Next()
 			return
@@ -41,7 +47,7 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 		}
 
 		if !orgUser.CanExecuteAction(role_core.PermissionSlugs(permissionSlug)) {
-			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you don't have permission to execute this action"))
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you can't execute this action"))
 			ctx.Abort()
 			return
 		}

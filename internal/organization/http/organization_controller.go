@@ -14,11 +14,12 @@ import (
 )
 
 type OrganizationController struct {
-	ListOrganizationsService  *organization_services.ListOrganizationsService
-	GetOrganizationService    *organization_services.GetOrganizationService
-	CreateOrganizationService *organization_services.CreateOrganizationService
-	UpdateOrganizationService *organization_services.UpdateOrganizationService
-	DeleteOrganizationService *organization_services.DeleteOrganizationService
+	ListOrganizationsService         *organization_services.ListOrganizationsService
+	GetOrganizationService           *organization_services.GetOrganizationService
+	CreateOrganizationService        *organization_services.CreateOrganizationService
+	UpdateOrganizationService        *organization_services.UpdateOrganizationService
+	DeleteOrganizationService        *organization_services.DeleteOrganizationService
+	ListMyOrganizationInvitesService *organization_services.ListMyOrganizationInvitesService
 }
 
 func NewOrganizationController(
@@ -217,16 +218,44 @@ func (c *OrganizationController) DeleteOrganization(ctx *gin.Context) {
 	return
 }
 
+func (c *OrganizationController) ListMyOrganizationInvites(ctx *gin.Context) {
+	var request organization_http_requests.ListMyOrganizationInvitesRequest
+
+	if err := request.FromQuery(ctx); err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	input := request.ToInput()
+	input.AuthenticatedUserIdentity = user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
+
+	response, err := c.ListMyOrganizationInvitesService.Execute(input)
+	if err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
+	return
+}
+
 func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
 	g := group.Group("/organization")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
-		g.GET("", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.ListOrganizations)
+		g.GET("", c.ListOrganizations)
 		g.GET("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.GetOrganization)
-		g.POST("", organization_http_middlewares.UserMustHavePermission("organizations:create"), c.CreateOrganization)
+		g.POST("", c.CreateOrganization)
 		g.PUT("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:update"), c.UpdateOrganization)
 		g.DELETE("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
+	}
+
+	invitesGroup := group.Group("/organization-invites")
+	{
+		invitesGroup.Use(user_http_middlewares.AuthMiddleware())
+
+		invitesGroup.GET("", c.ListMyOrganizationInvites)
 	}
 
 	return g

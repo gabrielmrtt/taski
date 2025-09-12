@@ -20,7 +20,6 @@ type GetPermissionBySlugParams struct {
 
 type ListPermissionsParams struct {
 	Filters PermissionFilters
-	Include map[string]any
 }
 
 type PaginatePermissionsParams struct {

@@ -6,7 +6,6 @@ type PermissionSlugs string
 
 const (
 	OrganizationsView        PermissionSlugs = "organizations:view"
-	OrganizationsCreate      PermissionSlugs = "organizations:create"
 	OrganizationsUpdate      PermissionSlugs = "organizations:update"
 	OrganizationsDelete      PermissionSlugs = "organizations:delete"
 	OrganizationsUsersView   PermissionSlugs = "organizations:users:view"
@@ -30,8 +29,6 @@ type PermissionSlugsArrayItem struct {
 }
 
 var PermissionSlugsArray = []PermissionSlugsArrayItem{
-	{Name: "Organizations View", Slug: OrganizationsView, Description: "Allow users to view organizations"},
-	{Name: "Organizations Create", Slug: OrganizationsCreate, Description: "Allow users to create organizations"},
 	{Name: "Organizations Update", Slug: OrganizationsUpdate, Description: "Allow users to update organizations"},
 	{Name: "Organizations Delete", Slug: OrganizationsDelete, Description: "Allow users to delete organizations"},
 	{Name: "Organizations Users View", Slug: OrganizationsUsersView, Description: "Allow users to view organizations users"},
@@ -46,4 +43,56 @@ var PermissionSlugsArray = []PermissionSlugsArrayItem{
 	{Name: "Projects Create", Slug: ProjectsCreate, Description: "Allow users to create projects"},
 	{Name: "Projects Update", Slug: ProjectsUpdate, Description: "Allow users to update projects"},
 	{Name: "Projects Delete", Slug: ProjectsDelete, Description: "Allow users to delete projects"},
+}
+
+type DefaultRoleSlugs string
+
+const (
+	DefaultRoleSlug DefaultRoleSlugs = "default"
+	AdminRoleSlug   DefaultRoleSlugs = "admin"
+)
+
+type DefaultRoleSlugsArrayItem struct {
+	Name        string
+	Slug        DefaultRoleSlugs
+	Description string
+	Permissions []PermissionSlugs
+}
+
+var DefaultRoleSlugsArray = []DefaultRoleSlugsArrayItem{
+	{
+		Name:        "Default",
+		Slug:        DefaultRoleSlug,
+		Description: "Default role",
+		Permissions: []PermissionSlugs{
+			OrganizationsView,
+			RolesView,
+			ProjectsView,
+			ProjectsCreate,
+			ProjectsUpdate,
+			ProjectsDelete,
+		},
+	},
+	{
+		Name:        "Admin",
+		Slug:        AdminRoleSlug,
+		Description: "Admin role",
+		Permissions: []PermissionSlugs{
+			OrganizationsView,
+			OrganizationsUpdate,
+			OrganizationsDelete,
+			OrganizationsUsersView,
+			OrganizationsUsersCreate,
+			OrganizationsUsersUpdate,
+			OrganizationsUsersDelete,
+			RolesView,
+			RolesCreate,
+			RolesUpdate,
+			RolesDelete,
+			ProjectsView,
+			ProjectsCreate,
+			ProjectsUpdate,
+			ProjectsDelete,
+		},
+	},
 }
