@@ -10,10 +10,10 @@ type OrganizationDto struct {
 	Id            string  `json:"id"`
 	Name          string  `json:"name"`
 	Status        string  `json:"status"`
-	UserCreatorId string  `json:"user_creator_id"`
-	UserEditorId  *string `json:"user_editor_id"`
-	CreatedAt     string  `json:"created_at"`
-	UpdatedAt     *string `json:"updated_at"`
+	UserCreatorId string  `json:"userCreatorId"`
+	UserEditorId  *string `json:"userEditorId"`
+	CreatedAt     string  `json:"createdAt"`
+	UpdatedAt     *string `json:"updatedAt"`
 }
 
 func OrganizationToDto(organization *Organization) *OrganizationDto {
@@ -47,7 +47,7 @@ func OrganizationToDto(organization *Organization) *OrganizationDto {
 }
 
 type OrganizationUserDto struct {
-	OrganizationId string             `json:"organization_id"`
+	OrganizationId string             `json:"organizationId"`
 	User           *user_core.UserDto `json:"user"`
 	Role           *role_core.RoleDto `json:"role"`
 	Status         string             `json:"status"`

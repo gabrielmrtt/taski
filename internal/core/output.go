@@ -3,7 +3,7 @@ package core
 type PaginationOutput[T any] struct {
 	Data    []T  `json:"data"`
 	Page    int  `json:"page"`
-	HasMore bool `json:"has_more"`
+	HasMore bool `json:"hasMore"`
 	Total   int  `json:"total"`
 }
 

@@ -4,7 +4,7 @@ import user_services "github.com/gabrielmrtt/taski/internal/user/services"
 
 type ChangeUserPasswordRequest struct {
 	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	PasswordConfirmation string `json:"passwordConfirmation"`
 }
 
 func (r *ChangeUserPasswordRequest) ToInput() user_services.ChangeUserPasswordInput {

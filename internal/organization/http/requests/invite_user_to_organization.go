@@ -7,7 +7,7 @@ import (
 
 type InviteUserToOrganizationRequest struct {
 	Email  string `json:"email"`
-	RoleId string `json:"role_id"`
+	RoleId string `json:"roleId"`
 }
 
 func (r *InviteUserToOrganizationRequest) ToInput() organization_services.InviteUserToOrganizationInput {

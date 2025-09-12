@@ -561,7 +561,7 @@
                     },
                     {
                         "type": "integer",
-                        "name": "per_page",
+                        "name": "perPage",
                         "in": "query"
                     },
                     {
@@ -571,12 +571,12 @@
                     },
                     {
                         "type": "string",
-                        "name": "sort_by",
+                        "name": "sortBy",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "sort_direction",
+                        "name": "sortDirection",
                         "in": "query"
                     }
                 ],
@@ -969,7 +969,7 @@
                     },
                     {
                         "type": "integer",
-                        "name": "per_page",
+                        "name": "perPage",
                         "in": "query"
                     },
                     {
@@ -979,12 +979,12 @@
                     },
                     {
                         "type": "string",
-                        "name": "sort_by",
+                        "name": "sortBy",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "sort_direction",
+                        "name": "sortDirection",
                         "in": "query"
                     }
                 ],
@@ -1875,7 +1875,7 @@
         "github_com_gabrielmrtt_taski_internal_organization.OrganizationDto": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
@@ -1887,13 +1887,13 @@
                 "status": {
                     "type": "string"
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 },
-                "user_creator_id": {
+                "userCreatorId": {
                     "type": "string"
                 },
-                "user_editor_id": {
+                "userEditorId": {
                     "type": "string"
                 }
             }
@@ -1901,7 +1901,7 @@
         "github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto": {
             "type": "object",
             "properties": {
-                "organization_id": {
+                "organizationId": {
                     "type": "string"
                 },
                 "role": {
@@ -1929,7 +1929,7 @@
                 "email": {
                     "type": "string"
                 },
-                "role_id": {
+                "roleId": {
                     "type": "string"
                 }
             }
@@ -1945,7 +1945,7 @@
         "github_com_gabrielmrtt_taski_internal_role.RoleDto": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "description": {
@@ -1954,13 +1954,13 @@
                 "id": {
                     "type": "string"
                 },
-                "is_system_default": {
+                "isSystemDefault": {
                     "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
-                "organization_id": {
+                "organizationId": {
                     "type": "string"
                 },
                 "permissions": {
@@ -1969,13 +1969,13 @@
                         "type": "string"
                     }
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 },
-                "user_creator_id": {
+                "userCreatorId": {
                     "type": "string"
                 },
-                "user_editor_id": {
+                "userEditorId": {
                     "type": "string"
                 }
             }
@@ -2082,7 +2082,7 @@
                 "password": {
                     "type": "string"
                 },
-                "password_confirmation": {
+                "passwordConfirmation": {
                     "type": "string"
                 }
             }
@@ -2101,7 +2101,7 @@
                 "password": {
                     "type": "string"
                 },
-                "password_confirmation": {
+                "passwordConfirmation": {
                     "type": "string"
                 },
                 "token": {
@@ -2121,7 +2121,7 @@
                 "password": {
                     "type": "string"
                 },
-                "phone_number": {
+                "phoneNumber": {
                     "type": "string"
                 }
             }
@@ -2135,7 +2135,7 @@
                 "name": {
                     "type": "string"
                 },
-                "phone_number": {
+                "phoneNumber": {
                     "type": "string"
                 }
             }
@@ -2146,10 +2146,10 @@
                 "about": {
                     "type": "string"
                 },
-                "display_name": {
+                "displayName": {
                     "type": "string"
                 },
-                "profile_picture": {
+                "profilePicture": {
                     "$ref": "#/definitions/multipart.FileHeader"
                 }
             }

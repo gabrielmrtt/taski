@@ -15,13 +15,13 @@ import (
 type ListOrganizationUsersRequest struct {
 	Name          *string `schema:"name"`
 	Email         *string `schema:"email"`
-	DisplayName   *string `schema:"display_name"`
-	RoleId        *string `schema:"role_id"`
+	DisplayName   *string `schema:"displayName"`
+	RoleId        *string `schema:"roleId"`
 	Status        *string `schema:"status"`
 	Page          *int    `schema:"page"`
-	PerPage       *int    `schema:"per_page"`
-	SortBy        *string `schema:"sort_by"`
-	SortDirection *string `schema:"sort_direction"`
+	PerPage       *int    `schema:"perPage"`
+	SortBy        *string `schema:"sortBy"`
+	SortDirection *string `schema:"sortDirection"`
 	Relations     *string `schema:"relations"`
 }
 

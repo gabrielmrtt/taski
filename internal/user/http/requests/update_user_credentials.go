@@ -5,7 +5,7 @@ import user_services "github.com/gabrielmrtt/taski/internal/user/services"
 type UpdateUserCredentialsRequest struct {
 	Name        *string `json:"name"`
 	Email       *string `json:"email"`
-	PhoneNumber *string `json:"phone_number"`
+	PhoneNumber *string `json:"phoneNumber"`
 }
 
 func (r *UpdateUserCredentialsRequest) ToInput() user_services.UpdateUserCredentialsInput {

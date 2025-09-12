@@ -9,9 +9,9 @@ import (
 )
 
 type UpdateUserDataRequest struct {
-	DisplayName    *string               `json:"display_name"`
+	DisplayName    *string               `json:"displayName"`
 	About          *string               `json:"about"`
-	ProfilePicture *multipart.FileHeader `form:"profile_picture"`
+	ProfilePicture *multipart.FileHeader `form:"profilePicture"`
 }
 
 func (r *UpdateUserDataRequest) ToInput() user_services.UpdateUserDataInput {

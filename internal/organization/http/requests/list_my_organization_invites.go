@@ -12,9 +12,9 @@ import (
 
 type ListMyOrganizationInvitesRequest struct {
 	Page          *int    `json:"page" schema:"page"`
-	PerPage       *int    `json:"per_page" schema:"per_page"`
-	SortBy        *string `json:"sort_by" schema:"sort_by"`
-	SortDirection *string `json:"sort_direction" schema:"sort_direction"`
+	PerPage       *int    `json:"perPage" schema:"perPage"`
+	SortBy        *string `json:"sortBy" schema:"sortBy"`
+	SortDirection *string `json:"sortDirection" schema:"sortDirection"`
 	Relations     *string `json:"relations" schema:"relations"`
 }
 

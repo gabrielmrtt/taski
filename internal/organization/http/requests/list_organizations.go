@@ -16,9 +16,9 @@ type ListOrganizationsRequest struct {
 	Name          *string `schema:"name"`
 	Status        *string `schema:"status"`
 	Page          *int    `schema:"page"`
-	PerPage       *int    `schema:"per_page"`
-	SortBy        *string `schema:"sort_by"`
-	SortDirection *string `schema:"sort_direction"`
+	PerPage       *int    `schema:"perPage"`
+	SortBy        *string `schema:"sortBy"`
+	SortDirection *string `schema:"sortDirection"`
 	Relations     *string `schema:"relations"`
 }
 

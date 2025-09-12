@@ -7,7 +7,7 @@ import (
 )
 
 type UpdateOrganizationUserRequest struct {
-	RoleId *string `json:"role_id"`
+	RoleId *string `json:"roleId"`
 	Status *string `json:"status"`
 }
 

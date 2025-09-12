@@ -572,7 +572,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "name": "per_page",
+                        "name": "perPage",
                         "in": "query"
                     },
                     {
@@ -582,12 +582,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "sort_by",
+                        "name": "sortBy",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "sort_direction",
+                        "name": "sortDirection",
                         "in": "query"
                     }
                 ],
@@ -980,7 +980,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "name": "per_page",
+                        "name": "perPage",
                         "in": "query"
                     },
                     {
@@ -990,12 +990,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "sort_by",
+                        "name": "sortBy",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "sort_direction",
+                        "name": "sortDirection",
                         "in": "query"
                     }
                 ],
@@ -1886,7 +1886,7 @@ const docTemplate = `{
         "github_com_gabrielmrtt_taski_internal_organization.OrganizationDto": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
@@ -1898,13 +1898,13 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 },
-                "user_creator_id": {
+                "userCreatorId": {
                     "type": "string"
                 },
-                "user_editor_id": {
+                "userEditorId": {
                     "type": "string"
                 }
             }
@@ -1912,7 +1912,7 @@ const docTemplate = `{
         "github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto": {
             "type": "object",
             "properties": {
-                "organization_id": {
+                "organizationId": {
                     "type": "string"
                 },
                 "role": {
@@ -1940,7 +1940,7 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "role_id": {
+                "roleId": {
                     "type": "string"
                 }
             }
@@ -1956,7 +1956,7 @@ const docTemplate = `{
         "github_com_gabrielmrtt_taski_internal_role.RoleDto": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "description": {
@@ -1965,13 +1965,13 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "is_system_default": {
+                "isSystemDefault": {
                     "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
-                "organization_id": {
+                "organizationId": {
                     "type": "string"
                 },
                 "permissions": {
@@ -1980,13 +1980,13 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 },
-                "user_creator_id": {
+                "userCreatorId": {
                     "type": "string"
                 },
-                "user_editor_id": {
+                "userEditorId": {
                     "type": "string"
                 }
             }
@@ -2093,7 +2093,7 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "password_confirmation": {
+                "passwordConfirmation": {
                     "type": "string"
                 }
             }
@@ -2112,7 +2112,7 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "password_confirmation": {
+                "passwordConfirmation": {
                     "type": "string"
                 },
                 "token": {
@@ -2132,7 +2132,7 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "phone_number": {
+                "phoneNumber": {
                     "type": "string"
                 }
             }
@@ -2146,7 +2146,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "phone_number": {
+                "phoneNumber": {
                     "type": "string"
                 }
             }
@@ -2157,10 +2157,10 @@ const docTemplate = `{
                 "about": {
                     "type": "string"
                 },
-                "display_name": {
+                "displayName": {
                     "type": "string"
                 },
-                "profile_picture": {
+                "profilePicture": {
                     "$ref": "#/definitions/multipart.FileHeader"
                 }
             }

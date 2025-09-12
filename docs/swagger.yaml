@@ -13,7 +13,7 @@ definitions:
     type: object
   github_com_gabrielmrtt_taski_internal_organization.OrganizationDto:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
@@ -21,16 +21,16 @@ definitions:
         type: string
       status:
         type: string
-      updated_at:
+      updatedAt:
         type: string
-      user_creator_id:
+      userCreatorId:
         type: string
-      user_editor_id:
+      userEditorId:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto:
     properties:
-      organization_id:
+      organizationId:
         type: string
       role:
         $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_role.RoleDto'
@@ -48,7 +48,7 @@ definitions:
     properties:
       email:
         type: string
-      role_id:
+      roleId:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_organization_http_requests.UpdateOrganizationRequest:
@@ -58,27 +58,27 @@ definitions:
     type: object
   github_com_gabrielmrtt_taski_internal_role.RoleDto:
     properties:
-      created_at:
+      createdAt:
         type: string
       description:
         type: string
       id:
         type: string
-      is_system_default:
+      isSystemDefault:
         type: boolean
       name:
         type: string
-      organization_id:
+      organizationId:
         type: string
       permissions:
         items:
           type: string
         type: array
-      updated_at:
+      updatedAt:
         type: string
-      user_creator_id:
+      userCreatorId:
         type: string
-      user_editor_id:
+      userEditorId:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_role_http_requests.CreateRoleRequest:
@@ -147,7 +147,7 @@ definitions:
     properties:
       password:
         type: string
-      password_confirmation:
+      passwordConfirmation:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_user_http_requests.ForgotUserPasswordRequest:
@@ -159,7 +159,7 @@ definitions:
     properties:
       password:
         type: string
-      password_confirmation:
+      passwordConfirmation:
         type: string
       token:
         type: string
@@ -172,7 +172,7 @@ definitions:
         type: string
       password:
         type: string
-      phone_number:
+      phoneNumber:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserCredentialsRequest:
@@ -181,16 +181,16 @@ definitions:
         type: string
       name:
         type: string
-      phone_number:
+      phoneNumber:
         type: string
     type: object
   github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserDataRequest:
     properties:
       about:
         type: string
-      display_name:
+      displayName:
         type: string
-      profile_picture:
+      profilePicture:
         $ref: '#/definitions/multipart.FileHeader'
     type: object
   github_com_gabrielmrtt_taski_internal_user_http_requests.UserLoginRequest:
@@ -905,16 +905,16 @@ paths:
         name: page
         type: integer
       - in: query
-        name: per_page
+        name: perPage
         type: integer
       - in: query
         name: relations
         type: string
       - in: query
-        name: sort_by
+        name: sortBy
         type: string
       - in: query
-        name: sort_direction
+        name: sortDirection
         type: string
       produces:
       - application/json
@@ -1177,16 +1177,16 @@ paths:
         name: page
         type: integer
       - in: query
-        name: per_page
+        name: perPage
         type: integer
       - in: query
         name: relations
         type: string
       - in: query
-        name: sort_by
+        name: sortBy
         type: string
       - in: query
-        name: sort_direction
+        name: sortDirection
         type: string
       produces:
       - application/json

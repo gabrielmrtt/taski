@@ -9,12 +9,12 @@ type RoleDto struct {
 	Name            string   `json:"name"`
 	Description     string   `json:"description"`
 	Permissions     []string `json:"permissions"`
-	OrganizationId  *string  `json:"organization_id"`
-	IsSystemDefault bool     `json:"is_system_default"`
-	UserCreatorId   *string  `json:"user_creator_id"`
-	UserEditorId    *string  `json:"user_editor_id"`
-	CreatedAt       string   `json:"created_at"`
-	UpdatedAt       *string  `json:"updated_at"`
+	OrganizationId  *string  `json:"organizationId"`
+	IsSystemDefault bool     `json:"isSystemDefault"`
+	UserCreatorId   *string  `json:"userCreatorId"`
+	UserEditorId    *string  `json:"userEditorId"`
+	CreatedAt       string   `json:"createdAt"`
+	UpdatedAt       *string  `json:"updatedAt"`
 }
 
 func RoleToDto(role *Role) *RoleDto {
