@@ -27,6 +27,8 @@ services:
       - 5432:5432
     networks:
       - net
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: taski
       POSTGRES_USER: taski_admin

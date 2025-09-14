@@ -16,8 +16,8 @@ type Identity struct {
 }
 
 type Timestamps struct {
-	CreatedAt *int64
-	UpdatedAt *int64
+	CreatedAt *int64 `json:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt"`
 }
 
 func NewIdentity(publicPrefix string) Identity {

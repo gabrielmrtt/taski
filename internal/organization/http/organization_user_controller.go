@@ -63,7 +63,7 @@ func (c *OrganizationUserController) ListOrganizationUsers(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
+	input.Filters.OrganizationIdentity = organizationIdentity
 
 	response, err := c.ListOrganizationUsersService.Execute(input)
 	if err != nil {

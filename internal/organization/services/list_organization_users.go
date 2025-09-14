@@ -19,11 +19,10 @@ func NewListOrganizationUsersService(
 }
 
 type ListOrganizationUsersInput struct {
-	OrganizationIdentity core.Identity
-	Filters              organization_repositories.OrganizationUserFilters
-	Pagination           *core.PaginationInput
-	SortInput            *core.SortInput
-	RelationsInput       core.RelationsInput
+	Filters        organization_repositories.OrganizationUserFilters
+	Pagination     *core.PaginationInput
+	SortInput      *core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListOrganizationUsersInput) Validate() error {

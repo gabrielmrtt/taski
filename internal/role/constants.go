@@ -29,6 +29,7 @@ type PermissionSlugsArrayItem struct {
 }
 
 var PermissionSlugsArray = []PermissionSlugsArrayItem{
+	{Name: "Organizations View", Slug: OrganizationsView, Description: "Allow users to view organizations"},
 	{Name: "Organizations Update", Slug: OrganizationsUpdate, Description: "Allow users to update organizations"},
 	{Name: "Organizations Delete", Slug: OrganizationsDelete, Description: "Allow users to delete organizations"},
 	{Name: "Organizations Users View", Slug: OrganizationsUsersView, Description: "Allow users to view organizations users"},

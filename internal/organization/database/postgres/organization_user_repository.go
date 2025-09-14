@@ -225,7 +225,7 @@ func (r *OrganizationUserPostgresRepository) UpdateOrganizationUser(params organ
 		Status:                 string(params.OrganizationUser.Status),
 	}
 
-	_, err := tx.NewUpdate().Model(organizationUserTable).Where("internal_id = ?", params.OrganizationUser.User.Identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(organizationUserTable).Where("user_internal_id = ? AND organization_internal_id = ?", params.OrganizationUser.User.Identity.Internal.String(), params.OrganizationUser.OrganizationIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

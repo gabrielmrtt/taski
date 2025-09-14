@@ -93,7 +93,7 @@ func (r *OrganizationPostgresRepository) applyFilters(selectQuery *bun.SelectQue
 	if filters.LoggedUserIdentity != nil {
 		selectQuery = selectQuery.WhereGroup(" OR ", func(query *bun.SelectQuery) *bun.SelectQuery {
 			query = query.Where("user_creator_internal_id = ?", filters.LoggedUserIdentity.Internal.String())
-			query = query.WhereOr("internal_id IN (SELECT organization_internal_id FROM organization_user WHERE user_internal_id = ?)", filters.LoggedUserIdentity.Internal.String())
+			query = query.WhereOr("internal_id IN (SELECT organization_internal_id FROM organization_user WHERE user_internal_id = ? AND organization_user.status = ?)", filters.LoggedUserIdentity.Internal.String(), organization_core.OrganizationUserStatusActive)
 			return query
 		})
 	}

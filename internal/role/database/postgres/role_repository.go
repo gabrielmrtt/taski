@@ -55,10 +55,19 @@ func (r *RoleTable) ToEntity() *role_core.Role {
 		organizationIdentity = &identity
 	}
 
+	var permissions []role_core.Permission = make([]role_core.Permission, 0)
+	for _, rolePermission := range r.RolePermissions {
+		if rolePermission.Permission != nil {
+			permissions = append(permissions, *rolePermission.ToEntity())
+		}
+	}
+
 	return &role_core.Role{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(r.InternalId), role_core.RoleIdentityPrefix),
 		Name:                 r.Name,
+		Slug:                 r.Slug,
 		Description:          r.Description,
+		Permissions:          permissions,
 		OrganizationIdentity: organizationIdentity,
 		UserCreatorIdentity:  userCreatorIdentity,
 		UserEditorIdentity:   userEditorIdentity,
@@ -82,6 +91,7 @@ type RolePermissionTable struct {
 
 func (r *RolePermissionTable) ToEntity() *role_core.Permission {
 	return &role_core.Permission{
+		Identity:    core.NewIdentityWithoutPublicFromInternal(uuid.MustParse(r.PermissionInternalId)),
 		Name:        r.Permission.Name,
 		Description: r.Permission.Description,
 		Slug:        role_core.PermissionSlugs(r.Permission.Slug),

@@ -1,6 +1,7 @@
 package role_core
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
@@ -96,9 +97,14 @@ func (r *Role) ChangeDescription(description string, userEditorIdentity *core.Id
 }
 
 func (r *Role) HasPermission(permissionSlug PermissionSlugs) bool {
-	return slices.ContainsFunc(r.Permissions, func(p Permission) bool {
-		return p.Slug == permissionSlug
-	})
+	fmt.Println(permissionSlug)
+	for _, p := range r.Permissions {
+		if p.Slug == permissionSlug {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *Role) ClearPermissions(userEditorIdentity *core.Identity) {

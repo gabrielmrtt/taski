@@ -13,16 +13,16 @@ import (
 )
 
 type ListOrganizationUsersRequest struct {
-	Name          *string `schema:"name"`
-	Email         *string `schema:"email"`
-	DisplayName   *string `schema:"displayName"`
-	RoleId        *string `schema:"roleId"`
-	Status        *string `schema:"status"`
-	Page          *int    `schema:"page"`
-	PerPage       *int    `schema:"perPage"`
-	SortBy        *string `schema:"sortBy"`
-	SortDirection *string `schema:"sortDirection"`
-	Relations     *string `schema:"relations"`
+	Name          *string `json:"name" schema:"name"`
+	Email         *string `json:"email" schema:"email"`
+	DisplayName   *string `json:"displayName" schema:"displayName"`
+	RoleId        *string `json:"roleId" schema:"roleId"`
+	Status        *string `json:"status" schema:"status"`
+	Page          *int    `json:"page" schema:"page"`
+	PerPage       *int    `json:"perPage" schema:"perPage"`
+	SortBy        *string `json:"sortBy" schema:"sortBy"`
+	SortDirection *string `json:"sortDirection" schema:"sortDirection"`
+	Relations     *string `json:"relations" schema:"relations"`
 }
 
 func (r *ListOrganizationUsersRequest) FromQuery(ctx *gin.Context) error {

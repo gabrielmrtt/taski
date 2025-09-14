@@ -16,14 +16,14 @@ type PermissionTable struct {
 	bun.BaseModel `bun:"table:permissions,alias:permissions"`
 
 	InternalId  string `bun:"internal_id,pk,notnull,type:uuid"`
-	Slug        string `bun:"slug,pk,notnull,type:varchar(510)"`
+	Slug        string `bun:"slug,notnull,type:varchar(510)"`
 	Name        string `bun:"name,notnull,type:varchar(255)"`
 	Description string `bun:"description,type:varchar(510)"`
 }
 
 func (p *PermissionTable) ToEntity() *role_core.Permission {
 	return &role_core.Permission{
-		Identity:    core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), "permission"),
+		Identity:    core.NewIdentityWithoutPublicFromInternal(uuid.MustParse(p.InternalId)),
 		Name:        p.Name,
 		Description: p.Description,
 		Slug:        role_core.PermissionSlugs(p.Slug),
@@ -66,7 +66,7 @@ func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_repositor
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(&permission).Where("slug = ?", params.Slug)
+	selectQuery = selectQuery.Model(permission).Where("slug = ?", params.Slug)
 
 	err := selectQuery.Scan(context.Background())
 
@@ -74,6 +74,7 @@ func (r *PermissionPostgresRepository) GetPermissionBySlug(params role_repositor
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
+		return nil, err
 	}
 
 	if permission.InternalId == "" {
@@ -136,7 +137,7 @@ func (r *PermissionPostgresRepository) PaginatePermissionsBy(params role_reposit
 	}
 
 	selectQuery = core_database_postgres.ApplyPagination(selectQuery, params.Pagination)
-	err = selectQuery.Scan(context.Background(), permissions)
+	err = selectQuery.Scan(context.Background())
 	if err != nil {
 		return nil, err
 	}
