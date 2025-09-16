@@ -71,15 +71,15 @@ func (o *Organization) IsInactive() bool {
 
 type OrganizationUser struct {
 	OrganizationIdentity core.Identity
-	User                 *user_core.User
-	Role                 *role_core.Role
+	User                 user_core.User
+	Role                 role_core.Role
 	Status               OrganizationUserStatuses
 }
 
 type NewOrganizationUserInput struct {
 	OrganizationIdentity core.Identity
-	User                 *user_core.User
-	Role                 *role_core.Role
+	User                 user_core.User
+	Role                 role_core.Role
 	Status               OrganizationUserStatuses
 }
 
@@ -124,14 +124,10 @@ func (o *OrganizationUser) RefuseInvitation() {
 	o.Status = OrganizationUserStatusRefused
 }
 
-func (o *OrganizationUser) ChangeRole(role *role_core.Role) {
+func (o *OrganizationUser) ChangeRole(role role_core.Role) {
 	o.Role = role
 }
 
 func (o *OrganizationUser) CanExecuteAction(permissionSlug role_core.PermissionSlugs) bool {
-	if o.Role == nil {
-		return false
-	}
-
 	return o.Role.HasPermission(permissionSlug)
 }

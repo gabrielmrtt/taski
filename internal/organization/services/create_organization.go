@@ -107,8 +107,8 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 
 	organizationUser, err := organization_core.NewOrganizationUser(organization_core.NewOrganizationUserInput{
 		OrganizationIdentity: organization.Identity,
-		User:                 user,
-		Role:                 adminRole,
+		User:                 *user,
+		Role:                 *adminRole,
 		Status:               organization_core.OrganizationUserStatusActive,
 	})
 	if err != nil {

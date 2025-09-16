@@ -20,14 +20,14 @@ type ProjectFilters struct {
 type GetProjectByIdentityParams struct {
 	ProjectIdentity   core.Identity
 	WorkspaceIdentity *core.Identity
-	RelationsInput    *core.RelationsInput
+	RelationsInput    core.RelationsInput
 }
 
 type PaginateProjectsParams struct {
 	Filters        ProjectFilters
 	SortInput      *core.SortInput
 	Pagination     *core.PaginationInput
-	RelationsInput *core.RelationsInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreProjectParams struct {

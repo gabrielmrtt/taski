@@ -19,6 +19,7 @@ func NewGetOrganizationUserService(organizationUserRepository organization_repos
 type GetOrganizationUserInput struct {
 	OrganizationIdentity core.Identity
 	UserIdentity         core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i GetOrganizationUserInput) Validate() error {

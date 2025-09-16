@@ -15,26 +15,22 @@ type RoleFilters struct {
 }
 
 type GetRoleByIdentityParams struct {
-	RoleIdentity   core.Identity
-	RelationsInput core.RelationsInput
+	RoleIdentity core.Identity
 }
 
 type GetRoleByIdentityAndOrganizationIdentityParams struct {
 	RoleIdentity         core.Identity
 	OrganizationIdentity core.Identity
-	RelationsInput       core.RelationsInput
 }
 
 type GetDefaultRoleParams struct {
-	Slug           role_core.DefaultRoleSlugs
-	RelationsInput core.RelationsInput
+	Slug role_core.DefaultRoleSlugs
 }
 
 type PaginateRolesParams struct {
-	Filters        RoleFilters
-	SortInput      *core.SortInput
-	Pagination     *core.PaginationInput
-	RelationsInput core.RelationsInput
+	Filters    RoleFilters
+	SortInput  *core.SortInput
+	Pagination *core.PaginationInput
 }
 
 type StoreRoleParams struct {

@@ -14,12 +14,10 @@ type WorkspaceUserFilters struct {
 type GetWorkspaceUserByIdentityParams struct {
 	WorkspaceIdentity core.Identity
 	UserIdentity      core.Identity
-	RelationsInput    core.RelationsInput
 }
 
 type GetWorkspaceUsersByUserIdentityParams struct {
-	UserIdentity   core.Identity
-	RelationsInput *core.RelationsInput
+	UserIdentity core.Identity
 }
 
 type StoreWorkspaceUserParams struct {

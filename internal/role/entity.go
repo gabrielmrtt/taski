@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -42,6 +43,9 @@ type Role struct {
 	IsSystemDefault      bool
 	core.Timestamps
 	DeletedAt *int64
+
+	Creator *user_core.User
+	Editor  *user_core.User
 }
 
 type NewRoleInput struct {

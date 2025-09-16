@@ -36,11 +36,10 @@ func (s *ListOrganizationsService) Execute(input ListOrganizationsInput) (*core.
 	}
 
 	organizations, err := s.OrganizationRepository.PaginateOrganizationsBy(organization_repositories.PaginateOrganizationsParams{
-		Filters:        input.Filters,
-		ShowDeleted:    input.ShowDeleted,
-		SortInput:      input.SortInput,
-		Pagination:     input.Pagination,
-		RelationsInput: input.RelationsInput,
+		Filters:     input.Filters,
+		ShowDeleted: input.ShowDeleted,
+		SortInput:   input.SortInput,
+		Pagination:  input.Pagination,
 	})
 	if err != nil {
 		return nil, err

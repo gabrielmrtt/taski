@@ -81,7 +81,7 @@ func (s *InviteUserToOrganizationService) createWorkspaceUsers(organization *org
 
 		workspaceUser, err := workspace_core.NewWorkspaceUser(workspace_core.NewWorkspaceUserInput{
 			WorkspaceIdentity: workspace.Identity,
-			UserIdentity:      user.Identity,
+			User:              *user,
 		})
 		if err != nil {
 			return err
@@ -104,7 +104,7 @@ func (s *InviteUserToOrganizationService) createWorkspaceUsers(organization *org
 
 			projectUser, err := project_core.NewProjectUser(project_core.NewProjectUserInput{
 				ProjectIdentity: project.Identity,
-				UserIdentity:    user.Identity,
+				User:            *user,
 			})
 			if err != nil {
 				return err
@@ -175,8 +175,8 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	if organizationUser == nil {
 		organizationUser, err = organization_core.NewOrganizationUser(organization_core.NewOrganizationUserInput{
 			OrganizationIdentity: input.OrganizationIdentity,
-			User:                 user,
-			Role:                 role,
+			User:                 *user,
+			Role:                 *role,
 			Status:               organization_core.OrganizationUserStatusInvited,
 		})
 		if err != nil {

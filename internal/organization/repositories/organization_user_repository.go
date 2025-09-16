@@ -18,14 +18,12 @@ type OrganizationUserFilters struct {
 type GetOrganizationUserByIdentityParams struct {
 	OrganizationIdentity core.Identity
 	UserIdentity         core.Identity
-	RelationsInput       core.RelationsInput
 }
 
 type PaginateOrganizationUsersParams struct {
-	Filters        OrganizationUserFilters
-	SortInput      *core.SortInput
-	Pagination     *core.PaginationInput
-	RelationsInput core.RelationsInput
+	Filters    OrganizationUserFilters
+	SortInput  *core.SortInput
+	Pagination *core.PaginationInput
 }
 
 type StoreOrganizationUserParams struct {

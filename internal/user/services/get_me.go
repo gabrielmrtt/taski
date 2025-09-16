@@ -32,7 +32,7 @@ func (s *GetMeService) Execute(input GetMeInput) (*user_core.UserDto, error) {
 		return nil, err
 	}
 
-	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity, RelationsInput: input.RelationsInput})
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

@@ -36,7 +36,6 @@ func (s *ListMyOrganizationInvitesService) Execute(input ListMyOrganizationInvit
 		LoggedUserIdentity: input.AuthenticatedUserIdentity,
 		SortInput:          input.SortInput,
 		Pagination:         input.Pagination,
-		RelationsInput:     input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

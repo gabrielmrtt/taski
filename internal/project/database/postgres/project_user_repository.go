@@ -8,7 +8,6 @@ import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	project_core "github.com/gabrielmrtt/taski/internal/project"
 	project_repositories "github.com/gabrielmrtt/taski/internal/project/repositories"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -28,7 +27,7 @@ type ProjectUserTable struct {
 func (p *ProjectUserTable) ToEntity() *project_core.ProjectUser {
 	return &project_core.ProjectUser{
 		ProjectIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.ProjectInternalId), project_core.ProjectIdentityPrefix),
-		UserIdentity:    core.NewIdentityFromInternal(uuid.MustParse(p.UserInternalId), user_core.UserIdentityPrefix),
+		User:            *p.User.ToEntity(),
 		Status:          project_core.ProjectUserStatuses(p.Status),
 	}
 }
@@ -102,7 +101,7 @@ func (r *ProjectUserPostgresRepository) GetProjectUsersByUserIdentity(params pro
 	}
 
 	selectQuery = selectQuery.Model(&projectUsers)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("user_internal_id = ?", params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -138,7 +137,7 @@ func (r *ProjectUserPostgresRepository) StoreProjectUser(params project_reposito
 
 	_, err := tx.NewInsert().Model(&ProjectUserTable{
 		ProjectInternalId: params.ProjectUser.ProjectIdentity.Internal.String(),
-		UserInternalId:    params.ProjectUser.UserIdentity.Internal.String(),
+		UserInternalId:    params.ProjectUser.User.Identity.Internal.String(),
 		Status:            string(params.ProjectUser.Status),
 	}).Exec(context.Background())
 	if err != nil {
@@ -173,9 +172,9 @@ func (r *ProjectUserPostgresRepository) UpdateProjectUser(params project_reposit
 
 	_, err := tx.NewUpdate().Model(&ProjectUserTable{
 		ProjectInternalId: params.ProjectUser.ProjectIdentity.Internal.String(),
-		UserInternalId:    params.ProjectUser.UserIdentity.Internal.String(),
+		UserInternalId:    params.ProjectUser.User.Identity.Internal.String(),
 		Status:            string(params.ProjectUser.Status),
-	}).Where("project_internal_id = ? and user_internal_id = ?", params.ProjectUser.ProjectIdentity.Internal.String(), params.ProjectUser.UserIdentity.Internal.String()).Exec(context.Background())
+	}).Where("project_internal_id = ? and user_internal_id = ?", params.ProjectUser.ProjectIdentity.Internal.String(), params.ProjectUser.User.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

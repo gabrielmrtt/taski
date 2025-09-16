@@ -19,14 +19,14 @@ type GetProjectUserByIdentityParams struct {
 
 type GetProjectUsersByUserIdentityParams struct {
 	UserIdentity   core.Identity
-	RelationsInput *core.RelationsInput
+	RelationsInput core.RelationsInput
 }
 
 type PaginateProjectUsersParams struct {
 	Filters        ProjectUserFilters
 	SortInput      *core.SortInput
 	Pagination     *core.PaginationInput
-	RelationsInput *core.RelationsInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreProjectUserParams struct {

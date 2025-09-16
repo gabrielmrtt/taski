@@ -37,15 +37,9 @@ type WorkspaceTable struct {
 func (w *WorkspaceTable) ToEntity() *workspace_core.Workspace {
 	var userCreatorIdentity core.Identity = core.NewIdentityFromInternal(uuid.MustParse(w.UserCreatorInternalId), user_core.UserIdentityPrefix)
 	var userEditorIdentity *core.Identity = nil
-
 	if w.UserEditorInternalId != nil {
 		identity := core.NewIdentityFromInternal(uuid.MustParse(*w.UserEditorInternalId), user_core.UserIdentityPrefix)
 		userEditorIdentity = &identity
-	}
-
-	var organization *organization_core.Organization = nil
-	if w.Organization != nil {
-		organization = w.Organization.ToEntity()
 	}
 
 	return &workspace_core.Workspace{
@@ -61,8 +55,7 @@ func (w *WorkspaceTable) ToEntity() *workspace_core.Workspace {
 			CreatedAt: &w.CreatedAt,
 			UpdatedAt: w.UpdatedAt,
 		},
-		DeletedAt:    w.DeletedAt,
-		Organization: organization,
+		DeletedAt: w.DeletedAt,
 	}
 }
 
@@ -121,7 +114,6 @@ func (r *WorkspaceRepository) GetWorkspaceByIdentity(params workspace_repositori
 	}
 
 	selectQuery = selectQuery.Model(workspace)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.WorkspaceIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -160,7 +152,6 @@ func (r *WorkspaceRepository) PaginateWorkspacesBy(params workspace_repositories
 	}
 
 	selectQuery = selectQuery.Model(&workspaces)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

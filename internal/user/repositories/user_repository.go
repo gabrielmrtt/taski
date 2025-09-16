@@ -16,20 +16,17 @@ type UserFilters struct {
 }
 
 type GetUserByIdentityParams struct {
-	UserIdentity   core.Identity
-	RelationsInput core.RelationsInput
+	UserIdentity core.Identity
 }
 
 type GetUserByEmailParams struct {
-	Email          string
-	RelationsInput core.RelationsInput
+	Email string
 }
 
 type PaginateUsersParams struct {
-	Filters        UserFilters
-	Pagination     *core.PaginationInput
-	SortInput      *core.SortInput
-	RelationsInput core.RelationsInput
+	Filters    UserFilters
+	Pagination *core.PaginationInput
+	SortInput  *core.SortInput
 }
 
 type StoreUserParams struct {

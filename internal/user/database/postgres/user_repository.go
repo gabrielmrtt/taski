@@ -141,7 +141,7 @@ func (r *UserPostgresRepository) GetUserByIdentity(params user_repositories.GetU
 	}
 
 	selectQuery = selectQuery.Model(user)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
 	selectQuery = selectQuery.Where("users.internal_id = ?", params.UserIdentity.Internal)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -169,8 +169,8 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUser
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(user).Join("JOIN user_credentials ON user_credentials.user_internal_id = users.internal_id")
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Model(user)
+	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
 	selectQuery = selectQuery.Where("user_credentials.email = ?", params.Email)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -209,7 +209,7 @@ func (r *UserPostgresRepository) PaginateUsersBy(params user_repositories.Pagina
 	}
 
 	selectQuery = selectQuery.Model(&users)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	selectQuery = core_database_postgres.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())

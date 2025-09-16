@@ -169,13 +169,19 @@ type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organiz
 // @Failure 500 {object} core_http.HttpErrorResponse
 // @Router /organization/:organization_id/user/:user_id [get]
 func (c *OrganizationUserController) GetOrganizationUser(ctx *gin.Context) {
+	var request organization_http_requests.GetOrganizationUserRequest
+
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
 
-	input := organization_services.GetOrganizationUserInput{
-		OrganizationIdentity: organizationIdentity,
-		UserIdentity:         userIdentity,
+	if err := request.FromQuery(ctx); err != nil {
+		core_http.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input := request.ToInput()
+	input.OrganizationIdentity = organizationIdentity
+	input.UserIdentity = userIdentity
 
 	response, err := c.GetOrganizationUserService.Execute(input)
 	if err != nil {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	workspace_core "github.com/gabrielmrtt/taski/internal/workspace"
 	workspace_repositories "github.com/gabrielmrtt/taski/internal/workspace/repositories"
@@ -28,7 +27,7 @@ type WorkspaceUserTable struct {
 func (w *WorkspaceUserTable) ToEntity() *workspace_core.WorkspaceUser {
 	return &workspace_core.WorkspaceUser{
 		WorkspaceIdentity: core.NewIdentityFromInternal(uuid.MustParse(w.WorkspaceInternalId), workspace_core.WorkspaceIdentityPrefix),
-		UserIdentity:      core.NewIdentityFromInternal(uuid.MustParse(w.UserInternalId), user_core.UserIdentityPrefix),
+		User:              *w.User.ToEntity(),
 		Status:            workspace_core.WorkspaceUserStatuses(w.Status),
 	}
 }
@@ -72,7 +71,7 @@ func (r *WorkspaceUserPostgresRepository) GetWorkspaceUserByIdentity(params work
 	}
 
 	selectQuery = selectQuery.Model(workspaceUser)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Relation("User")
 	selectQuery = selectQuery.Where("workspace_internal_id = ? and user_internal_id = ?", params.WorkspaceIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -102,7 +101,7 @@ func (r *WorkspaceUserPostgresRepository) GetWorkspaceUsersByUserIdentity(params
 	}
 
 	selectQuery = selectQuery.Model(&workspaceUsers)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
+	selectQuery = selectQuery.Relation("User")
 	selectQuery = selectQuery.Where("user_internal_id = ?", params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -140,7 +139,7 @@ func (r *WorkspaceUserPostgresRepository) StoreWorkspaceUser(params workspace_re
 
 	_, err := tx.NewInsert().Model(&WorkspaceUserTable{
 		WorkspaceInternalId: params.WorkspaceUser.WorkspaceIdentity.Internal.String(),
-		UserInternalId:      params.WorkspaceUser.UserIdentity.Internal.String(),
+		UserInternalId:      params.WorkspaceUser.User.Identity.Internal.String(),
 		Status:              string(params.WorkspaceUser.Status),
 	}).Exec(context.Background())
 	if err != nil {
@@ -175,9 +174,9 @@ func (r *WorkspaceUserPostgresRepository) UpdateWorkspaceUser(params workspace_r
 
 	_, err := tx.NewUpdate().Model(&WorkspaceUserTable{
 		WorkspaceInternalId: params.WorkspaceUser.WorkspaceIdentity.Internal.String(),
-		UserInternalId:      params.WorkspaceUser.UserIdentity.Internal.String(),
+		UserInternalId:      params.WorkspaceUser.User.Identity.Internal.String(),
 		Status:              string(params.WorkspaceUser.Status),
-	}).Where("workspace_internal_id = ? and user_internal_id = ?", params.WorkspaceUser.WorkspaceIdentity.Internal.String(), params.WorkspaceUser.UserIdentity.Internal.String()).Exec(context.Background())
+	}).Where("workspace_internal_id = ? and user_internal_id = ?", params.WorkspaceUser.WorkspaceIdentity.Internal.String(), params.WorkspaceUser.User.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

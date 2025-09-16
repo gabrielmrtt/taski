@@ -3,7 +3,6 @@ package project_core
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	user_core "github.com/gabrielmrtt/taski/internal/user"
-	workspace_core "github.com/gabrielmrtt/taski/internal/workspace"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -21,10 +20,6 @@ type Project struct {
 	EndAt               *int64
 	Timestamps          core.Timestamps
 	DeletedAt           *int64
-
-	Workspace *workspace_core.Workspace
-	Creator   *user_core.User
-	Editor    *user_core.User
 }
 
 type NewProjectInput struct {
@@ -226,20 +221,20 @@ func (p *Project) HasStarted() bool {
 
 type ProjectUser struct {
 	ProjectIdentity core.Identity
-	UserIdentity    core.Identity
+	User            user_core.User
 	Status          ProjectUserStatuses
 }
 
 type NewProjectUserInput struct {
 	ProjectIdentity core.Identity
-	UserIdentity    core.Identity
+	User            user_core.User
 	Status          ProjectUserStatuses
 }
 
 func NewProjectUser(input NewProjectUserInput) (*ProjectUser, error) {
 	return &ProjectUser{
 		ProjectIdentity: input.ProjectIdentity,
-		UserIdentity:    input.UserIdentity,
+		User:            input.User,
 		Status:          input.Status,
 	}, nil
 }

@@ -112,7 +112,6 @@ func (r *OrganizationPostgresRepository) GetOrganizationByIdentity(params organi
 	}
 
 	selectQuery = selectQuery.Model(organization)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -151,7 +150,6 @@ func (r *OrganizationPostgresRepository) PaginateOrganizationsBy(params organiza
 	}
 
 	selectQuery = selectQuery.Model(&organizations)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
@@ -213,7 +211,6 @@ func (r *OrganizationPostgresRepository) PaginateInvitedOrganizationsBy(params o
 	}
 
 	selectQuery = selectQuery.Model(&organizations)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("organization.internal_id IN (SELECT organization_user.organization_internal_id FROM organization_user WHERE organization_user.user_internal_id = ? AND organization_user.status = ?)", params.LoggedUserIdentity.Internal.String(), organization_core.OrganizationUserStatusInvited)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

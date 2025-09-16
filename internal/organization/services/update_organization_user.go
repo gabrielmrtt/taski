@@ -96,7 +96,7 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 			return core.NewNotFoundError("role not found")
 		}
 
-		organizationUser.ChangeRole(role)
+		organizationUser.ChangeRole(*role)
 	}
 
 	if input.Status != nil {
@@ -133,7 +133,7 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 
 			workspaceUser, err := workspace_core.NewWorkspaceUser(workspace_core.NewWorkspaceUserInput{
 				WorkspaceIdentity: workspace.Identity,
-				UserIdentity:      input.UserIdentity,
+				User:              organizationUser.User,
 				Status:            workspace_core.WorkspaceUserStatuses(organizationUser.Status),
 			})
 			if err != nil {
@@ -160,7 +160,7 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 
 				projectUser, err := project_core.NewProjectUser(project_core.NewProjectUserInput{
 					ProjectIdentity: project.Identity,
-					UserIdentity:    input.UserIdentity,
+					User:            organizationUser.User,
 					Status:          project_core.ProjectUserStatuses(organizationUser.Status),
 				})
 				if err != nil {

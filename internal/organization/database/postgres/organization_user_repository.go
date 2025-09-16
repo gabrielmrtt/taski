@@ -8,7 +8,9 @@ import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	role_core "github.com/gabrielmrtt/taski/internal/role"
 	role_database_postgres "github.com/gabrielmrtt/taski/internal/role/database/postgres"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -27,10 +29,21 @@ type OrganizationUserTable struct {
 }
 
 func (o *OrganizationUserTable) ToEntity() *organization_core.OrganizationUser {
+	var user *user_core.User = nil
+	var role *role_core.Role = nil
+
+	if o.User != nil {
+		user = o.User.ToEntity()
+	}
+
+	if o.Role != nil {
+		role = o.Role.ToEntity()
+	}
+
 	return &organization_core.OrganizationUser{
 		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(o.OrganizationInternalId), organization_core.OrganizationIdentityPrefix),
-		User:                 o.User.ToEntity(),
-		Role:                 o.Role.ToEntity(),
+		User:                 *user,
+		Role:                 *role,
 		Status:               organization_core.OrganizationUserStatuses(o.Status),
 	}
 }
@@ -87,7 +100,6 @@ func (r *OrganizationUserPostgresRepository) GetOrganizationUserByIdentity(param
 
 	selectQuery = selectQuery.Model(organizationUser)
 	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("organization_user.organization_internal_id = ? and organization_user.user_internal_id = ?", params.OrganizationIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -128,7 +140,6 @@ func (r *OrganizationUserPostgresRepository) PaginateOrganizationUsersBy(params 
 
 	selectQuery = selectQuery.Model(&organizationUsers)
 	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

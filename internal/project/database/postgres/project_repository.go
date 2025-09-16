@@ -49,21 +49,6 @@ func (p *ProjectTable) ToEntity() *project_core.Project {
 		userEditorIdentity = &identity
 	}
 
-	var workspace *workspace_core.Workspace = nil
-	if p.Workspace != nil {
-		workspace = p.Workspace.ToEntity()
-	}
-
-	var creator *user_core.User = nil
-	if p.Creator != nil {
-		creator = p.Creator.ToEntity()
-	}
-
-	var editor *user_core.User = nil
-	if p.Editor != nil {
-		editor = p.Editor.ToEntity()
-	}
-
 	return &project_core.Project{
 		Identity:            core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project_core.ProjectIdentityPrefix),
 		WorkspaceIdentity:   core.NewIdentityFromInternal(uuid.MustParse(p.WorkspaceInternalId), workspace_core.WorkspaceIdentityPrefix),
@@ -81,9 +66,6 @@ func (p *ProjectTable) ToEntity() *project_core.Project {
 			UpdatedAt: p.UpdatedAt,
 		},
 		DeletedAt: p.DeletedAt,
-		Workspace: workspace,
-		Creator:   creator,
-		Editor:    editor,
 	}
 }
 
@@ -150,7 +132,7 @@ func (r *ProjectPostgresRepository) GetProjectByIdentity(params project_reposito
 	}
 
 	selectQuery = selectQuery.Model(project)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -190,7 +172,7 @@ func (r *ProjectPostgresRepository) PaginateProjectsBy(params project_repositori
 	}
 
 	selectQuery = selectQuery.Model(&projects)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, *params.RelationsInput)
+	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

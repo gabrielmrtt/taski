@@ -48,16 +48,16 @@ func OrganizationToDto(organization *Organization) *OrganizationDto {
 
 type OrganizationUserDto struct {
 	OrganizationId string             `json:"organizationId"`
-	User           *user_core.UserDto `json:"user"`
-	Role           *role_core.RoleDto `json:"role"`
+	Role           *role_core.RoleDto `json:"role,omitempty"`
+	User           *user_core.UserDto `json:"user,omitempty"`
 	Status         string             `json:"status"`
 }
 
 func OrganizationUserToDto(organizationUser *OrganizationUser) *OrganizationUserDto {
 	return &OrganizationUserDto{
 		OrganizationId: organizationUser.OrganizationIdentity.Public,
-		User:           user_core.UserToDto(organizationUser.User),
-		Role:           role_core.RoleToDto(organizationUser.Role),
+		Role:           role_core.RoleToDto(&organizationUser.Role),
+		User:           user_core.UserToDto(&organizationUser.User),
 		Status:         string(organizationUser.Status),
 	}
 }
