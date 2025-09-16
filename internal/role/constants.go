@@ -20,6 +20,10 @@ const (
 	ProjectsCreate           PermissionSlugs = "projects:create"
 	ProjectsUpdate           PermissionSlugs = "projects:update"
 	ProjectsDelete           PermissionSlugs = "projects:delete"
+	WorkspacesView           PermissionSlugs = "workspaces:view"
+	WorkspacesCreate         PermissionSlugs = "workspaces:create"
+	WorkspacesUpdate         PermissionSlugs = "workspaces:update"
+	WorkspacesDelete         PermissionSlugs = "workspaces:delete"
 )
 
 type PermissionSlugsArrayItem struct {
@@ -44,6 +48,10 @@ var PermissionSlugsArray = []PermissionSlugsArrayItem{
 	{Name: "Projects Create", Slug: ProjectsCreate, Description: "Allow users to create projects"},
 	{Name: "Projects Update", Slug: ProjectsUpdate, Description: "Allow users to update projects"},
 	{Name: "Projects Delete", Slug: ProjectsDelete, Description: "Allow users to delete projects"},
+	{Name: "Workspaces View", Slug: WorkspacesView, Description: "Allow users to view workspaces"},
+	{Name: "Workspaces Create", Slug: WorkspacesCreate, Description: "Allow users to create workspaces"},
+	{Name: "Workspaces Update", Slug: WorkspacesUpdate, Description: "Allow users to update workspaces"},
+	{Name: "Workspaces Delete", Slug: WorkspacesDelete, Description: "Allow users to delete workspaces"},
 }
 
 type DefaultRoleSlugs string
@@ -72,6 +80,7 @@ var DefaultRoleSlugsArray = []DefaultRoleSlugsArrayItem{
 			ProjectsCreate,
 			ProjectsUpdate,
 			ProjectsDelete,
+			WorkspacesView,
 		},
 	},
 	{
@@ -94,6 +103,10 @@ var DefaultRoleSlugsArray = []DefaultRoleSlugsArrayItem{
 			ProjectsCreate,
 			ProjectsUpdate,
 			ProjectsDelete,
+			WorkspacesView,
+			WorkspacesCreate,
+			WorkspacesUpdate,
+			WorkspacesDelete,
 		},
 	},
 }

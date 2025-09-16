@@ -10,6 +10,7 @@ import (
 	role_http "github.com/gabrielmrtt/taski/internal/role/http"
 	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
 	user_http "github.com/gabrielmrtt/taski/internal/user/http"
+	workspace_http "github.com/gabrielmrtt/taski/internal/workspace/http"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -40,6 +41,7 @@ func bootstrapApplication() {
 		storage_http.BootstrapControllers(g)
 		organization_http.BootstrapControllers(g)
 		role_http.BootstrapControllers(g)
+		workspace_http.BootstrapControllers(g)
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
