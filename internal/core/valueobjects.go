@@ -170,3 +170,29 @@ func IsValidDescription(fl validator.FieldLevel) bool {
 
 	return err == nil
 }
+
+type Color struct {
+	Value string
+}
+
+func NewColor(value string) (Color, error) {
+	c := Color{Value: value}
+
+	if err := c.Validate(); err != nil {
+		return Color{}, err
+	}
+
+	return c, nil
+}
+
+func (c Color) Validate() error {
+	if c.Value == "" {
+		return errors.New("color cannot be empty")
+	}
+
+	if len(c.Value) != 7 || c.Value[0] != '#' {
+		return errors.New("color must be a valid hex color")
+	}
+
+	return nil
+}

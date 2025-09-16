@@ -4,8 +4,10 @@ import (
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_database_postgres "github.com/gabrielmrtt/taski/internal/organization/database/postgres"
 	organization_services "github.com/gabrielmrtt/taski/internal/organization/services"
+	project_database_postgres "github.com/gabrielmrtt/taski/internal/project/database/postgres"
 	role_database_postgres "github.com/gabrielmrtt/taski/internal/role/database/postgres"
 	user_database_postgres "github.com/gabrielmrtt/taski/internal/user/database/postgres"
+	workspace_database_postgres "github.com/gabrielmrtt/taski/internal/workspace/database/postgres"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +16,10 @@ func BootstrapControllers(g *gin.RouterGroup) {
 	organizationUserRepository := organization_database_postgres.NewOrganizationUserPostgresRepository()
 	roleRepository := role_database_postgres.NewRolePostgresRepository()
 	userRepository := user_database_postgres.NewUserPostgresRepository()
+	workspaceRepository := workspace_database_postgres.NewWorkspacePostgresRepository()
+	workspaceUserRepository := workspace_database_postgres.NewWorkspaceUserPostgresRepository()
+	projectRepository := project_database_postgres.NewProjectPostgresRepository()
+	projectUserRepository := project_database_postgres.NewProjectUserPostgresRepository()
 	transactionRepository := core_database_postgres.NewTransactionPostgresRepository()
 
 	createOrganizationService := organization_services.NewCreateOrganizationService(organizationRepository, organizationUserRepository, roleRepository, userRepository, transactionRepository)
@@ -21,13 +27,13 @@ func BootstrapControllers(g *gin.RouterGroup) {
 	listOrganizationsService := organization_services.NewListOrganizationsService(organizationRepository)
 	updateOrganizationService := organization_services.NewUpdateOrganizationService(organizationRepository, transactionRepository)
 	deleteOrganizationService := organization_services.NewDeleteOrganizationService(organizationRepository, transactionRepository)
-	inviteUserToOrganizationService := organization_services.NewInviteUserToOrganizationService(organizationRepository, organizationUserRepository, userRepository, roleRepository, transactionRepository)
+	inviteUserToOrganizationService := organization_services.NewInviteUserToOrganizationService(organizationRepository, organizationUserRepository, userRepository, roleRepository, workspaceRepository, workspaceUserRepository, projectRepository, projectUserRepository, transactionRepository)
 	removeUserFromOrganizationService := organization_services.NewRemoveUserFromOrganizationService(organizationRepository, organizationUserRepository, userRepository, transactionRepository)
-	acceptOrganizationUserInvitationService := organization_services.NewAcceptOrganizationUserInvitationService(organizationUserRepository, transactionRepository)
-	refuseOrganizationUserInvitationService := organization_services.NewRefuseOrganizationUserInvitationService(organizationRepository, organizationUserRepository, userRepository, transactionRepository)
+	acceptOrganizationUserInvitationService := organization_services.NewAcceptOrganizationUserInvitationService(organizationUserRepository, workspaceUserRepository, projectUserRepository, transactionRepository)
+	refuseOrganizationUserInvitationService := organization_services.NewRefuseOrganizationUserInvitationService(organizationUserRepository, workspaceUserRepository, projectUserRepository, transactionRepository)
 	listOrganizationUsersService := organization_services.NewListOrganizationUsersService(organizationUserRepository)
 	getOrganizationUserService := organization_services.NewGetOrganizationUserService(organizationUserRepository)
-	updateOrganizationUserService := organization_services.NewUpdateOrganizationUserService(organizationUserRepository, roleRepository, transactionRepository)
+	updateOrganizationUserService := organization_services.NewUpdateOrganizationUserService(organizationUserRepository, roleRepository, workspaceRepository, projectRepository, workspaceUserRepository, projectUserRepository, transactionRepository)
 	listMyOrganizationInvitesService := organization_services.NewListMyOrganizationInvitesService(organizationRepository)
 
 	organizationController := NewOrganizationController(listOrganizationsService, getOrganizationService, createOrganizationService, updateOrganizationService, deleteOrganizationService)

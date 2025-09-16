@@ -3,26 +3,27 @@ package organization_services
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
-	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
+	project_repositories "github.com/gabrielmrtt/taski/internal/project/repositories"
+	workspace_repositories "github.com/gabrielmrtt/taski/internal/workspace/repositories"
 )
 
 type RefuseOrganizationUserInvitationService struct {
-	OrganizationRepository     organization_repositories.OrganizationRepository
 	OrganizationUserRepository organization_repositories.OrganizationUserRepository
-	UserRepository             user_repositories.UserRepository
+	WorkspaceUserRepository    workspace_repositories.WorkspaceUserRepository
+	ProjectUserRepository      project_repositories.ProjectUserRepository
 	TransactionRepository      core.TransactionRepository
 }
 
 func NewRefuseOrganizationUserInvitationService(
-	organizationRepository organization_repositories.OrganizationRepository,
 	organizationUserRepository organization_repositories.OrganizationUserRepository,
-	userRepository user_repositories.UserRepository,
+	workspaceUserRepository workspace_repositories.WorkspaceUserRepository,
+	projectUserRepository project_repositories.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *RefuseOrganizationUserInvitationService {
 	return &RefuseOrganizationUserInvitationService{
-		OrganizationRepository:     organizationRepository,
 		OrganizationUserRepository: organizationUserRepository,
-		UserRepository:             userRepository,
+		WorkspaceUserRepository:    workspaceUserRepository,
+		ProjectUserRepository:      projectUserRepository,
 		TransactionRepository:      transactionRepository,
 	}
 }
@@ -46,8 +47,9 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 		return err
 	}
 
-	s.OrganizationRepository.SetTransaction(tx)
-	s.UserRepository.SetTransaction(tx)
+	s.OrganizationUserRepository.SetTransaction(tx)
+	s.WorkspaceUserRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
 
 	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_repositories.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
@@ -62,6 +64,36 @@ func (s *RefuseOrganizationUserInvitationService) Execute(input RefuseOrganizati
 	}
 
 	organizationUser.RefuseInvitation()
+
+	workspaceUsers, err := s.WorkspaceUserRepository.GetWorkspaceUsersByUserIdentity(workspace_repositories.GetWorkspaceUsersByUserIdentityParams{
+		UserIdentity: input.UserIdentity,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, workspaceUser := range workspaceUsers {
+		workspaceUser.RefuseInvitation()
+		err = s.WorkspaceUserRepository.UpdateWorkspaceUser(workspace_repositories.UpdateWorkspaceUserParams{WorkspaceUser: &workspaceUser})
+		if err != nil {
+			return err
+		}
+	}
+
+	projectUsers, err := s.ProjectUserRepository.GetProjectUsersByUserIdentity(project_repositories.GetProjectUsersByUserIdentityParams{
+		UserIdentity: input.UserIdentity,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, projectUser := range projectUsers {
+		projectUser.RefuseInvitation()
+		err = s.ProjectUserRepository.UpdateProjectUser(project_repositories.UpdateProjectUserParams{ProjectUser: &projectUser})
+		if err != nil {
+			return err
+		}
+	}
 
 	err = s.OrganizationUserRepository.UpdateOrganizationUser(organization_repositories.UpdateOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {

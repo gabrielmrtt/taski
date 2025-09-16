@@ -4,8 +4,13 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_repositories "github.com/gabrielmrtt/taski/internal/organization/repositories"
+	project_core "github.com/gabrielmrtt/taski/internal/project"
+	project_repositories "github.com/gabrielmrtt/taski/internal/project/repositories"
 	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
+	user_core "github.com/gabrielmrtt/taski/internal/user"
 	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
+	workspace_core "github.com/gabrielmrtt/taski/internal/workspace"
+	workspace_repositories "github.com/gabrielmrtt/taski/internal/workspace/repositories"
 )
 
 type InviteUserToOrganizationService struct {
@@ -13,6 +18,10 @@ type InviteUserToOrganizationService struct {
 	OrganizationUserRepository organization_repositories.OrganizationUserRepository
 	UserRepository             user_repositories.UserRepository
 	RoleRepository             role_repositories.RoleRepository
+	WorkspaceRepository        workspace_repositories.WorkspaceRepository
+	WorkspaceUserRepository    workspace_repositories.WorkspaceUserRepository
+	ProjectRepository          project_repositories.ProjectRepository
+	ProjectUserRepository      project_repositories.ProjectUserRepository
 	TransactionRepository      core.TransactionRepository
 }
 
@@ -21,6 +30,10 @@ func NewInviteUserToOrganizationService(
 	organizationUserRepository organization_repositories.OrganizationUserRepository,
 	userRepository user_repositories.UserRepository,
 	roleRepository role_repositories.RoleRepository,
+	workspaceRepository workspace_repositories.WorkspaceRepository,
+	workspaceUserRepository workspace_repositories.WorkspaceUserRepository,
+	projectRepository project_repositories.ProjectRepository,
+	projectUserRepository project_repositories.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *InviteUserToOrganizationService {
 	return &InviteUserToOrganizationService{
@@ -28,17 +41,82 @@ func NewInviteUserToOrganizationService(
 		OrganizationUserRepository: organizationUserRepository,
 		UserRepository:             userRepository,
 		RoleRepository:             roleRepository,
+		WorkspaceRepository:        workspaceRepository,
+		WorkspaceUserRepository:    workspaceUserRepository,
+		ProjectRepository:          projectRepository,
+		ProjectUserRepository:      projectUserRepository,
 		TransactionRepository:      transactionRepository,
 	}
+}
+
+type InviteUserToOrganizationWorkspaceInput struct {
+	WorkspaceIdentity core.Identity
+	Projects          []core.Identity
 }
 
 type InviteUserToOrganizationInput struct {
 	OrganizationIdentity core.Identity
 	Email                string
 	RoleIdentity         core.Identity
+	Workspaces           []InviteUserToOrganizationWorkspaceInput
 }
 
 func (i InviteUserToOrganizationInput) Validate() error {
+	return nil
+}
+
+func (s *InviteUserToOrganizationService) createWorkspaceUsers(organization *organization_core.Organization, user *user_core.User, workspaces []InviteUserToOrganizationWorkspaceInput) error {
+	for _, w := range workspaces {
+		workspace, err := s.WorkspaceRepository.GetWorkspaceByIdentity(workspace_repositories.GetWorkspaceByIdentityParams{
+			WorkspaceIdentity:    w.WorkspaceIdentity,
+			OrganizationIdentity: &organization.Identity,
+		})
+		if err != nil {
+			return err
+		}
+
+		if workspace == nil {
+			return core.NewNotFoundError("workspace not found")
+		}
+
+		workspaceUser, err := workspace_core.NewWorkspaceUser(workspace_core.NewWorkspaceUserInput{
+			WorkspaceIdentity: workspace.Identity,
+			UserIdentity:      user.Identity,
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = s.WorkspaceUserRepository.StoreWorkspaceUser(workspace_repositories.StoreWorkspaceUserParams{WorkspaceUser: workspaceUser})
+		if err != nil {
+			return err
+		}
+
+		for _, p := range w.Projects {
+			project, err := s.ProjectRepository.GetProjectByIdentity(project_repositories.GetProjectByIdentityParams{
+				ProjectIdentity:   p,
+				WorkspaceIdentity: &workspace.Identity,
+			})
+
+			if project == nil {
+				return core.NewNotFoundError("project not found")
+			}
+
+			projectUser, err := project_core.NewProjectUser(project_core.NewProjectUserInput{
+				ProjectIdentity: project.Identity,
+				UserIdentity:    user.Identity,
+			})
+			if err != nil {
+				return err
+			}
+
+			_, err = s.ProjectUserRepository.StoreProjectUser(project_repositories.StoreProjectUserParams{ProjectUser: projectUser})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -54,6 +132,10 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 
 	s.OrganizationRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
+	s.WorkspaceRepository.SetTransaction(tx)
+	s.WorkspaceUserRepository.SetTransaction(tx)
+	s.ProjectRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
 
 	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_repositories.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
 	if err != nil {
@@ -102,6 +184,18 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 		}
 
 		organizationUser, err = s.OrganizationUserRepository.StoreOrganizationUser(organization_repositories.StoreOrganizationUserParams{OrganizationUser: organizationUser})
+		if err != nil {
+			return err
+		}
+
+		err = s.createWorkspaceUsers(organization, user, input.Workspaces)
+		if err != nil {
+			return err
+		}
+	} else {
+		s.WorkspaceUserRepository.DeleteAllByUserIdentity(workspace_repositories.DeleteAllByUserIdentityParams{UserIdentity: user.Identity})
+		s.ProjectUserRepository.DeleteAllByUserIdentity(project_repositories.DeleteAllByUserIdentityParams{UserIdentity: user.Identity})
+		err = s.createWorkspaceUsers(organization, user, input.Workspaces)
 		if err != nil {
 			return err
 		}
