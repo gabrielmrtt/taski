@@ -3,7 +3,6 @@ package organization_http
 import (
 	"net/http"
 
-	"github.com/gabrielmrtt/taski/internal/core"
 	core_http "github.com/gabrielmrtt/taski/internal/core/http"
 	organization_core "github.com/gabrielmrtt/taski/internal/organization"
 	organization_http_middlewares "github.com/gabrielmrtt/taski/internal/organization/http/middlewares"
@@ -82,7 +81,7 @@ type GetOrganizationResponse = core_http.HttpSuccessResponseWithData[organizatio
 // @Description Returns an accessible organization by the authenticated user and the organization ID.
 // @Tags Organization
 // @Accept json
-// @Param organization_id path string true "Organization ID"
+// @Param organizationId path string true "Organization ID"
 // @Produce json
 // @Success 200 {object} GetOrganizationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -90,9 +89,9 @@ type GetOrganizationResponse = core_http.HttpSuccessResponseWithData[organizatio
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id [get]
+// @Router /organization/:organizationId [get]
 func (c *OrganizationController) GetOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 	input := organization_services.GetOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
 	}
@@ -151,7 +150,7 @@ type UpdateOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Description Updates an existing and accessible organization by the authenticated user and the organization ID.
 // @Tags Organization
 // @Accept json
-// @Param organization_id path string true "Organization ID"
+// @Param organizationId path string true "Organization ID"
 // @Param request body organization_http_requests.UpdateOrganizationRequest true "Request body"
 // @Produce json
 // @Success 200 {object} UpdateOrganizationResponse
@@ -160,10 +159,10 @@ type UpdateOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id [put]
+// @Router /organization/:organizationId [put]
 func (c *OrganizationController) UpdateOrganization(ctx *gin.Context) {
 	var request organization_http_requests.UpdateOrganizationRequest
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -192,7 +191,7 @@ type DeleteOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Description Deletes an existing and accessible organization by the authenticated user and the organization ID.
 // @Tags Organization
 // @Accept json
-// @Param organization_id path string true "Organization ID"
+// @Param organizationId path string true "Organization ID"
 // @Produce json
 // @Success 200 {object} DeleteOrganizationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -200,9 +199,9 @@ type DeleteOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id [delete]
+// @Router /organization/:organizationId [delete]
 func (c *OrganizationController) DeleteOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 
 	input := organization_services.DeleteOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
@@ -245,10 +244,10 @@ func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.Ro
 		g.Use(user_http_middlewares.AuthMiddleware())
 
 		g.GET("", c.ListOrganizations)
-		g.GET("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.GetOrganization)
 		g.POST("", c.CreateOrganization)
-		g.PUT("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:update"), c.UpdateOrganization)
-		g.DELETE("/:organization_id", organization_http_middlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
+		g.GET("/:organizationId", organization_http_middlewares.UserMustHavePermission("organizations:view"), c.GetOrganization)
+		g.PUT("/:organizationId", organization_http_middlewares.UserMustHavePermission("organizations:update"), c.UpdateOrganization)
+		g.DELETE("/:organizationId", organization_http_middlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
 	}
 
 	return g

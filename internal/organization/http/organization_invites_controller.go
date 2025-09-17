@@ -74,21 +74,21 @@ type AcceptOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessRespon
 // @Description Accept organization user invitation
 // @Tags Organization Invites
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
+// @Param organizationId path string true "Organization ID"
+// @Param userId path string true "User ID"
 // @Produce json
 // @Success 200 {object} AcceptOrganizationUserInvitationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 401 {object} core_http.HttpErrorResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization-invites/:organization_id/user/:user_id/accept-invitation [patch]
+// @Router /organization-invites/:organizationId/user/:userId/accept-invitation [patch]
 func (c *OrganizationInvitesController) AcceptOrganizationUserInvitation(ctx *gin.Context) {
 	var organizationIdentity core.Identity
 	var userIdentity core.Identity
 
-	organizationId := ctx.Param("organization_id")
-	userId := ctx.Param("user_id")
+	organizationId := ctx.Param("organizationId")
+	userId := ctx.Param("userId")
 
 	organizationIdentity = core.NewIdentityFromPublic(organizationId)
 	userIdentity = core.NewIdentityFromPublic(userId)
@@ -115,21 +115,21 @@ type RefuseOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessRespon
 // @Description Refuse organization user invitation
 // @Tags Organization Invites
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
+// @Param organizationId path string true "Organization ID"
+// @Param userId path string true "User ID"
 // @Produce json
 // @Success 200 {object} RefuseOrganizationUserInvitationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
 // @Failure 401 {object} core_http.HttpErrorResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization-invites/:organization_id/user/:user_id/refuse-invitation [patch]
+// @Router /organization-invites/:organizationId/user/:userId/refuse-invitation [patch]
 func (c *OrganizationInvitesController) RefuseOrganizationUserInvitation(ctx *gin.Context) {
 	var organizationIdentity core.Identity
 	var userIdentity core.Identity
 
-	organizationId := ctx.Param("organization_id")
-	userId := ctx.Param("user_id")
+	organizationId := ctx.Param("organizationId")
+	userId := ctx.Param("userId")
 
 	organizationIdentity = core.NewIdentityFromPublic(organizationId)
 	userIdentity = core.NewIdentityFromPublic(userId)
@@ -156,8 +156,8 @@ func (c *OrganizationInvitesController) ConfigureRoutes(group *gin.RouterGroup) 
 		g.Use(organization_http_middlewares.UserMustBeSame())
 
 		g.GET("", c.ListMyOrganizationInvites)
-		g.PATCH("/:organization_id/user/:user_id/accept-invitation", c.AcceptOrganizationUserInvitation)
-		g.PATCH("/:organization_id/user/:user_id/refuse-invitation", c.RefuseOrganizationUserInvitation)
+		g.PATCH("/:organizationId/user/:userId/accept-invitation", c.AcceptOrganizationUserInvitation)
+		g.PATCH("/:organizationId/user/:userId/refuse-invitation", c.RefuseOrganizationUserInvitation)
 	}
 
 	return g

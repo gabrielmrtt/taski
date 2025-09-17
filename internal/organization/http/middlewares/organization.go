@@ -19,13 +19,13 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 			return
 		}
 
-		organizationId := ctx.Param("organization_id")
-		if organizationId == "" {
-			ctx.Next()
+		organizationIdentity := GetOrganizationIdentityFromPath(ctx)
+		if organizationIdentity.IsEmpty() {
+			core_http.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("organizationId path parameter is required"))
+			ctx.Abort()
 			return
 		}
 
-		organizationIdentity := core.NewIdentityFromPublic(organizationId)
 		authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
@@ -56,18 +56,25 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 	}
 }
 
+func GetOrganizationIdentityFromPath(ctx *gin.Context) core.Identity {
+	organizationId := ctx.Param("organizationId")
+	if organizationId == "" {
+		return core.Identity{}
+	}
+
+	return core.NewIdentityFromPublic(organizationId)
+}
+
 func UserMustBeSame() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		organizationId := ctx.Param("organization_id")
-		userId := ctx.Param("user_id")
+		organizationIdentity := GetOrganizationIdentityFromPath(ctx)
+		userId := ctx.Param("userId")
 		authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
-		if organizationId == "" || userId == "" {
+		if organizationIdentity.IsEmpty() || userId == "" {
 			ctx.Next()
 			return
 		}
-
-		organizationIdentity := core.NewIdentityFromPublic(organizationId)
 
 		repo := organization_database_postgres.NewOrganizationUserPostgresRepository()
 
