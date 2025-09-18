@@ -625,7 +625,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization-invites/:organization_id/user/:user_id/accept-invitation": {
+        "/organization-invites/:organizationId/user/:userId/accept-invitation": {
             "patch": {
                 "description": "Accept organization user invitation",
                 "consumes": [
@@ -642,14 +642,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -688,7 +688,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization-invites/:organization_id/user/:user_id/refuse-invitation": {
+        "/organization-invites/:organizationId/user/:userId/refuse-invitation": {
             "patch": {
                 "description": "Refuse organization user invitation",
                 "consumes": [
@@ -705,14 +705,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -751,7 +751,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organization_id": {
+        "/organization/:organizationId": {
             "get": {
                 "description": "Returns an accessible organization by the authenticated user and the organization ID.",
                 "consumes": [
@@ -768,7 +768,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     }
@@ -828,7 +828,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
@@ -897,7 +897,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     }
@@ -942,7 +942,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organization_id/role": {
+        "/organization/:organizationId/role": {
             "get": {
                 "description": "Lists all existing roles in an organization.",
                 "consumes": [
@@ -956,13 +956,6 @@ const docTemplate = `{
                 ],
                 "summary": "List roles in an organization",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Organization ID",
-                        "name": "organization_id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "string",
                         "name": "description",
@@ -1052,13 +1045,6 @@ const docTemplate = `{
                 "summary": "Create a role in an organization",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Organization ID",
-                        "name": "organization_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Request body",
                         "name": "request",
                         "in": "body",
@@ -1108,7 +1094,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organization_id/role/:role_id": {
+        "/organization/:organizationId/role/:roleId": {
             "put": {
                 "description": "Updates an existing role in an organization.",
                 "consumes": [
@@ -1124,15 +1110,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organization ID",
-                        "name": "organization_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Role ID",
-                        "name": "role_id",
+                        "name": "roleId",
                         "in": "path",
                         "required": true
                     },
@@ -1200,15 +1179,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organization ID",
-                        "name": "organization_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Role ID",
-                        "name": "role_id",
+                        "name": "roleId",
                         "in": "path",
                         "required": true
                     }
@@ -1253,7 +1225,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organization_id/user": {
+        "/organization/:organizationId/user": {
             "get": {
                 "description": "Lists all users in an organization.",
                 "consumes": [
@@ -1270,7 +1242,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
@@ -1380,7 +1352,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
@@ -1434,7 +1406,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organization_id/user/:user_id": {
+        "/organization/:organizationId/user/:userId": {
             "get": {
                 "description": "Returns an organization user.",
                 "consumes": [
@@ -1451,14 +1423,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -1518,14 +1490,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -1585,14 +1557,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organization ID",
-                        "name": "organization_id",
+                        "name": "organizationId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -1602,6 +1574,372 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/internal_organization_http.RemoveUserFromOrganizationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/organization/:organizationId/workspace": {
+            "get": {
+                "description": "Returns all workspaces in an organization based in the authenticated user accesses.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "List workspaces in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_workspace_http.ListWorkspacesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new workspace in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Create a workspace in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_workspace_http.CreateWorkspaceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/organization/:organizationId/workspace/:workspaceId": {
+            "get": {
+                "description": "Returns a workspace in an organization based in the authenticated user accesses.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Get a workspace in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_workspace_http.GetWorkspaceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing workspace in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Update a workspace in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_workspace_http.UpdateWorkspaceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing workspace in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Delete a workspace in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_workspace_http.DeleteWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -1862,6 +2200,337 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/workspace/:workspaceId/project": {
+            "get": {
+                "description": "Returns all projects in a workspace accessible by the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "List projects in a workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "priorityLevel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_http.ListProjectsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new project in a workspace.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Create a project in a workspace",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_http_requests.CreateProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_http.CreateProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/:workspaceId/project/:projectId": {
+            "get": {
+                "description": "Returns an accessible project in a workspace by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Get a project in a workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_http.GetProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an accessible project in a workspace.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Update a project in a workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_http_requests.UpdateProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_http.UpdateProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an accessible project in a workspace.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Delete a project in a workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_http.DeleteProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1942,6 +2611,26 @@ const docTemplate = `{
                 },
                 "roleId": {
                     "type": "string"
+                },
+                "workspaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput"
+                    }
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "workspaceId": {
+                    "type": "string"
                 }
             }
         },
@@ -1949,6 +2638,99 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_project.ProjectDto": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "startAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userCreatorId": {
+                    "type": "string"
+                },
+                "userEditorId": {
+                    "type": "string"
+                },
+                "workspaceId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_project_http_requests.CreateProjectRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endAt": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "startAt": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_project_http_requests.UpdateProjectRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endAt": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "startAt": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -2184,6 +2966,72 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organizationId": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userCreatorId": {
+                    "type": "string"
+                },
+                "userEditorId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_organization_http.AcceptOrganizationUserInvitationResponse": {
             "type": "object",
             "properties": {
@@ -2407,6 +3255,100 @@ const docTemplate = `{
             }
         },
         "internal_organization_http.UpdateOrganizationUserResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_http.CreateProjectResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_http.DeleteProjectResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_http.GetProjectResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_http.ListProjectsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_http.UpdateProjectResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -2660,6 +3602,100 @@ const docTemplate = `{
             }
         },
         "internal_user_http.VerifyUserRegistrationResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_http.CreateWorkspaceResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_http.DeleteWorkspaceResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_http.GetWorkspaceResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_http.ListWorkspacesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_http.UpdateWorkspaceResponse": {
             "type": "object",
             "properties": {
                 "message": {

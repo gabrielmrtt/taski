@@ -134,6 +134,13 @@ func (r *ProjectPostgresRepository) GetProjectByIdentity(params project_reposito
 	selectQuery = selectQuery.Model(project)
 	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectIdentity.Internal.String())
+	if params.WorkspaceIdentity != nil {
+		selectQuery = selectQuery.Where("workspace_internal_id = ?", params.WorkspaceIdentity.Internal.String())
+	}
+
+	if params.OrganizationIdentity != nil {
+		selectQuery = selectQuery.Where("workspace_internal_id IN (SELECT internal_id FROM workspace WHERE workspace.organization_internal_id = ?)", params.OrganizationIdentity.Internal.String())
+	}
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
