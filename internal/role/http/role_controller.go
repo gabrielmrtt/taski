@@ -41,7 +41,6 @@ type CreateRoleResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDt
 // @Description Creates a new role in an organization.
 // @Tags Role
 // @Accept json
-// @Param organization_id path string true "Organization ID"
 // @Param request body role_http_requests.CreateRoleRequest true "Request body"
 // @Produce json
 // @Success 200 {object} CreateRoleResponse
@@ -50,11 +49,11 @@ type CreateRoleResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDt
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/role [post]
+// @Router /organization/:organizationId/role [post]
 func (c *RoleController) CreateRole(ctx *gin.Context) {
 	var request role_http_requests.CreateRoleRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -82,8 +81,7 @@ type UpdateRoleResponse = core_http.EmptyHttpSuccessResponse
 // @Tags Role
 // @Accept json
 // @Produce json
-// @Param organization_id path string true "Organization ID"
-// @Param role_id path string true "Role ID"
+// @Param roleId path string true "Role ID"
 // @Param request body role_http_requests.UpdateRoleRequest true "Request body"
 // @Success 200 {object} UpdateRoleResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -91,12 +89,12 @@ type UpdateRoleResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/role/:role_id [put]
+// @Router /organization/:organizationId/role/:roleId [put]
 func (c *RoleController) UpdateRole(ctx *gin.Context) {
 	var request role_http_requests.UpdateRoleRequest
 	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	roleIdentity := core.NewIdentityFromPublic(ctx.Param("role_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -124,8 +122,7 @@ type DeleteRoleResponse = core_http.EmptyHttpSuccessResponse
 // @Description Deletes an existing role in an organization.
 // @Tags Role
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param role_id path string true "Role ID"
+// @Param roleId path string true "Role ID"
 // @Produce json
 // @Success 200 {object} DeleteRoleResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -133,10 +130,10 @@ type DeleteRoleResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/role/:role_id [delete]
+// @Router /organization/:organizationId/role/:roleId [delete]
 func (c *RoleController) DeleteRole(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	roleIdentity := core.NewIdentityFromPublic(ctx.Param("role_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
 
 	input := role_services.DeleteRoleInput{
 		RoleIdentity:         roleIdentity,
@@ -159,7 +156,6 @@ type ListRolesResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDto
 // @Description Lists all existing roles in an organization.
 // @Tags Role
 // @Accept json
-// @Param organization_id path string true "Organization ID"
 // @Param request query role_http_requests.ListRolesRequest true "Query parameters"
 // @Produce json
 // @Success 200 {object} ListRolesResponse
@@ -168,10 +164,10 @@ type ListRolesResponse = core_http.HttpSuccessResponseWithData[role_core.RoleDto
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/role [get]
+// @Router /organization/:organizationId/role [get]
 func (c *RoleController) ListRoles(ctx *gin.Context) {
 	var request role_http_requests.ListRolesRequest
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -191,14 +187,14 @@ func (c *RoleController) ListRoles(ctx *gin.Context) {
 }
 
 func (c *RoleController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization/:organization_id/role")
+	g := group.Group("/organization/:organizationId/role")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
 		g.GET("", organization_http_middlewares.UserMustHavePermission("roles:view"), c.ListRoles)
 		g.POST("", organization_http_middlewares.UserMustHavePermission("roles:create"), c.CreateRole)
-		g.PUT("/:role_id", organization_http_middlewares.UserMustHavePermission("roles:update"), c.UpdateRole)
-		g.DELETE("/:role_id", organization_http_middlewares.UserMustHavePermission("roles:delete"), c.DeleteRole)
+		g.PUT("/:roleId", organization_http_middlewares.UserMustHavePermission("roles:update"), c.UpdateRole)
+		g.DELETE("/:roleId", organization_http_middlewares.UserMustHavePermission("roles:delete"), c.DeleteRole)
 	}
 
 	return g

@@ -18,9 +18,10 @@ type ProjectFilters struct {
 }
 
 type GetProjectByIdentityParams struct {
-	ProjectIdentity   core.Identity
-	WorkspaceIdentity *core.Identity
-	RelationsInput    core.RelationsInput
+	ProjectIdentity      core.Identity
+	WorkspaceIdentity    *core.Identity
+	OrganizationIdentity *core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 type PaginateProjectsParams struct {

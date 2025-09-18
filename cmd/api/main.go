@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/docs"
 	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
 	organization_http "github.com/gabrielmrtt/taski/internal/organization/http"
+	project_http "github.com/gabrielmrtt/taski/internal/project/http"
 	role_http "github.com/gabrielmrtt/taski/internal/role/http"
 	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
 	user_http "github.com/gabrielmrtt/taski/internal/user/http"
@@ -42,6 +43,7 @@ func bootstrapApplication() {
 		organization_http.BootstrapControllers(g)
 		role_http.BootstrapControllers(g)
 		workspace_http.BootstrapControllers(g)
+		project_http.BootstrapControllers(g)
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

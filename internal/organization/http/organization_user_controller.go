@@ -44,7 +44,7 @@ type ListOrganizationUsersResponse = core_http.HttpSuccessResponseWithData[organ
 // @Description Lists all users in an organization.
 // @Tags Organization User
 // @Accept json
-// @Param organization_id path string true "Organization ID"
+// @Param organizationId path string true "Organization ID"
 // @Param request query organization_http_requests.ListOrganizationUsersRequest true "Query parameters"
 // @Produce json
 // @Success 200 {object} ListOrganizationUsersResponse
@@ -53,10 +53,10 @@ type ListOrganizationUsersResponse = core_http.HttpSuccessResponseWithData[organ
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user [get]
+// @Router /organization/:organizationId/user [get]
 func (c *OrganizationUserController) ListOrganizationUsers(ctx *gin.Context) {
 	var request organization_http_requests.ListOrganizationUsersRequest
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 	if err := request.FromQuery(ctx); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
 		return
@@ -82,7 +82,7 @@ type InviteUserToOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Description Invites a user to an organization.
 // @Tags Organization User
 // @Accept json
-// @Param organization_id path string true "Organization ID"
+// @Param organizationId path string true "Organization ID"
 // @Param request body organization_http_requests.InviteUserToOrganizationRequest true "Request body"
 // @Produce json
 // @Success 200 {object} InviteUserToOrganizationResponse
@@ -91,7 +91,7 @@ type InviteUserToOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user [post]
+// @Router /organization/:organizationId/user [post]
 func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) {
 	var request organization_http_requests.InviteUserToOrganizationRequest
 
@@ -100,7 +100,7 @@ func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) 
 		return
 	}
 
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
 
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
@@ -122,8 +122,8 @@ type RemoveUserFromOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Description Removes a user from an organization.
 // @Tags Organization User
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
+// @Param organizationId path string true "Organization ID"
+// @Param userId path string true "User ID"
 // @Produce json
 // @Success 200 {object} RemoveUserFromOrganizationResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -131,10 +131,10 @@ type RemoveUserFromOrganizationResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user/:user_id [delete]
+// @Router /organization/:organizationId/user/:userId [delete]
 func (c *OrganizationUserController) RemoveUserFromOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
 
 	input := organization_services.RemoveUserFromOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
@@ -158,8 +158,8 @@ type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organiz
 // @Description Returns an organization user.
 // @Tags Organization User
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
+// @Param organizationId path string true "Organization ID"
+// @Param userId path string true "User ID"
 // @Produce json
 // @Success 200 {object} GetOrganizationUserResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -167,12 +167,12 @@ type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organiz
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user/:user_id [get]
+// @Router /organization/:organizationId/user/:userId [get]
 func (c *OrganizationUserController) GetOrganizationUser(ctx *gin.Context) {
 	var request organization_http_requests.GetOrganizationUserRequest
 
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
 
 	if err := request.FromQuery(ctx); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -200,8 +200,8 @@ type UpdateOrganizationUserResponse = core_http.EmptyHttpSuccessResponse
 // @Description Updates an organization user.
 // @Tags Organization User
 // @Accept json
-// @Param organization_id path string true "Organization ID"
-// @Param user_id path string true "User ID"
+// @Param organizationId path string true "Organization ID"
+// @Param userId path string true "User ID"
 // @Produce json
 // @Success 200 {object} UpdateOrganizationUserResponse
 // @Failure 400 {object} core_http.HttpErrorResponse
@@ -209,12 +209,12 @@ type UpdateOrganizationUserResponse = core_http.EmptyHttpSuccessResponse
 // @Failure 403 {object} core_http.HttpErrorResponse
 // @Failure 404 {object} core_http.HttpErrorResponse
 // @Failure 500 {object} core_http.HttpErrorResponse
-// @Router /organization/:organization_id/user/:user_id [put]
+// @Router /organization/:organizationId/user/:userId [put]
 func (c *OrganizationUserController) UpdateOrganizationUser(ctx *gin.Context) {
 	var request organization_http_requests.UpdateOrganizationUserRequest
 
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("user_id"))
+	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -236,15 +236,15 @@ func (c *OrganizationUserController) UpdateOrganizationUser(ctx *gin.Context) {
 }
 
 func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization/:organization_id/user")
+	g := group.Group("/organization/:organizationId/user")
 	{
 		g.Use(user_http_middlewares.AuthMiddleware())
 
 		g.GET("", organization_http_middlewares.UserMustHavePermission("organizations:users:view"), c.ListOrganizationUsers)
-		g.GET("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:view"), c.GetOrganizationUser)
+		g.GET("/:userId", organization_http_middlewares.UserMustHavePermission("organizations:users:view"), c.GetOrganizationUser)
 		g.POST("", organization_http_middlewares.UserMustHavePermission("organizations:users:create"), c.InviteUserToOrganization)
-		g.PUT("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:update"), c.UpdateOrganizationUser)
-		g.DELETE("/:user_id", organization_http_middlewares.UserMustHavePermission("organizations:users:delete"), c.RemoveUserFromOrganization)
+		g.PUT("/:userId", organization_http_middlewares.UserMustHavePermission("organizations:users:update"), c.UpdateOrganizationUser)
+		g.DELETE("/:userId", organization_http_middlewares.UserMustHavePermission("organizations:users:delete"), c.RemoveUserFromOrganization)
 	}
 
 	return g

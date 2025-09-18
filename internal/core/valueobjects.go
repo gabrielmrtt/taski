@@ -15,11 +15,6 @@ type Identity struct {
 	Internal uuid.UUID
 }
 
-type Timestamps struct {
-	CreatedAt *int64 `json:"createdAt"`
-	UpdatedAt *int64 `json:"updatedAt"`
-}
-
 func NewIdentity(publicPrefix string) Identity {
 	uuid := uuid.New()
 	length := new(big.Int).SetBytes(uuid[:])
@@ -85,6 +80,15 @@ func NewIdentityFromPublic(publicId string) Identity {
 
 func (i Identity) Equals(_i Identity) bool {
 	return i.Public == _i.Public && i.Internal == _i.Internal
+}
+
+func (i Identity) IsEmpty() bool {
+	return i.Internal == uuid.Nil
+}
+
+type Timestamps struct {
+	CreatedAt *int64 `json:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt"`
 }
 
 type Name struct {

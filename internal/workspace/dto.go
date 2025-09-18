@@ -16,14 +16,18 @@ type WorkspaceDto struct {
 }
 
 func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
-	var createdAt string = datetimeutils.EpochToRFC3339(*workspace.Timestamps.CreatedAt)
+	createdAt := datetimeutils.EpochToRFC3339(*workspace.Timestamps.CreatedAt)
+
 	var updatedAt *string = nil
 	if workspace.Timestamps.UpdatedAt != nil {
 		updatedAtString := datetimeutils.EpochToRFC3339(*workspace.Timestamps.UpdatedAt)
 		updatedAt = &updatedAtString
 	}
 
-	var userCreatorId string = workspace.UserCreatorIdentity.Public
+	var userCreatorId *string = nil
+	if workspace.UserCreatorIdentity != nil {
+		userCreatorId = &workspace.UserCreatorIdentity.Public
+	}
 
 	var userEditorId *string = nil
 	if workspace.UserEditorIdentity != nil {
@@ -37,7 +41,7 @@ func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
 		Color:          workspace.Color,
 		Status:         string(workspace.Status),
 		OrganizationId: workspace.OrganizationIdentity.Public,
-		UserCreatorId:  userCreatorId,
+		UserCreatorId:  *userCreatorId,
 		UserEditorId:   userEditorId,
 		CreatedAt:      createdAt,
 		UpdatedAt:      updatedAt,
