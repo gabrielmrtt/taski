@@ -50,6 +50,19 @@ definitions:
         type: string
       roleId:
         type: string
+      workspaces:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput'
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput:
+    properties:
+      projects:
+        items:
+          type: string
+        type: array
+      workspaceId:
+        type: string
     type: object
   github_com_gabrielmrtt_taski_internal_organization_http_requests.UpdateOrganizationRequest:
     properties:
@@ -203,6 +216,28 @@ definitions:
   github_com_gabrielmrtt_taski_internal_user_http_requests.VerifyUserRegistrationRequest:
     properties:
       token:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto:
+    type: object
+  github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest:
+    properties:
+      color:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest:
+    properties:
+      color:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      status:
         type: string
     type: object
   internal_organization_http.AcceptOrganizationUserInvitationResponse:
@@ -514,6 +549,67 @@ definitions:
         type: string
     type: object
   internal_user_http.VerifyUserRegistrationResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_workspace_http.CreateWorkspaceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_workspace_http.DeleteWorkspaceResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_workspace_http.GetWorkspaceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_workspace_http.ListWorkspacesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_workspace_http.UpdateWorkspaceResponse:
     properties:
       message:
         type: string
@@ -1614,6 +1710,250 @@ paths:
       summary: Update organization user
       tags:
       - Organization User
+  /organization/:organization_id/workspace:
+    get:
+      consumes:
+      - application/json
+      description: Returns all workspaces in an organization based in the authenticated
+        user accesses.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      - in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_workspace_http.ListWorkspacesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List workspaces in an organization
+      tags:
+      - Workspace
+    post:
+      consumes:
+      - application/json
+      description: Creates a new workspace in an organization.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_workspace_http.CreateWorkspaceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a workspace in an organization
+      tags:
+      - Workspace
+  /organization/:organization_id/workspace/:workspace_id:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing workspace in an organization.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_workspace_http.DeleteWorkspaceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a workspace in an organization
+      tags:
+      - Workspace
+    get:
+      consumes:
+      - application/json
+      description: Returns a workspace in an organization based in the authenticated
+        user accesses.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_workspace_http.GetWorkspaceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get a workspace in an organization
+      tags:
+      - Workspace
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing workspace in an organization.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: organization_id
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_workspace_http.UpdateWorkspaceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a workspace in an organization
+      tags:
+      - Workspace
   /user-registration:
     post:
       consumes:

@@ -66,7 +66,7 @@ func (u *UserTable) ToEntity() *user_core.User {
 }
 
 type UserCredentialsTable struct {
-	bun.BaseModel `bun:"table:user_credentials"`
+	bun.BaseModel `bun:"table:user_credentials,alias:user_credentials"`
 
 	UserInternalId string  `bun:"user_internal_id,pk,notnull,type:uuid"`
 	Name           string  `bun:"name,notnull,type:varchar(255)"`
@@ -76,7 +76,7 @@ type UserCredentialsTable struct {
 }
 
 type UserDataTable struct {
-	bun.BaseModel `bun:"table:user_data"`
+	bun.BaseModel `bun:"table:user_data,alias:user_data"`
 
 	UserInternalId           string  `bun:"user_internal_id,pk,notnull,type:uuid"`
 	DisplayName              string  `bun:"display_name,notnull,type:varchar(255)"`
@@ -100,7 +100,7 @@ func (r *UserPostgresRepository) SetTransaction(tx core.Transaction) error {
 
 func (r *UserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters user_repositories.UserFilters) *bun.SelectQuery {
 	if filters.Email != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.email", filters.Email)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "credentials.email", filters.Email)
 	}
 
 	if filters.Status != nil {
@@ -108,11 +108,11 @@ func (r *UserPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filt
 	}
 
 	if filters.Name != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_credentials.name", filters.Name)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "credentials.name", filters.Name)
 	}
 
 	if filters.DisplayName != nil {
-		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "user_data.display_name", filters.DisplayName)
+		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "data.display_name", filters.DisplayName)
 	}
 
 	if filters.CreatedAt != nil {
@@ -171,7 +171,7 @@ func (r *UserPostgresRepository) GetUserByEmail(params user_repositories.GetUser
 
 	selectQuery = selectQuery.Model(user)
 	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
-	selectQuery = selectQuery.Where("user_credentials.email = ?", params.Email)
+	selectQuery = selectQuery.Where("credentials.email = ?", params.Email)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {

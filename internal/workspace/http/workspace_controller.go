@@ -131,6 +131,7 @@ type CreateWorkspaceResponse = core_http.HttpSuccessResponseWithData[workspace_c
 func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 	var request workspace_http_requests.CreateWorkspaceRequest
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
+	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -139,6 +140,7 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
+	input.UserCreatorIdentity = authenticatedUserIdentity
 
 	response, err := c.CreateWorkspaceService.Execute(input)
 	if err != nil {
@@ -172,6 +174,7 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 	var request workspace_http_requests.UpdateWorkspaceRequest
 	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organization_id"))
 	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspace_id"))
+	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -181,6 +184,7 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 	input.WorkspaceIdentity = workspaceIdentity
+	input.UserEditorIdentity = authenticatedUserIdentity
 
 	err := c.UpdateWorkspaceService.Execute(input)
 	if err != nil {
