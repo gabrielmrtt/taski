@@ -73,7 +73,6 @@ func (c *WorkspaceController) ListWorkspaces(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type GetWorkspaceResponse = core_http.HttpSuccessResponseWithData[workspace_core.WorkspaceDto]
@@ -109,7 +108,6 @@ func (c *WorkspaceController) GetWorkspace(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type CreateWorkspaceResponse = core_http.HttpSuccessResponseWithData[workspace_core.WorkspaceDto]
@@ -149,7 +147,6 @@ func (c *WorkspaceController) CreateWorkspace(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type UpdateWorkspaceResponse = core_http.EmptyHttpSuccessResponse
@@ -193,7 +190,6 @@ func (c *WorkspaceController) UpdateWorkspace(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type DeleteWorkspaceResponse = core_http.EmptyHttpSuccessResponse
@@ -229,7 +225,6 @@ func (c *WorkspaceController) DeleteWorkspace(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 func (c *WorkspaceController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {

@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"strings"
 
@@ -51,6 +52,7 @@ func NewIdentityFromInternal(internalId uuid.UUID, publicPrefix string) Identity
 func NewIdentityFromPublic(publicId string) Identity {
 	parts := strings.Split(publicId, "_")
 	if len(parts) != 2 {
+		fmt.Printf("INVALID IDENTITY FOR %s", publicId)
 		return Identity{}
 	}
 

@@ -12,7 +12,7 @@ import (
 func UserMustBeInWorkspace() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
-		workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspace_id"))
+		workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 
 		repo := workspace_database_postgres.NewWorkspaceUserPostgresRepository()
 
@@ -33,6 +33,5 @@ func UserMustBeInWorkspace() gin.HandlerFunc {
 		}
 
 		ctx.Next()
-		return
 	}
 }
