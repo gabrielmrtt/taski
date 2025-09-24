@@ -72,7 +72,6 @@ func (c *OrganizationUserController) ListOrganizationUsers(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type InviteUserToOrganizationResponse = core_http.EmptyHttpSuccessResponse
@@ -112,7 +111,6 @@ func (c *OrganizationUserController) InviteUserToOrganization(ctx *gin.Context) 
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type RemoveUserFromOrganizationResponse = core_http.EmptyHttpSuccessResponse
@@ -148,7 +146,6 @@ func (c *OrganizationUserController) RemoveUserFromOrganization(ctx *gin.Context
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type GetOrganizationUserResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationUserDto]
@@ -190,7 +187,6 @@ func (c *OrganizationUserController) GetOrganizationUser(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type UpdateOrganizationUserResponse = core_http.EmptyHttpSuccessResponse
@@ -232,7 +228,6 @@ func (c *OrganizationUserController) UpdateOrganizationUser(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 func (c *OrganizationUserController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {

@@ -71,7 +71,6 @@ func (c *OrganizationController) ListOrganizations(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type GetOrganizationResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
@@ -103,7 +102,6 @@ func (c *OrganizationController) GetOrganization(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type CreateOrganizationResponse = core_http.HttpSuccessResponseWithData[organization_core.OrganizationDto]
@@ -140,7 +138,6 @@ func (c *OrganizationController) CreateOrganization(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type UpdateOrganizationResponse = core_http.EmptyHttpSuccessResponse
@@ -181,7 +178,6 @@ func (c *OrganizationController) UpdateOrganization(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type DeleteOrganizationResponse = core_http.EmptyHttpSuccessResponse
@@ -214,7 +210,6 @@ func (c *OrganizationController) DeleteOrganization(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 func (c *OrganizationController) ListMyOrganizationInvites(ctx *gin.Context) {
@@ -235,7 +230,6 @@ func (c *OrganizationController) ListMyOrganizationInvites(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 func (c *OrganizationController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {

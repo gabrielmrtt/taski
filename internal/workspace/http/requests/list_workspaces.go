@@ -59,6 +59,7 @@ func (r *ListWorkspacesRequest) ToInput() workspace_services.ListWorkspacesInput
 			Description: descriptionFilter,
 			Status:      statusFilter,
 		},
+		ShowDeleted: false,
 		Pagination: &core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,

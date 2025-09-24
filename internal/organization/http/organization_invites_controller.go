@@ -64,7 +64,6 @@ func (c *OrganizationInvitesController) ListMyOrganizationInvites(ctx *gin.Conte
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type AcceptOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
@@ -105,7 +104,6 @@ func (c *OrganizationInvitesController) AcceptOrganizationUserInvitation(ctx *gi
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type RefuseOrganizationUserInvitationResponse = core_http.EmptyHttpSuccessResponse
@@ -146,7 +144,6 @@ func (c *OrganizationInvitesController) RefuseOrganizationUserInvitation(ctx *gi
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 func (c *OrganizationInvitesController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {

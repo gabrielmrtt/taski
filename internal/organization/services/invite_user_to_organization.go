@@ -97,6 +97,9 @@ func (s *InviteUserToOrganizationService) createWorkspaceUsers(organization *org
 				ProjectIdentity:   p,
 				WorkspaceIdentity: &workspace.Identity,
 			})
+			if err != nil {
+				return err
+			}
 
 			if project == nil {
 				return core.NewNotFoundError("project not found")
@@ -149,6 +152,9 @@ func (s *InviteUserToOrganizationService) Execute(input InviteUserToOrganization
 	user, err := s.UserRepository.GetUserByEmail(user_repositories.GetUserByEmailParams{
 		Email: input.Email,
 	})
+	if err != nil {
+		return err
+	}
 
 	if user == nil {
 		return core.NewNotFoundError("user not found")

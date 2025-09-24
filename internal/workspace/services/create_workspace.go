@@ -113,6 +113,7 @@ func (s *CreateWorkspaceService) Execute(input CreateWorkspaceInput) (*workspace
 	workspaceUser, err := workspace_core.NewWorkspaceUser(workspace_core.NewWorkspaceUserInput{
 		WorkspaceIdentity: workspace.Identity,
 		User:              *user,
+		Status:            workspace_core.WorkspaceUserStatusActive,
 	})
 	if err != nil {
 		return nil, err

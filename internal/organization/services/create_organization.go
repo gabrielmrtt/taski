@@ -122,7 +122,7 @@ func (s *CreateOrganizationService) Execute(input CreateOrganizationInput) (*org
 		return nil, err
 	}
 
-	organizationUser, err = s.OrganizationUserRepository.StoreOrganizationUser(organization_repositories.StoreOrganizationUserParams{OrganizationUser: organizationUser})
+	_, err = s.OrganizationUserRepository.StoreOrganizationUser(organization_repositories.StoreOrganizationUserParams{OrganizationUser: organizationUser})
 	if err != nil {
 		tx.Rollback()
 		return nil, err

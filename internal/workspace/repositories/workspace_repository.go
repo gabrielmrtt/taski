@@ -7,6 +7,7 @@ import (
 
 type WorkspaceFilters struct {
 	OrganizationIdentity core.Identity
+	LoggedUserIdentity   *core.Identity
 	Name                 *core.ComparableFilter[string]
 	Description          *core.ComparableFilter[string]
 	Color                *core.ComparableFilter[string]
@@ -22,9 +23,10 @@ type GetWorkspaceByIdentityParams struct {
 }
 
 type PaginateWorkspacesParams struct {
-	Filters    WorkspaceFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	Filters     WorkspaceFilters
+	SortInput   *core.SortInput
+	Pagination  *core.PaginationInput
+	ShowDeleted bool
 }
 
 type StoreWorkspaceParams struct {

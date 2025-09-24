@@ -2,7 +2,6 @@ package seeders
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	role_core "github.com/gabrielmrtt/taski/internal/role"
@@ -63,13 +62,11 @@ func (s *PermissionSeeder) Run() error {
 			existingPermission.Description = permission.Description
 			err = s.PermissionRepository.UpdatePermission(role_repositories.UpdatePermissionParams{Permission: existingPermission})
 			if err != nil {
-				fmt.Println("caiu aqui")
 				return err
 			}
 		} else {
 			_, err = s.PermissionRepository.StorePermission(role_repositories.StorePermissionParams{Permission: &permission})
 			if err != nil {
-				fmt.Println("caiu aqui 2")
 				return err
 			}
 		}

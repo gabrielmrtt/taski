@@ -76,6 +76,10 @@ func (r *WorkspaceRepository) SetTransaction(tx core.Transaction) error {
 func (r *WorkspaceRepository) applyFilters(selectQuery *bun.SelectQuery, filters workspace_repositories.WorkspaceFilters) *bun.SelectQuery {
 	selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
 
+	if filters.LoggedUserIdentity != nil {
+		selectQuery = selectQuery.Where("workspace.internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND workspace_user.status = ?)", filters.LoggedUserIdentity.Internal.String(), workspace_core.WorkspaceUserStatusActive)
+	}
+
 	if filters.Name != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "name", filters.Name)
 	}
@@ -153,6 +157,11 @@ func (r *WorkspaceRepository) PaginateWorkspacesBy(params workspace_repositories
 
 	selectQuery = selectQuery.Model(&workspaces)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
+
+	if !params.ShowDeleted {
+		selectQuery = selectQuery.Where("deleted_at IS NULL")
+	}
+
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err

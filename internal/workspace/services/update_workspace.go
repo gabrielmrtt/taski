@@ -97,18 +97,30 @@ func (s *UpdateWorkspaceService) Execute(input UpdateWorkspaceInput) error {
 
 	if input.Name != nil {
 		err = workspace.ChangeName(*input.Name, &input.UserEditorIdentity)
+		if err != nil {
+			return err
+		}
 	}
 
 	if input.Description != nil {
 		err = workspace.ChangeDescription(*input.Description, &input.UserEditorIdentity)
+		if err != nil {
+			return err
+		}
 	}
 
 	if input.Color != nil {
 		err = workspace.ChangeColor(*input.Color, &input.UserEditorIdentity)
+		if err != nil {
+			return err
+		}
 	}
 
 	if input.Status != nil {
 		err = workspace.ChangeStatus(*input.Status, &input.UserEditorIdentity)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = s.WorkspaceRepository.UpdateWorkspace(workspace_repositories.UpdateWorkspaceParams{Workspace: workspace})

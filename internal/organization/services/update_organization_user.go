@@ -13,6 +13,7 @@ import (
 
 type UpdateOrganizationUserService struct {
 	OrganizationUserRepository organization_repositories.OrganizationUserRepository
+	OrganizationRepository     organization_repositories.OrganizationRepository
 	RoleRepository             role_repositories.RoleRepository
 	WorkspaceRepository        workspace_repositories.WorkspaceRepository
 	WorkspaceUserRepository    workspace_repositories.WorkspaceUserRepository
@@ -22,6 +23,7 @@ type UpdateOrganizationUserService struct {
 }
 
 func NewUpdateOrganizationUserService(
+	organizationRepository organization_repositories.OrganizationRepository,
 	organizationUserRepository organization_repositories.OrganizationUserRepository,
 	roleRepository role_repositories.RoleRepository,
 	workspaceRepository workspace_repositories.WorkspaceRepository,
@@ -32,6 +34,7 @@ func NewUpdateOrganizationUserService(
 ) *UpdateOrganizationUserService {
 	return &UpdateOrganizationUserService{
 		OrganizationUserRepository: organizationUserRepository,
+		OrganizationRepository:     organizationRepository,
 		RoleRepository:             roleRepository,
 		WorkspaceRepository:        workspaceRepository,
 		ProjectRepository:          projectRepository,
@@ -69,7 +72,17 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 	}
 
 	s.OrganizationUserRepository.SetTransaction(tx)
+	s.OrganizationRepository.SetTransaction(tx)
 	s.RoleRepository.SetTransaction(tx)
+
+	organization, err := s.OrganizationRepository.GetOrganizationByIdentity(organization_repositories.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
+	if err != nil {
+		return core.NewInternalError(err.Error())
+	}
+
+	if organization == nil {
+		return core.NewNotFoundError("organization not found")
+	}
 
 	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organization_repositories.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
@@ -103,6 +116,10 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 		if *input.Status == organization_core.OrganizationUserStatusActive && organizationUser.IsInactive() {
 			organizationUser.Activate()
 		} else if *input.Status == organization_core.OrganizationUserStatusInactive && organizationUser.IsActive() {
+			if organizationUser.User.Identity.Equals(*organization.UserCreatorIdentity) {
+				return core.NewConflictError("cannot deactivate the creator of the organization")
+			}
+
 			organizationUser.Deactivate()
 		} else {
 			return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{
@@ -111,6 +128,36 @@ func (s *UpdateOrganizationUserService) Execute(input UpdateOrganizationUserInpu
 					Error: "valid statuses are: active, inactive",
 				},
 			})
+		}
+
+		workspaceUsers, err := s.WorkspaceUserRepository.GetWorkspaceUsersByUserIdentity(workspace_repositories.GetWorkspaceUsersByUserIdentityParams{
+			UserIdentity: input.UserIdentity,
+		})
+		if err != nil {
+			return core.NewInternalError(err.Error())
+		}
+
+		for _, workspaceUser := range workspaceUsers {
+			workspaceUser.Status = workspace_core.WorkspaceUserStatuses(organizationUser.Status)
+			err = s.WorkspaceUserRepository.UpdateWorkspaceUser(workspace_repositories.UpdateWorkspaceUserParams{WorkspaceUser: &workspaceUser})
+			if err != nil {
+				return core.NewInternalError(err.Error())
+			}
+		}
+
+		projectUsers, err := s.ProjectUserRepository.GetProjectUsersByUserIdentity(project_repositories.GetProjectUsersByUserIdentityParams{
+			UserIdentity: input.UserIdentity,
+		})
+		if err != nil {
+			return core.NewInternalError(err.Error())
+		}
+
+		for _, projectUser := range projectUsers {
+			projectUser.Status = project_core.ProjectUserStatuses(organizationUser.Status)
+			err = s.ProjectUserRepository.UpdateProjectUser(project_repositories.UpdateProjectUserParams{ProjectUser: &projectUser})
+			if err != nil {
+				return core.NewInternalError(err.Error())
+			}
 		}
 	}
 

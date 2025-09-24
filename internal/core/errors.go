@@ -77,3 +77,15 @@ func (e *InternalError) Error() string {
 func NewInternalError(message string) *InternalError {
 	return &InternalError{Message: message}
 }
+
+type ConflictError struct {
+	Message string
+}
+
+func (e *ConflictError) Error() string {
+	return e.Message
+}
+
+func NewConflictError(message string) *ConflictError {
+	return &ConflictError{Message: message}
+}

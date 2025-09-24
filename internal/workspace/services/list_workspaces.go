@@ -24,6 +24,7 @@ type ListWorkspacesInput struct {
 	SortInput            *core.SortInput
 	Pagination           *core.PaginationInput
 	RelationsInput       core.RelationsInput
+	ShowDeleted          bool
 }
 
 func (i ListWorkspacesInput) Validate() error {
@@ -38,9 +39,10 @@ func (s *ListWorkspacesService) Execute(input ListWorkspacesInput) (*core.Pagina
 	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
 	workspaces, err := s.WorkspaceRepository.PaginateWorkspacesBy(workspace_repositories.PaginateWorkspacesParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:     input.Filters,
+		SortInput:   input.SortInput,
+		Pagination:  input.Pagination,
+		ShowDeleted: input.ShowDeleted,
 	})
 	if err != nil {
 		return nil, err

@@ -57,6 +57,7 @@ type ListWorkspacesResponse = core_http.HttpSuccessResponseWithData[workspace_co
 func (c *WorkspaceController) ListWorkspaces(ctx *gin.Context) {
 	var request workspace_http_requests.ListWorkspacesRequest
 	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -65,6 +66,7 @@ func (c *WorkspaceController) ListWorkspaces(ctx *gin.Context) {
 
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
+	input.Filters.LoggedUserIdentity = &authenticatedUserIdentity
 
 	response, err := c.ListWorkspacesService.Execute(input)
 	if err != nil {
