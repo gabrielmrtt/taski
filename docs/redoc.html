@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>ReDoc - Dark Violet Theme</title>
+    <style>
+      /* Forçar estilo dos botões de amostra */
+      .react-tabs__tab {
+        background-color: #2A2A2A !important;
+        color: #EAEAEA !important;
+        border: 1px solid #9A7DFF !important;
+        border-radius: 6px !important;
+        padding: 4px 10px !important;
+      }
+
+      /* Botão ativo (selecionado) */
+      .react-tabs__tab--selected {
+        background-color: #9A7DFF !important;
+        color: #FFFFFF !important;
+      }
+
+      /* Remove fundo branco que o ReDoc aplica às vezes */
+      .react-tabs__tab:focus {
+        box-shadow: 0 0 0 2px #9A7DFF55 !important;
+        outline: none !important;
+      } 
+    </style>
+  </head>
+  <body style="margin:0; background-color:#121212;">
+    <div id="redoc-container"></div>
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+    <script>
+      Redoc.init('/swagger.json', {
+        theme: {
+          colors: {
+            primary: { main: '#9A7DFF' },
+            accent: { main: '#9A7DFF' },
+            text: {
+              primary: '#EAEAEA',
+              secondary: '#B3B3B3',
+              tertiary: '#8C8C8C'
+            },
+            http: {
+              get: '#4ADE80',
+              post: '#9A7DFF',
+              put: '#FACC15',
+              patch: '#F59E0B',
+              delete: '#EF4444'
+            }
+          },
+          typography: {
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: '14px',
+            color: '#EAEAEA',
+            headings: {
+              fontWeight: 'bold',
+              color: '#FFFFFF'
+            },
+            code: {
+              fontFamily: 'Fira Code, monospace',
+              fontSize: '13px',
+              color: '#EAEAEA',
+              backgroundColor: '#1E1E1E'
+            },
+            links: {
+              color: '#9A7DFF',
+              visited: '#9A7DFF',
+              hover: '#B39DFF'
+            },
+            fieldName: {
+              color: '#EAEAEA',
+              fontWeight: 'bold'
+            }
+          },
+          sidebar: {
+            backgroundColor: '#1E1E1E',
+            textColor: '#EAEAEA'
+          },
+          rightPanel: {
+            backgroundColor: '#1E1E1E',
+            textColor: '#EAEAEA'
+          },
+          labels: {
+            textColor: '#EAEAEA',
+            backgroundColor: '#2A2A2A'
+          },
+          buttons: {
+            backgroundColor: '#2A2A2A',
+            textColor: '#EAEAEA',
+            primary: {
+              backgroundColor: '#9A7DFF',
+              textColor: '#FFFFFF'
+            }
+          }
+        }
+      }, document.getElementById('redoc-container'))
+    </script>
+  </body>
+</html>

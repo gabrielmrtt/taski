@@ -86,6 +86,10 @@ func (r *ProjectPostgresRepository) SetTransaction(tx core.Transaction) error {
 func (r *ProjectPostgresRepository) applyFilters(selectQuery *bun.SelectQuery, filters project_repositories.ProjectFilters) *bun.SelectQuery {
 	selectQuery = selectQuery.Where("workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
 
+	if filters.LoggedUserIdentity != nil {
+		selectQuery = selectQuery.Where("internal_id IN (SELECT project_internal_id FROM project_user WHERE user_internal_id = ? AND status = ?)", filters.LoggedUserIdentity.Internal.String(), project_core.ProjectUserStatusActive)
+	}
+
 	if filters.Name != nil {
 		selectQuery = core_database_postgres.ApplyComparableFilter(selectQuery, "name", filters.Name)
 	}

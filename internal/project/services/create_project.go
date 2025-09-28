@@ -4,22 +4,29 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	project_core "github.com/gabrielmrtt/taski/internal/project"
 	project_repositories "github.com/gabrielmrtt/taski/internal/project/repositories"
+	user_repositories "github.com/gabrielmrtt/taski/internal/user/repositories"
 	workspace_repositories "github.com/gabrielmrtt/taski/internal/workspace/repositories"
 )
 
 type CreateProjectService struct {
 	ProjectRepository     project_repositories.ProjectRepository
+	ProjectUserRepository project_repositories.ProjectUserRepository
+	UserRepository        user_repositories.UserRepository
 	WorkspaceRepository   workspace_repositories.WorkspaceRepository
 	TransactionRepository core.TransactionRepository
 }
 
 func NewCreateProjectService(
 	projectRepository project_repositories.ProjectRepository,
+	projectUserRepository project_repositories.ProjectUserRepository,
+	userRepository user_repositories.UserRepository,
 	workspaceRepository workspace_repositories.WorkspaceRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateProjectService {
 	return &CreateProjectService{
 		ProjectRepository:     projectRepository,
+		ProjectUserRepository: projectUserRepository,
+		UserRepository:        userRepository,
 		WorkspaceRepository:   workspaceRepository,
 		TransactionRepository: transactionRepository,
 	}
@@ -79,6 +86,19 @@ func (s *CreateProjectService) Execute(input CreateProjectInput) (*project_core.
 	}
 
 	s.ProjectRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
+	s.UserRepository.SetTransaction(tx)
+
+	user, err := s.UserRepository.GetUserByIdentity(user_repositories.GetUserByIdentityParams{
+		UserIdentity: input.UserCreatorIdentity,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, core.NewNotFoundError("user creator not found")
+	}
 
 	workspace, err := s.WorkspaceRepository.GetWorkspaceByIdentity(workspace_repositories.GetWorkspaceByIdentityParams{
 		WorkspaceIdentity:    input.WorkspaceIdentity,
@@ -107,6 +127,20 @@ func (s *CreateProjectService) Execute(input CreateProjectInput) (*project_core.
 	}
 
 	project, err = s.ProjectRepository.StoreProject(project_repositories.StoreProjectParams{Project: project})
+	if err != nil {
+		return nil, err
+	}
+
+	projectUser, err := project_core.NewProjectUser(project_core.NewProjectUserInput{
+		ProjectIdentity: project.Identity,
+		User:            *user,
+		Status:          project_core.ProjectUserStatusActive,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.ProjectUserRepository.StoreProjectUser(project_repositories.StoreProjectUserParams{ProjectUser: projectUser})
 	if err != nil {
 		return nil, err
 	}

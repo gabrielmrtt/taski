@@ -71,7 +71,7 @@ func (r *ProjectUserPostgresRepository) GetProjectUserByIdentity(params project_
 	}
 
 	selectQuery = selectQuery.Model(projectUser)
-	selectQuery = core_database_postgres.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Relation("User")
 	selectQuery = selectQuery.Where("project_internal_id = ? and user_internal_id = ?", params.ProjectIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())

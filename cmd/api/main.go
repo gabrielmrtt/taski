@@ -47,6 +47,8 @@ func bootstrapApplication() {
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	engine.StaticFile("/swagger.json", "./docs/swagger.json")
+	engine.StaticFile("/docs", "./docs/redoc.html")
 	engine.Run(fmt.Sprintf(":%s", appPort))
 }
 

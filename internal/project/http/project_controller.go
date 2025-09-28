@@ -59,6 +59,7 @@ func (c *ProjectController) ListProjects(ctx *gin.Context) {
 
 	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 	organizationIdentity := organization_http_middlewares.GetOrganizationIdentityFromPath(ctx)
+	authenticatedUserIdentity := user_http_middlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		core_http.NewHttpErrorResponse(ctx, err)
@@ -68,6 +69,7 @@ func (c *ProjectController) ListProjects(ctx *gin.Context) {
 	input := request.ToInput()
 	input.WorkspaceIdentity = workspaceIdentity
 	input.OrganizationIdentity = organizationIdentity
+	input.Filters.LoggedUserIdentity = &authenticatedUserIdentity
 
 	response, err := c.ListProjectsService.Execute(input)
 	if err != nil {
@@ -76,7 +78,6 @@ func (c *ProjectController) ListProjects(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type GetProjectResponse = core_http.HttpSuccessResponseWithData[project_core.ProjectDto]
@@ -113,7 +114,6 @@ func (c *ProjectController) GetProject(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type CreateProjectResponse = core_http.HttpSuccessResponseWithData[project_core.ProjectDto]
@@ -154,7 +154,6 @@ func (c *ProjectController) CreateProject(ctx *gin.Context) {
 	}
 
 	core_http.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
-	return
 }
 
 type UpdateProjectResponse = core_http.EmptyHttpSuccessResponse
@@ -199,7 +198,6 @@ func (c *ProjectController) UpdateProject(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 type DeleteProjectResponse = core_http.EmptyHttpSuccessResponse
@@ -236,7 +234,6 @@ func (c *ProjectController) DeleteProject(ctx *gin.Context) {
 	}
 
 	core_http.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
-	return
 }
 
 func (c *ProjectController) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
