@@ -1,4 +1,17 @@
 definitions:
+  github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_team_TeamDto:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamDto'
+        type: array
+      hasMore:
+        type: boolean
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse:
     properties:
       errors: {}
@@ -176,6 +189,56 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_team.TeamDto:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      members:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamUserDto'
+        type: array
+      name:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      userCreatorId:
+        type: string
+      userEditorId:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_team.TeamUserDto:
+    properties:
+      user:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+    type: object
+  github_com_gabrielmrtt_taski_internal_team_http_requests.CreateTeamRequest:
+    properties:
+      description:
+        type: string
+      members:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_team_http_requests.UpdateTeamRequest:
+    properties:
+      description:
+        type: string
+      members:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
     type: object
   github_com_gabrielmrtt_taski_internal_user.UserCredentialsDto:
     properties:
@@ -576,6 +639,67 @@ definitions:
         type: string
     type: object
   internal_role_http.UpdateRoleResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_team_http.CreateTeamResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_team_http.DeleteTeamResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_team_http.GetTeamResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_team_http.ListTeamsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_team_TeamDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_team_http.UpdateTeamResponse:
     properties:
       message:
         type: string
@@ -1580,6 +1704,227 @@ paths:
       summary: Update a role in an organization
       tags:
       - Role
+  /organization/:organizationId/team:
+    get:
+      consumes:
+      - application/json
+      description: Lists all existing teams in an organization.
+      parameters:
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: relations
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      - in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_team_http.ListTeamsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List teams in an organization
+      tags:
+      - Team
+    post:
+      consumes:
+      - application/json
+      description: Creates a new team in an organization.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team_http_requests.CreateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_team_http.CreateTeamResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a team in an organization
+      tags:
+      - Team
+  /organization/:organizationId/team/:teamId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing team in an organization.
+      parameters:
+      - description: Team ID
+        in: path
+        name: teamId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_team_http.DeleteTeamResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a team in an organization
+      tags:
+      - Team
+    get:
+      consumes:
+      - application/json
+      description: Returns a team in an organization by its ID.
+      parameters:
+      - description: Team ID
+        in: path
+        name: teamId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_team_http.GetTeamResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get a team in an organization
+      tags:
+      - Team
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing team in an organization.
+      parameters:
+      - description: Team ID
+        in: path
+        name: teamId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_team_http_requests.UpdateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_team_http.UpdateTeamResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a team in an organization
+      tags:
+      - Team
   /organization/:organizationId/user:
     get:
       consumes:
