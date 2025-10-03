@@ -12,9 +12,13 @@ type PermissionSeeder struct {
 	PermissionRepository rolerepo.PermissionRepository
 }
 
-func NewPermissionSeeder(permissionRepository rolerepo.PermissionRepository) *PermissionSeeder {
+type PermissionSeederOptions struct {
+	PermissionRepository rolerepo.PermissionRepository
+}
+
+func NewPermissionSeeder(options PermissionSeederOptions) *PermissionSeeder {
 	return &PermissionSeeder{
-		PermissionRepository: permissionRepository,
+		PermissionRepository: options.PermissionRepository,
 	}
 }
 
@@ -29,6 +33,10 @@ func checkUniquePermissions(permissions []role.Permission) error {
 	}
 
 	return nil
+}
+
+func (s *PermissionSeeder) Name() string {
+	return "permission"
 }
 
 func (s *PermissionSeeder) Run() error {

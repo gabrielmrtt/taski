@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/joho/godotenv"
 )
@@ -59,6 +60,20 @@ func loadConfig() *Config {
 	return cfg
 }
 
-var (
-	Instance *Config = loadConfig()
-)
+var lock = &sync.Mutex{}
+
+var instance *Config = loadConfig()
+
+func GetConfig() *Config {
+	if instance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+
+		if instance == nil {
+			instance = loadConfig()
+			return instance
+		}
+	}
+
+	return instance
+}

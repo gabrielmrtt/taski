@@ -20,8 +20,8 @@ import (
 func bootstrapApplication() {
 	engine := gin.New()
 
-	apiVersion := config.Instance.ApiVersion
-	appPort := config.Instance.AppPort
+	apiVersion := config.GetConfig().ApiVersion
+	appPort := config.GetConfig().AppPort
 
 	engine.Use(gin.Recovery())
 	engine.Use(gin.Logger())

@@ -27,7 +27,7 @@ func GetAuthenticatedUserIdentity(ctx *gin.Context) core.Identity {
 }
 
 func GenerateJwtToken(userIdentity core.Identity) (string, error) {
-	expirationMinutes := config.Instance.JwtExpirationMinutes
+	expirationMinutes := config.GetConfig().JwtExpirationMinutes
 
 	now := time.Now()
 	claims := &JwtClaims{
@@ -40,7 +40,7 @@ func GenerateJwtToken(userIdentity core.Identity) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.Instance.JwtSecret))
+	return token.SignedString([]byte(config.GetConfig().JwtSecret))
 }
 
 func extractBearerToken(ctx *gin.Context) (string, error) {
@@ -60,7 +60,7 @@ func extractBearerToken(ctx *gin.Context) (string, error) {
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		jwtSecret := config.Instance.JwtSecret
+		jwtSecret := config.GetConfig().JwtSecret
 
 		tokenStr, err := extractBearerToken(ctx)
 		if err != nil {

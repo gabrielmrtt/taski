@@ -14,11 +14,20 @@ type RolesSeeder struct {
 	PermissionRepository rolerepo.PermissionRepository
 }
 
-func NewRolesSeeder(roleRepository rolerepo.RoleRepository, permissionRepository rolerepo.PermissionRepository) *RolesSeeder {
+type RolesSeederOptions struct {
+	RoleRepository       rolerepo.RoleRepository
+	PermissionRepository rolerepo.PermissionRepository
+}
+
+func NewRolesSeeder(options RolesSeederOptions) *RolesSeeder {
 	return &RolesSeeder{
-		RoleRepository:       roleRepository,
-		PermissionRepository: permissionRepository,
+		RoleRepository:       options.RoleRepository,
+		PermissionRepository: options.PermissionRepository,
 	}
+}
+
+func (s *RolesSeeder) Name() string {
+	return "roles"
 }
 
 func (s *RolesSeeder) Run() error {
