@@ -1,4 +1,4 @@
-package user_core
+package user
 
 import (
 	"errors"

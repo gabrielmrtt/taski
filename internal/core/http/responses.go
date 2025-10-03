@@ -1,4 +1,4 @@
-package core_http
+package corehttp
 
 import (
 	"net/http"

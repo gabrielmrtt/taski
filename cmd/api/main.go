@@ -5,14 +5,13 @@ import (
 
 	"github.com/gabrielmrtt/taski/config"
 	"github.com/gabrielmrtt/taski/docs"
-	core_database_postgres "github.com/gabrielmrtt/taski/internal/core/database/postgres"
-	organization_http "github.com/gabrielmrtt/taski/internal/organization/http"
-	project_http "github.com/gabrielmrtt/taski/internal/project/http"
-	role_http "github.com/gabrielmrtt/taski/internal/role/http"
-	storage_http "github.com/gabrielmrtt/taski/internal/storage/http"
-	team_http "github.com/gabrielmrtt/taski/internal/team/http"
-	user_http "github.com/gabrielmrtt/taski/internal/user/http"
-	workspace_http "github.com/gabrielmrtt/taski/internal/workspace/http"
+	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	organizationinfra "github.com/gabrielmrtt/taski/internal/organization/infra"
+	projectinfra "github.com/gabrielmrtt/taski/internal/project/infra"
+	roleinfra "github.com/gabrielmrtt/taski/internal/role/infra"
+	teaminfra "github.com/gabrielmrtt/taski/internal/team/infra"
+	userinfra "github.com/gabrielmrtt/taski/internal/user/infra"
+	workspaceinfra "github.com/gabrielmrtt/taski/internal/workspace/infra"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -20,7 +19,7 @@ import (
 
 func shutdownApplication() {
 	fmt.Println("Shutting down application...")
-	core_database_postgres.DB.Close()
+	coredatabase.DB.Close()
 }
 
 func bootstrapApplication() {
@@ -39,13 +38,30 @@ func bootstrapApplication() {
 
 	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{
-		user_http.BootstrapControllers(g)
-		storage_http.BootstrapControllers(g)
-		organization_http.BootstrapControllers(g)
-		role_http.BootstrapControllers(g)
-		workspace_http.BootstrapControllers(g)
-		project_http.BootstrapControllers(g)
-		team_http.BootstrapControllers(g)
+		userinfra.BootstrapInfra(userinfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
+		organizationinfra.BootstrapInfra(organizationinfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
+		workspaceinfra.BootstrapInfra(workspaceinfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
+		projectinfra.BootstrapInfra(projectinfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
+		roleinfra.BootstrapInfra(roleinfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
+		teaminfra.BootstrapInfra(teaminfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: coredatabase.DB,
+		})
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

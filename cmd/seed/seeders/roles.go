@@ -4,17 +4,17 @@ import (
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
+	"github.com/gabrielmrtt/taski/internal/role"
+	rolerepo "github.com/gabrielmrtt/taski/internal/role/repository"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RolesSeeder struct {
-	RoleRepository       role_repositories.RoleRepository
-	PermissionRepository role_repositories.PermissionRepository
+	RoleRepository       rolerepo.RoleRepository
+	PermissionRepository rolerepo.PermissionRepository
 }
 
-func NewRolesSeeder(roleRepository role_repositories.RoleRepository, permissionRepository role_repositories.PermissionRepository) *RolesSeeder {
+func NewRolesSeeder(roleRepository rolerepo.RoleRepository, permissionRepository rolerepo.PermissionRepository) *RolesSeeder {
 	return &RolesSeeder{
 		RoleRepository:       roleRepository,
 		PermissionRepository: permissionRepository,
@@ -22,8 +22,8 @@ func NewRolesSeeder(roleRepository role_repositories.RoleRepository, permissionR
 }
 
 func (s *RolesSeeder) Run() error {
-	permissions, err := s.PermissionRepository.ListPermissionsBy(role_repositories.ListPermissionsParams{
-		Filters: role_repositories.PermissionFilters{},
+	permissions, err := s.PermissionRepository.ListPermissionsBy(rolerepo.ListPermissionsParams{
+		Filters: rolerepo.PermissionFilters{},
 	})
 	if err != nil {
 		return err
@@ -31,17 +31,17 @@ func (s *RolesSeeder) Run() error {
 
 	now := datetimeutils.EpochNow()
 
-	var roles []role_core.Role = make([]role_core.Role, 0)
-	for _, defaultRole := range role_core.DefaultRoleSlugsArray {
-		var defaultRolePermissions []role_core.Permission = make([]role_core.Permission, 0)
+	var roles []role.Role = make([]role.Role, 0)
+	for _, defaultRole := range role.DefaultRoleSlugsArray {
+		var defaultRolePermissions []role.Permission = make([]role.Permission, 0)
 		for _, p := range *permissions {
 			if slices.Contains(defaultRole.Permissions, p.Slug) {
 				defaultRolePermissions = append(defaultRolePermissions, p)
 			}
 		}
 
-		roles = append(roles, role_core.Role{
-			Identity:        core.NewIdentity(role_core.RoleIdentityPrefix),
+		roles = append(roles, role.Role{
+			Identity:        core.NewIdentity(role.RoleIdentityPrefix),
 			Name:            defaultRole.Name,
 			Slug:            string(defaultRole.Slug),
 			IsSystemDefault: true,
@@ -58,29 +58,29 @@ func (s *RolesSeeder) Run() error {
 		})
 	}
 
-	for _, role := range roles {
-		exists, err := s.RoleRepository.GetSystemDefaultRole(role_repositories.GetDefaultRoleParams{
-			Slug: role_core.DefaultRoleSlugs(role.Slug),
+	for _, rol := range roles {
+		exists, err := s.RoleRepository.GetSystemDefaultRole(rolerepo.GetDefaultRoleParams{
+			Slug: role.DefaultRoleSlugs(rol.Slug),
 		})
 		if err != nil {
 			return err
 		}
 		if exists != nil {
-			exists.Name = role.Name
-			exists.Description = role.Description
-			exists.Permissions = role.Permissions
-			exists.UserCreatorIdentity = role.UserCreatorIdentity
-			exists.UserEditorIdentity = role.UserEditorIdentity
-			exists.OrganizationIdentity = role.OrganizationIdentity
-			exists.DeletedAt = role.DeletedAt
-			exists.Timestamps = role.Timestamps
+			exists.Name = rol.Name
+			exists.Description = rol.Description
+			exists.Permissions = rol.Permissions
+			exists.UserCreatorIdentity = rol.UserCreatorIdentity
+			exists.UserEditorIdentity = rol.UserEditorIdentity
+			exists.OrganizationIdentity = rol.OrganizationIdentity
+			exists.DeletedAt = rol.DeletedAt
+			exists.Timestamps = rol.Timestamps
 
-			err = s.RoleRepository.UpdateRole(role_repositories.UpdateRoleParams{Role: exists})
+			err = s.RoleRepository.UpdateRole(rolerepo.UpdateRoleParams{Role: exists})
 			if err != nil {
 				return err
 			}
 		} else {
-			_, err := s.RoleRepository.StoreRole(role_repositories.StoreRoleParams{Role: &role})
+			_, err := s.RoleRepository.StoreRole(rolerepo.StoreRoleParams{Role: &rol})
 			if err != nil {
 				return err
 			}

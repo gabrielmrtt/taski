@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.UserLoginRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UserLoginRequest"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.LoginResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.LoginResponse"
                         }
                     },
                     "400": {
@@ -138,7 +138,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.GetMeResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.GetMeResponse"
                         }
                     },
                     "401": {
@@ -183,7 +183,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.DeleteUserResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.DeleteUserResponse"
                         }
                     },
                     "400": {
@@ -239,7 +239,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserCredentialsRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UpdateUserCredentialsRequest"
                         }
                     }
                 ],
@@ -247,7 +247,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.UpdateUserCredentialsResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.UpdateUserCredentialsResponse"
                         }
                     },
                     "400": {
@@ -303,7 +303,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserDataRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UpdateUserDataRequest"
                         }
                     }
                 ],
@@ -311,7 +311,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.UpdateUserDataResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.UpdateUserDataResponse"
                         }
                     },
                     "400": {
@@ -367,7 +367,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.ChangeUserPasswordRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.ChangeUserPasswordRequest"
                         }
                     }
                 ],
@@ -375,7 +375,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.ChangeUserPasswordResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.ChangeUserPasswordResponse"
                         }
                     },
                     "400": {
@@ -465,7 +465,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.ListOrganizationsResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.ListOrganizationsResponse"
                         }
                     },
                     "400": {
@@ -513,7 +513,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.CreateOrganizationRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.CreateOrganizationRequest"
                         }
                     }
                 ],
@@ -521,7 +521,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.CreateOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.CreateOrganizationResponse"
                         }
                     },
                     "400": {
@@ -595,7 +595,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.ListMyOrganizationInvitesResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.ListMyOrganizationInvitesResponse"
                         }
                     },
                     "400": {
@@ -658,7 +658,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.AcceptOrganizationUserInvitationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.AcceptOrganizationUserInvitationResponse"
                         }
                     },
                     "400": {
@@ -721,7 +721,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.RefuseOrganizationUserInvitationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.RefuseOrganizationUserInvitationResponse"
                         }
                     },
                     "400": {
@@ -777,7 +777,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.GetOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.GetOrganizationResponse"
                         }
                     },
                     "400": {
@@ -838,7 +838,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.UpdateOrganizationRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.UpdateOrganizationRequest"
                         }
                     }
                 ],
@@ -846,7 +846,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.UpdateOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.UpdateOrganizationResponse"
                         }
                     },
                     "400": {
@@ -906,7 +906,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.DeleteOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.DeleteOrganizationResponse"
                         }
                     },
                     "400": {
@@ -996,7 +996,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_role_http.ListRolesResponse"
+                            "$ref": "#/definitions/internal_role_infra_http.ListRolesResponse"
                         }
                     },
                     "400": {
@@ -1050,7 +1050,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_http_requests.CreateRoleRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.CreateRoleRequest"
                         }
                     }
                 ],
@@ -1058,7 +1058,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_role_http.CreateRoleResponse"
+                            "$ref": "#/definitions/internal_role_infra_http.CreateRoleResponse"
                         }
                     },
                     "400": {
@@ -1121,7 +1121,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_http_requests.UpdateRoleRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.UpdateRoleRequest"
                         }
                     }
                 ],
@@ -1129,7 +1129,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_role_http.UpdateRoleResponse"
+                            "$ref": "#/definitions/internal_role_infra_http.UpdateRoleResponse"
                         }
                     },
                     "400": {
@@ -1189,7 +1189,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_role_http.DeleteRoleResponse"
+                            "$ref": "#/definitions/internal_role_infra_http.DeleteRoleResponse"
                         }
                     },
                     "400": {
@@ -1279,7 +1279,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_team_http.ListTeamsResponse"
+                            "$ref": "#/definitions/internal_team_infra_http.ListTeamsResponse"
                         }
                     },
                     "400": {
@@ -1333,7 +1333,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_http_requests.CreateTeamRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_infra_http_requests.CreateTeamRequest"
                         }
                     }
                 ],
@@ -1341,7 +1341,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_team_http.CreateTeamResponse"
+                            "$ref": "#/definitions/internal_team_infra_http.CreateTeamResponse"
                         }
                     },
                     "400": {
@@ -1397,7 +1397,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_team_http.GetTeamResponse"
+                            "$ref": "#/definitions/internal_team_infra_http.GetTeamResponse"
                         }
                     },
                     "400": {
@@ -1458,7 +1458,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_http_requests.UpdateTeamRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_infra_http_requests.UpdateTeamRequest"
                         }
                     }
                 ],
@@ -1466,7 +1466,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_team_http.UpdateTeamResponse"
+                            "$ref": "#/definitions/internal_team_infra_http.UpdateTeamResponse"
                         }
                     },
                     "400": {
@@ -1526,7 +1526,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_team_http.DeleteTeamResponse"
+                            "$ref": "#/definitions/internal_team_infra_http.DeleteTeamResponse"
                         }
                     },
                     "400": {
@@ -1638,7 +1638,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.ListOrganizationUsersResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.ListOrganizationUsersResponse"
                         }
                     },
                     "400": {
@@ -1699,7 +1699,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.InviteUserToOrganizationRequest"
                         }
                     }
                 ],
@@ -1707,7 +1707,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.InviteUserToOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.InviteUserToOrganizationResponse"
                         }
                     },
                     "400": {
@@ -1776,7 +1776,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.GetOrganizationUserResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.GetOrganizationUserResponse"
                         }
                     },
                     "400": {
@@ -1843,7 +1843,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.UpdateOrganizationUserResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.UpdateOrganizationUserResponse"
                         }
                     },
                     "400": {
@@ -1910,7 +1910,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_organization_http.RemoveUserFromOrganizationResponse"
+                            "$ref": "#/definitions/internal_organization_infra_http.RemoveUserFromOrganizationResponse"
                         }
                     },
                     "400": {
@@ -2007,7 +2007,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_http.ListWorkspacesResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.ListWorkspacesResponse"
                         }
                     },
                     "400": {
@@ -2062,7 +2062,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.CreateWorkspaceRequest"
                         }
                     }
                 ],
@@ -2070,7 +2070,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_http.CreateWorkspaceResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.CreateWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2133,7 +2133,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_http.GetWorkspaceResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.GetWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2201,7 +2201,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.UpdateWorkspaceRequest"
                         }
                     }
                 ],
@@ -2209,7 +2209,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_http.UpdateWorkspaceResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.UpdateWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2276,7 +2276,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_http.DeleteWorkspaceResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.DeleteWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2332,7 +2332,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.RegisterUserRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.RegisterUserRequest"
                         }
                     }
                 ],
@@ -2340,7 +2340,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.RegisterUserResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.RegisterUserResponse"
                         }
                     },
                     "400": {
@@ -2384,7 +2384,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.ForgotUserPasswordRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.ForgotUserPasswordRequest"
                         }
                     }
                 ],
@@ -2392,7 +2392,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.ForgotUserPasswordResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.ForgotUserPasswordResponse"
                         }
                     },
                     "400": {
@@ -2442,7 +2442,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.RecoverUserPasswordRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.RecoverUserPasswordRequest"
                         }
                     }
                 ],
@@ -2450,7 +2450,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.RecoverUserPasswordResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.RecoverUserPasswordResponse"
                         }
                     },
                     "400": {
@@ -2500,7 +2500,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_http_requests.VerifyUserRegistrationRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.VerifyUserRegistrationRequest"
                         }
                     }
                 ],
@@ -2508,7 +2508,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_http.VerifyUserRegistrationResponse"
+                            "$ref": "#/definitions/internal_user_infra_http.VerifyUserRegistrationResponse"
                         }
                     },
                     "400": {
@@ -2592,7 +2592,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_http.ListProjectsResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.ListProjectsResponse"
                         }
                     },
                     "400": {
@@ -2640,7 +2640,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_http_requests.CreateProjectRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest"
                         }
                     }
                 ],
@@ -2648,7 +2648,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_http.CreateProjectResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.CreateProjectResponse"
                         }
                     },
                     "400": {
@@ -2704,7 +2704,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_http.GetProjectResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.GetProjectResponse"
                         }
                     },
                     "400": {
@@ -2765,7 +2765,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_http_requests.UpdateProjectRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest"
                         }
                     }
                 ],
@@ -2773,7 +2773,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_http.UpdateProjectResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.UpdateProjectResponse"
                         }
                     },
                     "400": {
@@ -2833,7 +2833,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_http.DeleteProjectResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.DeleteProjectResponse"
                         }
                     },
                     "400": {
@@ -2952,7 +2952,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_organization_http_requests.CreateOrganizationRequest": {
+        "github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.CreateOrganizationRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -2960,7 +2960,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationRequest": {
+        "github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.InviteUserToOrganizationRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -2972,12 +2972,12 @@ const docTemplate = `{
                 "workspaces": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput"
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.InviteUserToOrganizationWorkspaceInput"
                     }
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_organization_http_requests.InviteUserToOrganizationWorkspaceInput": {
+        "github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.InviteUserToOrganizationWorkspaceInput": {
             "type": "object",
             "properties": {
                 "projects": {
@@ -2991,7 +2991,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_organization_http_requests.UpdateOrganizationRequest": {
+        "github_com_gabrielmrtt_taski_internal_organization_infra_http_requests.UpdateOrganizationRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -3043,7 +3043,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_project_http_requests.CreateProjectRequest": {
+        "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -3066,7 +3066,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_project_http_requests.UpdateProjectRequest": {
+        "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -3130,7 +3130,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_role_http_requests.CreateRoleRequest": {
+        "github_com_gabrielmrtt_taski_internal_role_infra_http_requests.CreateRoleRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -3147,7 +3147,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_role_http_requests.UpdateRoleRequest": {
+        "github_com_gabrielmrtt_taski_internal_role_infra_http_requests.UpdateRoleRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -3207,7 +3207,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_team_http_requests.CreateTeamRequest": {
+        "github_com_gabrielmrtt_taski_internal_team_infra_http_requests.CreateTeamRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -3224,7 +3224,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_team_http_requests.UpdateTeamRequest": {
+        "github_com_gabrielmrtt_taski_internal_team_infra_http_requests.UpdateTeamRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -3303,7 +3303,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.ChangeUserPasswordRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.ChangeUserPasswordRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -3314,7 +3314,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.ForgotUserPasswordRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.ForgotUserPasswordRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -3322,7 +3322,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.RecoverUserPasswordRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.RecoverUserPasswordRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -3336,7 +3336,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.RegisterUserRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.RegisterUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -3353,7 +3353,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserCredentialsRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UpdateUserCredentialsRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -3367,7 +3367,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.UpdateUserDataRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UpdateUserDataRequest": {
             "type": "object",
             "properties": {
                 "about": {
@@ -3381,7 +3381,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.UserLoginRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UserLoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -3392,7 +3392,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_http_requests.VerifyUserRegistrationRequest": {
+        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.VerifyUserRegistrationRequest": {
             "type": "object",
             "properties": {
                 "token": {
@@ -3435,7 +3435,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_workspace_http_requests.CreateWorkspaceRequest": {
+        "github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.CreateWorkspaceRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -3449,7 +3449,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_workspace_http_requests.UpdateWorkspaceRequest": {
+        "github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.UpdateWorkspaceRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -3466,7 +3466,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.AcceptOrganizationUserInvitationResponse": {
+        "internal_organization_infra_http.AcceptOrganizationUserInvitationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3483,7 +3483,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.CreateOrganizationResponse": {
+        "internal_organization_infra_http.CreateOrganizationResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3503,7 +3503,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.DeleteOrganizationResponse": {
+        "internal_organization_infra_http.DeleteOrganizationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3520,7 +3520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.GetOrganizationResponse": {
+        "internal_organization_infra_http.GetOrganizationResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3540,7 +3540,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.GetOrganizationUserResponse": {
+        "internal_organization_infra_http.GetOrganizationUserResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3560,7 +3560,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.InviteUserToOrganizationResponse": {
+        "internal_organization_infra_http.InviteUserToOrganizationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3577,7 +3577,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.ListMyOrganizationInvitesResponse": {
+        "internal_organization_infra_http.ListMyOrganizationInvitesResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3597,7 +3597,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.ListOrganizationUsersResponse": {
+        "internal_organization_infra_http.ListOrganizationUsersResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3617,7 +3617,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.ListOrganizationsResponse": {
+        "internal_organization_infra_http.ListOrganizationsResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3637,7 +3637,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.RefuseOrganizationUserInvitationResponse": {
+        "internal_organization_infra_http.RefuseOrganizationUserInvitationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3654,7 +3654,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.RemoveUserFromOrganizationResponse": {
+        "internal_organization_infra_http.RemoveUserFromOrganizationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3671,7 +3671,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.UpdateOrganizationResponse": {
+        "internal_organization_infra_http.UpdateOrganizationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3688,7 +3688,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_organization_http.UpdateOrganizationUserResponse": {
+        "internal_organization_infra_http.UpdateOrganizationUserResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3705,44 +3705,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_project_http.CreateProjectResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_project_http.DeleteProjectResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_project_http.GetProjectResponse": {
+        "internal_project_infra_http.CreateProjectResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3762,7 +3725,24 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_project_http.ListProjectsResponse": {
+        "internal_project_infra_http.DeleteProjectResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.GetProjectResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3782,7 +3762,27 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_project_http.UpdateProjectResponse": {
+        "internal_project_infra_http.ListProjectsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.UpdateProjectResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3799,7 +3799,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_role_http.CreateRoleResponse": {
+        "internal_role_infra_http.CreateRoleResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3819,7 +3819,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_role_http.DeleteRoleResponse": {
+        "internal_role_infra_http.DeleteRoleResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3836,7 +3836,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_role_http.ListRolesResponse": {
+        "internal_role_infra_http.ListRolesResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3856,7 +3856,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_role_http.UpdateRoleResponse": {
+        "internal_role_infra_http.UpdateRoleResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3873,44 +3873,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_team_http.CreateTeamResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamDto"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_team_http.DeleteTeamResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_team_http.GetTeamResponse": {
+        "internal_team_infra_http.CreateTeamResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3930,7 +3893,44 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_team_http.ListTeamsResponse": {
+        "internal_team_infra_http.DeleteTeamResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_team_infra_http.GetTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team.TeamDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_team_infra_http.ListTeamsResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -3950,7 +3950,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_team_http.UpdateTeamResponse": {
+        "internal_team_infra_http.UpdateTeamResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3967,7 +3967,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.ChangeUserPasswordResponse": {
+        "internal_user_infra_http.ChangeUserPasswordResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -3984,7 +3984,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.DeleteUserResponse": {
+        "internal_user_infra_http.DeleteUserResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4001,7 +4001,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.ForgotUserPasswordResponse": {
+        "internal_user_infra_http.ForgotUserPasswordResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4018,7 +4018,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.GetMeResponse": {
+        "internal_user_infra_http.GetMeResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -4038,7 +4038,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.LoginResponse": {
+        "internal_user_infra_http.LoginResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -4058,7 +4058,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.RecoverUserPasswordResponse": {
+        "internal_user_infra_http.RecoverUserPasswordResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4075,7 +4075,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.RegisterUserResponse": {
+        "internal_user_infra_http.RegisterUserResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -4095,7 +4095,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.UpdateUserCredentialsResponse": {
+        "internal_user_infra_http.UpdateUserCredentialsResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4112,7 +4112,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.UpdateUserDataResponse": {
+        "internal_user_infra_http.UpdateUserDataResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4129,7 +4129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_user_http.VerifyUserRegistrationResponse": {
+        "internal_user_infra_http.VerifyUserRegistrationResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -4146,44 +4146,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_workspace_http.CreateWorkspaceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_workspace_http.DeleteWorkspaceResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_workspace_http.GetWorkspaceResponse": {
+        "internal_workspace_infra_http.CreateWorkspaceResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -4203,7 +4166,24 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_workspace_http.ListWorkspacesResponse": {
+        "internal_workspace_infra_http.DeleteWorkspaceResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_infra_http.GetWorkspaceResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -4223,7 +4203,27 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_workspace_http.UpdateWorkspaceResponse": {
+        "internal_workspace_infra_http.ListWorkspacesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace.WorkspaceDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_workspace_infra_http.UpdateWorkspaceResponse": {
             "type": "object",
             "properties": {
                 "message": {

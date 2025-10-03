@@ -1,4 +1,4 @@
-package project_core
+package project
 
 import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
 

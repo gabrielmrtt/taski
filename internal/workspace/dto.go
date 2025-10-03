@@ -1,4 +1,4 @@
-package workspace_core
+package workspace
 
 import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
 

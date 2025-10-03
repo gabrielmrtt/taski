@@ -1,8 +1,8 @@
-package workspace_core
+package workspace
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -127,13 +127,13 @@ func (w *Workspace) IsDeleted() bool {
 
 type WorkspaceUser struct {
 	WorkspaceIdentity core.Identity
-	User              user_core.User
+	User              user.User
 	Status            WorkspaceUserStatuses
 }
 
 type NewWorkspaceUserInput struct {
 	WorkspaceIdentity core.Identity
-	User              user_core.User
+	User              user.User
 	Status            WorkspaceUserStatuses
 }
 

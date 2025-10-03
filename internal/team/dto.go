@@ -1,7 +1,7 @@
-package team_core
+package team
 
 import (
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -54,11 +54,11 @@ func TeamToDto(team *Team) *TeamDto {
 }
 
 type TeamUserDto struct {
-	User *user_core.UserDto `json:"user"`
+	User *user.UserDto `json:"user"`
 }
 
 func TeamUserToDto(teamUser *TeamUser) *TeamUserDto {
 	return &TeamUserDto{
-		User: user_core.UserToDto(&teamUser.User),
+		User: user.UserToDto(&teamUser.User),
 	}
 }

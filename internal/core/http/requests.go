@@ -1,4 +1,4 @@
-package core_http
+package corehttp
 
 import "github.com/gabrielmrtt/taski/internal/core"
 

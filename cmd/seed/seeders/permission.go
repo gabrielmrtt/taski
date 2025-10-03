@@ -4,26 +4,26 @@ import (
 	"errors"
 
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	role_repositories "github.com/gabrielmrtt/taski/internal/role/repositories"
+	"github.com/gabrielmrtt/taski/internal/role"
+	rolerepo "github.com/gabrielmrtt/taski/internal/role/repository"
 )
 
 type PermissionSeeder struct {
-	PermissionRepository role_repositories.PermissionRepository
+	PermissionRepository rolerepo.PermissionRepository
 }
 
-func NewPermissionSeeder(permissionRepository role_repositories.PermissionRepository) *PermissionSeeder {
+func NewPermissionSeeder(permissionRepository rolerepo.PermissionRepository) *PermissionSeeder {
 	return &PermissionSeeder{
 		PermissionRepository: permissionRepository,
 	}
 }
 
-func checkUniquePermissions(permissions []role_core.Permission) error {
+func checkUniquePermissions(permissions []role.Permission) error {
 	slugsChecked := make(map[string]struct{})
 
 	for _, permission := range permissions {
 		if _, ok := slugsChecked[string(permission.Slug)]; ok {
-			return errors.New("there are duplicate slugs. unable to continue.")
+			return errors.New("there are duplicate slugs. unable to continue")
 		}
 		slugsChecked[string(permission.Slug)] = struct{}{}
 	}
@@ -32,10 +32,10 @@ func checkUniquePermissions(permissions []role_core.Permission) error {
 }
 
 func (s *PermissionSeeder) Run() error {
-	var permissions []role_core.Permission = make([]role_core.Permission, 0)
+	var permissions []role.Permission = make([]role.Permission, 0)
 
-	for _, i := range role_core.PermissionSlugsArray {
-		permissions = append(permissions, role_core.Permission{
+	for _, i := range role.PermissionSlugsArray {
+		permissions = append(permissions, role.Permission{
 			Identity:    core.NewIdentityWithoutPublic(),
 			Name:        i.Name,
 			Description: i.Description,
@@ -49,7 +49,7 @@ func (s *PermissionSeeder) Run() error {
 	}
 
 	for _, permission := range permissions {
-		existingPermission, err := s.PermissionRepository.GetPermissionBySlug(role_repositories.GetPermissionBySlugParams{
+		existingPermission, err := s.PermissionRepository.GetPermissionBySlug(rolerepo.GetPermissionBySlugParams{
 			Slug: string(permission.Slug),
 		})
 
@@ -60,12 +60,12 @@ func (s *PermissionSeeder) Run() error {
 		if existingPermission != nil {
 			existingPermission.Name = permission.Name
 			existingPermission.Description = permission.Description
-			err = s.PermissionRepository.UpdatePermission(role_repositories.UpdatePermissionParams{Permission: existingPermission})
+			err = s.PermissionRepository.UpdatePermission(rolerepo.UpdatePermissionParams{Permission: existingPermission})
 			if err != nil {
 				return err
 			}
 		} else {
-			_, err = s.PermissionRepository.StorePermission(role_repositories.StorePermissionParams{Permission: &permission})
+			_, err = s.PermissionRepository.StorePermission(rolerepo.StorePermissionParams{Permission: &permission})
 			if err != nil {
 				return err
 			}

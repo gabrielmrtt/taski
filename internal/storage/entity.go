@@ -1,4 +1,4 @@
-package storage_core
+package storage
 
 import (
 	"slices"

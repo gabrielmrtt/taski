@@ -1,4 +1,4 @@
-package role_core
+package role
 
 const RoleIdentityPrefix = "rol"
 

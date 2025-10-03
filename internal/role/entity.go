@@ -1,10 +1,10 @@
-package role_core
+package role
 
 import (
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -43,8 +43,8 @@ type Role struct {
 	core.Timestamps
 	DeletedAt *int64
 
-	Creator *user_core.User
-	Editor  *user_core.User
+	Creator *user.User
+	Editor  *user.User
 }
 
 type NewRoleInput struct {

@@ -1,8 +1,8 @@
-package organization_core
+package organization
 
 import (
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/role"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -47,17 +47,17 @@ func OrganizationToDto(organization *Organization) *OrganizationDto {
 }
 
 type OrganizationUserDto struct {
-	OrganizationId string             `json:"organizationId"`
-	Role           *role_core.RoleDto `json:"role,omitempty"`
-	User           *user_core.UserDto `json:"user,omitempty"`
-	Status         string             `json:"status"`
+	OrganizationId string        `json:"organizationId"`
+	Role           *role.RoleDto `json:"role,omitempty"`
+	User           *user.UserDto `json:"user,omitempty"`
+	Status         string        `json:"status"`
 }
 
 func OrganizationUserToDto(organizationUser *OrganizationUser) *OrganizationUserDto {
 	return &OrganizationUserDto{
 		OrganizationId: organizationUser.OrganizationIdentity.Public,
-		Role:           role_core.RoleToDto(&organizationUser.Role),
-		User:           user_core.UserToDto(&organizationUser.User),
+		Role:           role.RoleToDto(&organizationUser.Role),
+		User:           user.UserToDto(&organizationUser.User),
 		Status:         string(organizationUser.Status),
 	}
 }

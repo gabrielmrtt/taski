@@ -1,4 +1,4 @@
-package project_core
+package project
 
 const ProjectIdentityPrefix = "prj"
 

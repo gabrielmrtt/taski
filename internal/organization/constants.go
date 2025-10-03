@@ -1,4 +1,4 @@
-package organization_core
+package organization
 
 const OrganizationIdentityPrefix = "org"
 

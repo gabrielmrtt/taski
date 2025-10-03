@@ -1,9 +1,9 @@
-package organization_core
+package organization
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	role_core "github.com/gabrielmrtt/taski/internal/role"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/role"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -71,15 +71,15 @@ func (o *Organization) IsInactive() bool {
 
 type OrganizationUser struct {
 	OrganizationIdentity core.Identity
-	User                 user_core.User
-	Role                 role_core.Role
+	User                 user.User
+	Role                 role.Role
 	Status               OrganizationUserStatuses
 }
 
 type NewOrganizationUserInput struct {
 	OrganizationIdentity core.Identity
-	User                 user_core.User
-	Role                 role_core.Role
+	User                 user.User
+	Role                 role.Role
 	Status               OrganizationUserStatuses
 }
 
@@ -124,10 +124,10 @@ func (o *OrganizationUser) RefuseInvitation() {
 	o.Status = OrganizationUserStatusRefused
 }
 
-func (o *OrganizationUser) ChangeRole(role role_core.Role) {
+func (o *OrganizationUser) ChangeRole(role role.Role) {
 	o.Role = role
 }
 
-func (o *OrganizationUser) CanExecuteAction(permissionSlug role_core.PermissionSlugs) bool {
+func (o *OrganizationUser) CanExecuteAction(permissionSlug role.PermissionSlugs) bool {
 	return o.Role.HasPermission(permissionSlug)
 }

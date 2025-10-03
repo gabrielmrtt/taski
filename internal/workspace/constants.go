@@ -1,4 +1,4 @@
-package workspace_core
+package workspace
 
 const WorkspaceIdentityPrefix = "wks"
 

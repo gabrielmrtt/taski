@@ -4,7 +4,8 @@ import (
 	"log"
 
 	"github.com/gabrielmrtt/taski/cmd/seed/seeders"
-	role_database_postgres "github.com/gabrielmrtt/taski/internal/role/database/postgres"
+	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	roledatabase "github.com/gabrielmrtt/taski/internal/role/infra/database"
 )
 
 func runSeeder(seeder func() error, name string) {
@@ -17,11 +18,11 @@ func runSeeder(seeder func() error, name string) {
 }
 
 func main() {
-	permissionSeeder := seeders.NewPermissionSeeder(role_database_postgres.NewPermissionPostgresRepository())
+	permissionSeeder := seeders.NewPermissionSeeder(roledatabase.NewPermissionBunRepository(coredatabase.DB))
 
 	runSeeder(permissionSeeder.Run, "permissions")
 
-	rolesSeeder := seeders.NewRolesSeeder(role_database_postgres.NewRolePostgresRepository(), role_database_postgres.NewPermissionPostgresRepository())
+	rolesSeeder := seeders.NewRolesSeeder(roledatabase.NewRoleBunRepository(coredatabase.DB), roledatabase.NewPermissionBunRepository(coredatabase.DB))
 
 	runSeeder(rolesSeeder.Run, "roles")
 }

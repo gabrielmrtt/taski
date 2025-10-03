@@ -1,8 +1,8 @@
-package project_core
+package project
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -221,13 +221,13 @@ func (p *Project) HasStarted() bool {
 
 type ProjectUser struct {
 	ProjectIdentity core.Identity
-	User            user_core.User
+	User            user.User
 	Status          ProjectUserStatuses
 }
 
 type NewProjectUserInput struct {
 	ProjectIdentity core.Identity
-	User            user_core.User
+	User            user.User
 	Status          ProjectUserStatuses
 }
 

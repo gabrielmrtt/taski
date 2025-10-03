@@ -1,4 +1,4 @@
-package user_core
+package user
 
 import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"

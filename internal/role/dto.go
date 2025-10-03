@@ -1,4 +1,4 @@
-package role_core
+package role
 
 import (
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"

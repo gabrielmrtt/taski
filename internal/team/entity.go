@@ -1,10 +1,10 @@
-package team_core
+package team
 
 import (
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
-	user_core "github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
@@ -97,10 +97,10 @@ func (t *Team) IsInactive() bool {
 
 type TeamUser struct {
 	TeamIdentity core.Identity
-	User         user_core.User
+	User         user.User
 }
 
-func (t *Team) AddUser(user user_core.User) {
+func (t *Team) AddUser(user user.User) {
 	teamUser := TeamUser{
 		TeamIdentity: t.Identity,
 		User:         user,
@@ -111,7 +111,7 @@ func (t *Team) AddUser(user user_core.User) {
 	t.Timestamps.UpdatedAt = &now
 }
 
-func (t *Team) RemoveUser(user user_core.User) {
+func (t *Team) RemoveUser(user user.User) {
 	t.Members = slices.DeleteFunc(t.Members, func(tu TeamUser) bool {
 		return tu.User.Identity == user.Identity
 	})

@@ -1,4 +1,4 @@
-package team_core
+package team
 
 const TeamIdentityPrefix = "tea"
 
