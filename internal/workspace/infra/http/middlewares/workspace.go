@@ -15,7 +15,7 @@ func UserMustBeInWorkspace() gin.HandlerFunc {
 		userIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 		workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 
-		repo := workspacedatabase.NewWorkspaceUserBunRepository(coredatabase.DB)
+		repo := workspacedatabase.NewWorkspaceUserBunRepository(coredatabase.GetPostgresConnection())
 
 		workspaceUser, err := repo.GetWorkspaceUserByIdentity(workspacerepo.GetWorkspaceUserByIdentityParams{
 			WorkspaceIdentity: workspaceIdentity,

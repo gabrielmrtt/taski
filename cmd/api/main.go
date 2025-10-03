@@ -17,14 +17,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func shutdownApplication() {
-	fmt.Println("Shutting down application...")
-	coredatabase.DB.Close()
-}
-
 func bootstrapApplication() {
-	defer shutdownApplication()
-
 	engine := gin.New()
 
 	apiVersion := config.Instance.ApiVersion
@@ -40,27 +33,27 @@ func bootstrapApplication() {
 	{
 		userinfra.BootstrapInfra(userinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 		organizationinfra.BootstrapInfra(organizationinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 		workspaceinfra.BootstrapInfra(workspaceinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 		projectinfra.BootstrapInfra(projectinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 		roleinfra.BootstrapInfra(roleinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 		teaminfra.BootstrapInfra(teaminfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.DB,
+			DbConnection: coredatabase.GetPostgresConnection(),
 		})
 	}
 

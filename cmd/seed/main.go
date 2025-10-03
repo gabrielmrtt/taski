@@ -18,11 +18,11 @@ func runSeeder(seeder func() error, name string) {
 }
 
 func main() {
-	permissionSeeder := seeders.NewPermissionSeeder(roledatabase.NewPermissionBunRepository(coredatabase.DB))
+	permissionSeeder := seeders.NewPermissionSeeder(roledatabase.NewPermissionBunRepository(coredatabase.GetPostgresConnection()))
 
 	runSeeder(permissionSeeder.Run, "permissions")
 
-	rolesSeeder := seeders.NewRolesSeeder(roledatabase.NewRoleBunRepository(coredatabase.DB), roledatabase.NewPermissionBunRepository(coredatabase.DB))
+	rolesSeeder := seeders.NewRolesSeeder(roledatabase.NewRoleBunRepository(coredatabase.GetPostgresConnection()), roledatabase.NewPermissionBunRepository(coredatabase.GetPostgresConnection()))
 
 	runSeeder(rolesSeeder.Run, "roles")
 }

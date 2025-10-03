@@ -15,7 +15,7 @@ func UserMustBeInProject() gin.HandlerFunc {
 		projectIdentity := core.NewIdentityFromPublic(ctx.Param("projectId"))
 		authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
-		repo := projectdatabase.NewProjectUserBunRepository(coredatabase.DB)
+		repo := projectdatabase.NewProjectUserBunRepository(coredatabase.GetPostgresConnection())
 
 		projectUser, err := repo.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
 			ProjectIdentity: projectIdentity,

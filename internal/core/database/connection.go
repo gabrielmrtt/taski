@@ -3,6 +3,7 @@ package coredatabase
 import (
 	"database/sql"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/gabrielmrtt/taski/config"
@@ -11,9 +12,10 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-var DB *bun.DB = CreatePostgresConnection()
+var lock = &sync.Mutex{}
+var postgresConnection *bun.DB = nil
 
-func CreatePostgresConnection() *bun.DB {
+func createPostgresConnection() *bun.DB {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithDSN(
 			fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -38,4 +40,17 @@ func CreatePostgresConnection() *bun.DB {
 	db := bun.NewDB(sqldb, pgdialect.New())
 
 	return db
+}
+
+func GetPostgresConnection() *bun.DB {
+	if postgresConnection == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if postgresConnection == nil {
+			postgresConnection = createPostgresConnection()
+			return postgresConnection
+		}
+	}
+
+	return postgresConnection
 }

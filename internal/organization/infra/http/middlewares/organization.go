@@ -29,7 +29,7 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 
 		authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
-		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.DB)
+		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.GetPostgresConnection())
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
 			OrganizationIdentity: organizationIdentity,
@@ -77,7 +77,7 @@ func UserMustBeSame() gin.HandlerFunc {
 			return
 		}
 
-		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.DB)
+		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.GetPostgresConnection())
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
 			OrganizationIdentity: organizationIdentity,
