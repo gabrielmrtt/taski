@@ -4,12 +4,12 @@ WORKDIR /usr/src/app
 
 COPY go.mod go.sum ./
 
-RUN apt update && apt install -y make
+RUN apt update && apt install -y make gcc sqlite3 libsqlite3-dev
 
 RUN go mod download
 RUN go install github.com/air-verse/air@latest
 RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN go install -tags 'postgres sqlite3' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 COPY . .
 

@@ -23,7 +23,6 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	uploadedFileRepository := storagedatabase.NewUploadedFileBunRepository(options.DbConnection)
 	storageRepository := storagedatabase.NewLocalStorageRepository()
 
-	userLoginService := userservice.NewUserLoginService(userRepository)
 	registerUserService := userservice.NewRegisterUserService(userRepository, userRegistrationRepository, transactionRepository)
 	verifyUserRegistrationService := userservice.NewVerifyUserRegistrationService(userRegistrationRepository, userRepository, transactionRepository)
 	forgotUserPasswordService := userservice.NewForgotUserPasswordService(userRepository, passwordRecoveryRepository, transactionRepository)
@@ -36,9 +35,7 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 
 	userController := userhttp.NewUserHandler(getMeService, changeUserPasswordService, updateUserCredentialsService, updateUserDataService, deleteUserService)
 	userRegistrationController := userhttp.NewUserRegistrationHandler(registerUserService, verifyUserRegistrationService, forgotUserPasswordService, recoverUserPasswordService)
-	authController := userhttp.NewAuthHandler(userLoginService)
 
 	userController.ConfigureRoutes(options.RouterGroup)
 	userRegistrationController.ConfigureRoutes(options.RouterGroup)
-	authController.ConfigureRoutes(options.RouterGroup)
 }

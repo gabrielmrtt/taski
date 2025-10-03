@@ -43,3 +43,5 @@ Thumbs.db
 
 /storage/
 docker/
+
+test.db

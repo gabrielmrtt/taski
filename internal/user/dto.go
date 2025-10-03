@@ -67,15 +67,3 @@ func UserToDto(user *User) *UserDto {
 		UpdatedAt:   updatedAt,
 	}
 }
-
-type UserLoginDto struct {
-	Token string   `json:"token"`
-	User  *UserDto `json:"user"`
-}
-
-func UserLoginToDto(user *User, token string) *UserLoginDto {
-	return &UserLoginDto{
-		Token: token,
-		User:  UserToDto(user),
-	}
-}

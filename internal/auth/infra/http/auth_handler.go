@@ -1,28 +1,28 @@
-package userhttp
+package authhttp
 
 import (
 	"net/http"
 
+	"github.com/gabrielmrtt/taski/internal/auth"
+	authhttprequests "github.com/gabrielmrtt/taski/internal/auth/infra/http/requests"
+	authservice "github.com/gabrielmrtt/taski/internal/auth/service"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
-	user "github.com/gabrielmrtt/taski/internal/user"
-	userhttprequests "github.com/gabrielmrtt/taski/internal/user/infra/http/requests"
-	userservice "github.com/gabrielmrtt/taski/internal/user/service"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {
-	UserLoginService *userservice.UserLoginService
+	UserLoginService *authservice.UserLoginService
 }
 
 func NewAuthHandler(
-	userLoginService *userservice.UserLoginService,
+	userLoginService *authservice.UserLoginService,
 ) *AuthHandler {
 	return &AuthHandler{
 		UserLoginService: userLoginService,
 	}
 }
 
-type LoginResponse = corehttp.HttpSuccessResponseWithData[user.UserLoginDto]
+type LoginResponse = corehttp.HttpSuccessResponseWithData[auth.UserAuthDto]
 
 // Login godoc
 // @Summary Login
@@ -37,14 +37,17 @@ type LoginResponse = corehttp.HttpSuccessResponseWithData[user.UserLoginDto]
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /auth/login [post]
 func (c *AuthHandler) Login(ctx *gin.Context) {
-	var request userhttprequests.UserLoginRequest
+	var request authhttprequests.UserLoginRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	response, err := c.UserLoginService.Execute(request.ToInput())
+	response, err := c.UserLoginService.Execute(authservice.UserLoginInput{
+		Email:    request.Email,
+		Password: request.Password,
+	})
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return

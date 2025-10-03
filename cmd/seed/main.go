@@ -15,56 +15,96 @@ type Seeder interface {
 	Run() error
 }
 
-func runSeeder(seeder func() error, name string) {
-	log.Println("Running seeder: ", name)
-	err := seeder()
-	if err != nil {
-		log.Fatalf("Error running seeder: %v", err)
-	}
-	log.Println("Seeder completed: ", name)
+type SeedConfig struct {
+	Environment string
 }
 
-func main() {
-	var env string = "default"
-	if len(os.Args) >= 2 {
-		env = os.Args[1]
-	}
+type DatabaseRepositories struct {
+	PermissionRepository *roledatabase.PermissionBunRepository
+	RoleRepository       *roledatabase.RoleBunRepository
+}
 
+func getDatabaseRepositories(env string) (DatabaseRepositories, *bun.DB) {
 	var connection *bun.DB
-	var seedersArr []Seeder = make([]Seeder, 0)
+	var permissionRepository *roledatabase.PermissionBunRepository
+	var roleRepository *roledatabase.RoleBunRepository
 
 	switch env {
 	case "default":
 		connection = coredatabase.GetPostgresConnection()
-		permissionRepository := roledatabase.NewPermissionBunRepository(connection)
-		roleRepository := roledatabase.NewRoleBunRepository(connection)
-
-		seedersArr = append(seedersArr, seeders.NewPermissionSeeder(seeders.PermissionSeederOptions{
-			PermissionRepository: permissionRepository,
-		}))
-
-		seedersArr = append(seedersArr, seeders.NewRolesSeeder(seeders.RolesSeederOptions{
-			RoleRepository:       roleRepository,
-			PermissionRepository: permissionRepository,
-		}))
+		permissionRepository = roledatabase.NewPermissionBunRepository(connection)
+		roleRepository = roledatabase.NewRoleBunRepository(connection)
 	case "test":
 		connection = coredatabase.GetSQLiteConnection()
-		permissionRepository := roledatabase.NewPermissionBunRepository(connection)
-		roleRepository := roledatabase.NewRoleBunRepository(connection)
-
-		seedersArr = append(seedersArr, seeders.NewPermissionSeeder(seeders.PermissionSeederOptions{
-			PermissionRepository: permissionRepository,
-		}))
-
-		seedersArr = append(seedersArr, seeders.NewRolesSeeder(seeders.RolesSeederOptions{
-			RoleRepository:       roleRepository,
-			PermissionRepository: permissionRepository,
-		}))
+		permissionRepository = roledatabase.NewPermissionBunRepository(connection)
+		roleRepository = roledatabase.NewRoleBunRepository(connection)
 	default:
 		log.Fatalf("Invalid environment: %s", env)
 	}
 
-	for _, seeder := range seedersArr {
-		runSeeder(seeder.Run, seeder.Name())
+	return DatabaseRepositories{
+		PermissionRepository: permissionRepository,
+		RoleRepository:       roleRepository,
+	}, connection
+}
+
+func createSeeders(repos DatabaseRepositories) []Seeder {
+	var seedersArr []Seeder = make([]Seeder, 0)
+
+	seedersArr = append(seedersArr, seeders.NewPermissionSeeder(seeders.PermissionSeederOptions{
+		PermissionRepository: repos.PermissionRepository,
+	}))
+
+	seedersArr = append(seedersArr, seeders.NewRolesSeeder(seeders.RolesSeederOptions{
+		RoleRepository:       repos.RoleRepository,
+		PermissionRepository: repos.PermissionRepository,
+	}))
+
+	return seedersArr
+}
+
+func executeSeeder(seeder Seeder) {
+	log.Printf("Starting seeder: %s", seeder.Name())
+
+	err := seeder.Run()
+	if err != nil {
+		log.Fatalf("Seeder '%s' failed: %v", seeder.Name(), err)
 	}
+
+	log.Printf("Seeder '%s' completed successfully", seeder.Name())
+}
+
+func runSeeders(seedersArr []Seeder) {
+	log.Printf("Running %d seeders for environment", len(seedersArr))
+
+	for i, seeder := range seedersArr {
+		log.Printf("Progress: %d/%d", i+1, len(seedersArr))
+		executeSeeder(seeder)
+	}
+
+	log.Println("All seeders completed successfully")
+}
+
+func parseArguments() SeedConfig {
+	config := SeedConfig{
+		Environment: "default",
+	}
+
+	if len(os.Args) >= 2 {
+		config.Environment = os.Args[1]
+	}
+
+	return config
+}
+
+func main() {
+	config := parseArguments()
+
+	log.Printf("Starting seed process for environment: %s", config.Environment)
+
+	repos, connection := getDatabaseRepositories(config.Environment)
+	_ = connection
+
+	seedersArr := createSeeders(repos)
+	runSeeders(seedersArr)
 }

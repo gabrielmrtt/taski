@@ -1,4 +1,6 @@
-ALTER TABLE roles DROP CONSTRAINT fk_roles_organization;
+DROP TABLE IF EXISTS role_permission;
+
+DROP TABLE IF EXISTS roles;
 
 DROP TABLE IF EXISTS organization_user;
 

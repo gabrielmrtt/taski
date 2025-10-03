@@ -3,6 +3,7 @@ package coredatabase
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/driver/sqliteshim"
 )
 
 var lock = &sync.Mutex{}
@@ -64,13 +66,21 @@ func GetPostgresConnection() *bun.DB {
 var sqliteConnection *bun.DB = nil
 
 func createSQLiteConnection() *bun.DB {
-	sqldb, err := sql.Open("sqlite3", "file:test.db?cache=shared&_fk=1")
+	sqldb, err := sql.Open(sqliteshim.ShimName, "file:test.db?cache=shared&mode=rwc")
 	if err != nil {
 		panic(fmt.Errorf("failed to open sqlite connection: %w", err))
 	}
 
-	db := bun.NewDB(sqldb, sqlitedialect.New())
+	sqldb.SetMaxOpenConns(25)
+	sqldb.SetMaxIdleConns(10)
+	sqldb.SetConnMaxLifetime(10 * time.Minute)
+	sqldb.SetConnMaxIdleTime(10 * time.Minute)
 
+	if err := sqldb.Ping(); err != nil {
+		log.Fatal("failed to connect to sqlite: %w", err)
+	}
+
+	db := bun.NewDB(sqldb, sqlitedialect.New())
 	return db
 }
 

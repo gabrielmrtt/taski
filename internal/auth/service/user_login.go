@@ -1,6 +1,7 @@
-package userservice
+package authservice
 
 import (
+	"github.com/gabrielmrtt/taski/internal/auth"
 	"github.com/gabrielmrtt/taski/internal/core"
 	user "github.com/gabrielmrtt/taski/internal/user"
 	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
@@ -49,7 +50,7 @@ func (i UserLoginInput) Validate() error {
 	return nil
 }
 
-func (s *UserLoginService) Execute(input UserLoginInput) (*user.UserLoginDto, error) {
+func (s *UserLoginService) Execute(input UserLoginInput) (*auth.UserAuthDto, error) {
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
@@ -82,5 +83,5 @@ func (s *UserLoginService) Execute(input UserLoginInput) (*user.UserLoginDto, er
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	return user.UserLoginToDto(usr, jwtToken), nil
+	return auth.UserAuthToDto(usr, jwtToken), nil
 }
