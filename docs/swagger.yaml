@@ -28,17 +28,6 @@ definitions:
       total:
         type: integer
     type: object
-  github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse:
-    properties:
-      message:
-        type: string
-      resource:
-        type: string
-      status:
-        type: integer
-      timestamp:
-        type: string
-    type: object
   github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse:
     properties:
       errors: {}
@@ -400,6 +389,19 @@ definitions:
       name:
         type: string
       status:
+        type: string
+    type: object
+  internal_auth_infra_http.AccessOrganizationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_auth.UserAuthDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
         type: string
     type: object
   internal_auth_infra_http.LoginResponse:
@@ -927,7 +929,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticates an user
+      description: Authenticates an user with email and password. Also, it authenticates
+        with the latest accessed organization.
       parameters:
       - description: Request body
         in: body
@@ -961,7 +964,9 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Access an organization
+      description: Sets an organization as the latest accessed organization. Its returns
+        a new authenticable token. The Authorization header needs to be updated with
+        the new token.
       parameters:
       - description: Organization ID
         in: path
@@ -974,7 +979,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse'
+            $ref: '#/definitions/internal_auth_infra_http.AccessOrganizationResponse'
         "400":
           description: Bad Request
           schema:
@@ -1929,8 +1934,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns all projects in a workspace accessible by the authenticated
-        user.
+      description: Returns all accessible projects by the authenticated user.
       parameters:
       - in: query
         name: name
@@ -1979,13 +1983,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
-      summary: List projects in a workspace
+      summary: List projects
       tags:
       - Project
     post:
       consumes:
       - application/json
-      description: Creates a new project in a workspace.
+      description: Creates a new project.
       parameters:
       - description: Request body
         in: body
@@ -2016,14 +2020,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
-      summary: Create a project in a workspace
+      summary: Create a project
       tags:
       - Project
   /project/:projectId:
     delete:
       consumes:
       - application/json
-      description: Deletes an accessible project in a workspace.
+      description: Deletes an accessible project.
       parameters:
       - description: Project ID
         in: path
@@ -2057,13 +2061,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
-      summary: Delete a project in a workspace
+      summary: Delete a project
       tags:
       - Project
     get:
       consumes:
       - application/json
-      description: Returns an accessible project in a workspace by its ID.
+      description: Returns an accessible project by its ID.
       parameters:
       - description: Project ID
         in: path
@@ -2097,13 +2101,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
-      summary: Get a project in a workspace
+      summary: Get a project
       tags:
       - Project
     put:
       consumes:
       - application/json
-      description: Updates an accessible project in a workspace.
+      description: Updates an accessible project.
       parameters:
       - description: Project ID
         in: path
@@ -2143,7 +2147,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
-      summary: Update a project in a workspace
+      summary: Update a project
       tags:
       - Project
   /role:

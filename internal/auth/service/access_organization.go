@@ -27,7 +27,7 @@ func (i AccessOrganizationInput) Validate() error {
 	return nil
 }
 
-func (s *AccessOrganizationService) Execute(input AccessOrganizationInput) (*string, error) {
+func (s *AccessOrganizationService) Execute(input AccessOrganizationInput) (*auth.UserAuthDto, error) {
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
@@ -61,5 +61,5 @@ func (s *AccessOrganizationService) Execute(input AccessOrganizationInput) (*str
 		return nil, err
 	}
 
-	return &token, nil
+	return auth.UserAuthToDto(&organizationUser.User, token, &organizationUser.OrganizationIdentity.Public), nil
 }

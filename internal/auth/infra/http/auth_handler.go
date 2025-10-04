@@ -1,7 +1,6 @@
 package authhttp
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gabrielmrtt/taski/internal/auth"
@@ -35,7 +34,7 @@ type LoginResponse = corehttp.HttpSuccessResponseWithData[auth.UserAuthDto]
 
 // Login godoc
 // @Summary Login
-// @Description Authenticates an user
+// @Description Authenticates an user with email and password. Also, it authenticates with the latest accessed organization.
 // @Tags Auth
 // @Accept json
 // @Produce json
@@ -65,16 +64,16 @@ func (c *AuthHandler) Login(ctx *gin.Context) {
 	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
-type AccessOrganizationResponse = corehttp.EmptyHttpSuccessResponse
+type AccessOrganizationResponse = corehttp.HttpSuccessResponseWithData[auth.UserAuthDto]
 
 // AccessOrganization godoc
 // @Summary Access an organization
-// @Description Access an organization
+// @Description Sets an organization as the latest accessed organization. Its returns a new authenticable token. The Authorization header needs to be updated with the new token.
 // @Tags Auth
 // @Accept json
 // @Produce json
 // @Param organizationId path string true "Organization ID"
-// @Success 200 {object} corehttp.EmptyHttpSuccessResponse
+// @Success 200 {object} AccessOrganizationResponse
 // @Failure 400 {object} corehttp.HttpErrorResponse
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
@@ -90,14 +89,13 @@ func (c *AuthHandler) AccessOrganization(ctx *gin.Context) {
 		OrganizationIdentity:      core.NewIdentityFromPublic(organizationIdentity),
 	}
 
-	token, err := c.AccessOrganizationService.Execute(input)
+	response, err := c.AccessOrganizationService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", *token))
-	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
+	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
 func (c *AuthHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {

@@ -41,8 +41,8 @@ func NewProjectHandler(
 type ListProjectsResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDto]
 
 // ListProjects godoc
-// @Summary List projects in a workspace
-// @Description Returns all projects in a workspace accessible by the authenticated user.
+// @Summary List projects
+// @Description Returns all accessible projects by the authenticated user.
 // @Tags Project
 // @Accept json
 // @Param request query projecthttprequests.ListProjectsRequest true "Query parameters"
@@ -80,8 +80,8 @@ func (c *ProjectHandler) ListProjects(ctx *gin.Context) {
 type GetProjectResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDto]
 
 // GetProject godoc
-// @Summary Get a project in a workspace
-// @Description Returns an accessible project in a workspace by its ID.
+// @Summary Get a project
+// @Description Returns an accessible project by its ID.
 // @Tags Project
 // @Accept json
 // @Param projectId path string true "Project ID"
@@ -113,8 +113,8 @@ func (c *ProjectHandler) GetProject(ctx *gin.Context) {
 type CreateProjectResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDto]
 
 // CreateProject godoc
-// @Summary Create a project in a workspace
-// @Description Creates a new project in a workspace.
+// @Summary Create a project
+// @Description Creates a new project.
 // @Tags Project
 // @Accept json
 // @Param request body projecthttprequests.CreateProjectRequest true "Request body"
@@ -152,8 +152,8 @@ func (c *ProjectHandler) CreateProject(ctx *gin.Context) {
 type UpdateProjectResponse = corehttp.EmptyHttpSuccessResponse
 
 // UpdateProject godoc
-// @Summary Update a project in a workspace
-// @Description Updates an accessible project in a workspace.
+// @Summary Update a project
+// @Description Updates an accessible project.
 // @Tags Project
 // @Accept json
 // @Param projectId path string true "Project ID"
@@ -195,8 +195,8 @@ func (c *ProjectHandler) UpdateProject(ctx *gin.Context) {
 type DeleteProjectResponse = corehttp.EmptyHttpSuccessResponse
 
 // DeleteProject godoc
-// @Summary Delete a project in a workspace
-// @Description Deletes an accessible project in a workspace.
+// @Summary Delete a project
+// @Description Deletes an accessible project.
 // @Tags Project
 // @Accept json
 // @Param projectId path string true "Project ID"

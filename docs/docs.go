@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
-                "description": "Authenticates an user",
+                "description": "Authenticates an user with email and password. Also, it authenticates with the latest accessed organization.",
                 "consumes": [
                     "application/json"
                 ],
@@ -69,7 +69,7 @@ const docTemplate = `{
         },
         "/auth/organization/:organizationId/access": {
             "patch": {
-                "description": "Access an organization",
+                "description": "Sets an organization as the latest accessed organization. Its returns a new authenticable token. The Authorization header needs to be updated with the new token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -93,7 +93,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse"
+                            "$ref": "#/definitions/internal_auth_infra_http.AccessOrganizationResponse"
                         }
                     },
                     "400": {
@@ -1538,7 +1538,7 @@ const docTemplate = `{
         },
         "/project": {
             "get": {
-                "description": "Returns all projects in a workspace accessible by the authenticated user.",
+                "description": "Returns all accessible projects by the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1548,7 +1548,7 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "List projects in a workspace",
+                "summary": "List projects",
                 "parameters": [
                     {
                         "type": "string",
@@ -1625,7 +1625,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Creates a new project in a workspace.",
+                "description": "Creates a new project.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1635,7 +1635,7 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "Create a project in a workspace",
+                "summary": "Create a project",
                 "parameters": [
                     {
                         "description": "Request body",
@@ -1683,7 +1683,7 @@ const docTemplate = `{
         },
         "/project/:projectId": {
             "get": {
-                "description": "Returns an accessible project in a workspace by its ID.",
+                "description": "Returns an accessible project by its ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1693,7 +1693,7 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "Get a project in a workspace",
+                "summary": "Get a project",
                 "parameters": [
                     {
                         "type": "string",
@@ -1743,7 +1743,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Updates an accessible project in a workspace.",
+                "description": "Updates an accessible project.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1753,7 +1753,7 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "Update a project in a workspace",
+                "summary": "Update a project",
                 "parameters": [
                     {
                         "type": "string",
@@ -1812,7 +1812,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deletes an accessible project in a workspace.",
+                "description": "Deletes an accessible project.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1822,7 +1822,7 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "Delete a project in a workspace",
+                "summary": "Delete a project",
                 "parameters": [
                     {
                         "type": "string",
@@ -2987,23 +2987,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
         "github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse": {
             "type": "object",
             "properties": {
@@ -3559,6 +3542,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_infra_http.AccessOrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_auth.UserAuthDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
                     "type": "string"
                 }
             }
