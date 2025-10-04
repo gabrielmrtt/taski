@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UserLoginRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_auth_infra_http_requests.UserLoginRequest"
                         }
                     }
                 ],
@@ -43,11 +43,73 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_user_infra_http.LoginResponse"
+                            "$ref": "#/definitions/internal_auth_infra_http.LoginResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/organization/:organizationId/access": {
+            "patch": {
+                "description": "Access an organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Access an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
                         }
@@ -1030,290 +1092,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "post": {
-                "description": "Creates a new role in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Role"
-                ],
-                "summary": "Create a role in an organization",
-                "parameters": [
-                    {
-                        "description": "Request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.CreateRoleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_role_infra_http.CreateRoleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/organization/:organizationId/role/:roleId": {
-            "put": {
-                "description": "Updates an existing role in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Role"
-                ],
-                "summary": "Update a role in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role ID",
-                        "name": "roleId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.UpdateRoleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_role_infra_http.UpdateRoleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Deletes an existing role in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Role"
-                ],
-                "summary": "Delete a role in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role ID",
-                        "name": "roleId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_role_infra_http.DeleteRoleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
             }
         },
         "/organization/:organizationId/team": {
-            "get": {
-                "description": "Lists all existing teams in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Team"
-                ],
-                "summary": "List teams in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "perPage",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "relations",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "sortBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "sortDirection",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "status",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_team_infra_http.ListTeamsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Creates a new team in an organization.",
                 "consumes": [
@@ -1358,197 +1139,6 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/organization/:organizationId/team/:teamId": {
-            "get": {
-                "description": "Returns a team in an organization by its ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Team"
-                ],
-                "summary": "Get a team in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Team ID",
-                        "name": "teamId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_team_infra_http.GetTeamResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Updates an existing team in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Team"
-                ],
-                "summary": "Update a team in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Team ID",
-                        "name": "teamId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Request body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_infra_http_requests.UpdateTeamRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_team_infra_http.UpdateTeamResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Deletes an existing team in an organization.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Team"
-                ],
-                "summary": "Delete a team in an organization",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Team ID",
-                        "name": "teamId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_team_infra_http.DeleteTeamResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
                         }
@@ -1946,9 +1536,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organizationId/workspace": {
+        "/project": {
             "get": {
-                "description": "Returns all workspaces in an organization based in the authenticated user accesses.",
+                "description": "Returns all projects in a workspace accessible by the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1956,22 +1546,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspace"
+                    "Project"
                 ],
-                "summary": "List workspaces in an organization",
+                "summary": "List projects in a workspace",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Organization ID",
-                        "name": "organizationId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "description",
-                        "in": "query"
-                    },
                     {
                         "type": "string",
                         "name": "name",
@@ -1988,6 +1566,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "name": "priorityLevel",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "sortBy",
                         "in": "query"
@@ -2001,13 +1584,18 @@ const docTemplate = `{
                         "type": "string",
                         "name": "status",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "workspaceId",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_infra_http.ListWorkspacesResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.ListProjectsResponse"
                         }
                     },
                     "400": {
@@ -2037,7 +1625,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Creates a new workspace in an organization.",
+                "description": "Creates a new project in a workspace.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2045,24 +1633,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspace"
+                    "Project"
                 ],
-                "summary": "Create a workspace in an organization",
+                "summary": "Create a project in a workspace",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Organization ID",
-                        "name": "organizationId",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Request body",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.CreateWorkspaceRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest"
                         }
                     }
                 ],
@@ -2070,7 +1651,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_infra_http.CreateWorkspaceResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.CreateProjectResponse"
                         }
                     },
                     "400": {
@@ -2100,9 +1681,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/organization/:organizationId/workspace/:workspaceId": {
+        "/project/:projectId": {
             "get": {
-                "description": "Returns a workspace in an organization based in the authenticated user accesses.",
+                "description": "Returns an accessible project in a workspace by its ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2110,21 +1691,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspace"
+                    "Project"
                 ],
-                "summary": "Get a workspace in an organization",
+                "summary": "Get a project in a workspace",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organization ID",
-                        "name": "organizationId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Workspace ID",
-                        "name": "workspaceId",
+                        "description": "Project ID",
+                        "name": "projectId",
                         "in": "path",
                         "required": true
                     }
@@ -2133,7 +1707,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_infra_http.GetWorkspaceResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.GetProjectResponse"
                         }
                     },
                     "400": {
@@ -2169,7 +1743,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Updates an existing workspace in an organization.",
+                "description": "Updates an accessible project in a workspace.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2177,21 +1751,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspace"
+                    "Project"
                 ],
-                "summary": "Update a workspace in an organization",
+                "summary": "Update a project in a workspace",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organization ID",
-                        "name": "organizationId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Workspace ID",
-                        "name": "workspaceId",
+                        "description": "Project ID",
+                        "name": "projectId",
                         "in": "path",
                         "required": true
                     },
@@ -2201,7 +1768,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.UpdateWorkspaceRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest"
                         }
                     }
                 ],
@@ -2209,7 +1776,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_infra_http.UpdateWorkspaceResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.UpdateProjectResponse"
                         }
                     },
                     "400": {
@@ -2245,7 +1812,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deletes an existing workspace in an organization.",
+                "description": "Deletes an accessible project in a workspace.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2253,21 +1820,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspace"
+                    "Project"
                 ],
-                "summary": "Delete a workspace in an organization",
+                "summary": "Delete a project in a workspace",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organization ID",
-                        "name": "organizationId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Workspace ID",
-                        "name": "workspaceId",
+                        "description": "Project ID",
+                        "name": "projectId",
                         "in": "path",
                         "required": true
                     }
@@ -2276,7 +1836,483 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_workspace_infra_http.DeleteWorkspaceResponse"
+                            "$ref": "#/definitions/internal_project_infra_http.DeleteProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/role": {
+            "post": {
+                "description": "Creates a new role in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Create a role in an organization",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.CreateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_role_infra_http.CreateRoleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/role/:roleId": {
+            "put": {
+                "description": "Updates an existing role in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Update a role in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role ID",
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_role_infra_http_requests.UpdateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_role_infra_http.UpdateRoleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing role in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Delete a role in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role ID",
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_role_infra_http.DeleteRoleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/team": {
+            "get": {
+                "description": "Lists all existing teams in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Team"
+                ],
+                "summary": "List teams in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_team_infra_http.ListTeamsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/:teamId": {
+            "get": {
+                "description": "Returns a team in an organization by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Get a team in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "teamId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_team_infra_http.GetTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing team in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Update a team in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "teamId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_team_infra_http_requests.UpdateTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_team_infra_http.UpdateTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing team in an organization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Delete a team in an organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "teamId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_team_infra_http.DeleteTeamResponse"
                         }
                     },
                     "400": {
@@ -2538,9 +2574,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/:workspaceId/project": {
+        "/workspace": {
             "get": {
-                "description": "Returns all projects in a workspace accessible by the authenticated user.",
+                "description": "Returns all workspaces in an organization based in the authenticated user accesses.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2548,10 +2584,22 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "Workspace"
                 ],
-                "summary": "List projects in a workspace",
+                "summary": "List workspaces in an organization",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "name": "name",
@@ -2565,11 +2613,6 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "perPage",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "priorityLevel",
                         "in": "query"
                     },
                     {
@@ -2592,7 +2635,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_infra_http.ListProjectsResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.ListWorkspacesResponse"
                         }
                     },
                     "400": {
@@ -2622,7 +2665,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Creates a new project in a workspace.",
+                "description": "Creates a new workspace in an organization.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2630,17 +2673,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "Workspace"
                 ],
-                "summary": "Create a project in a workspace",
+                "summary": "Create a workspace in an organization",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "Request body",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.CreateWorkspaceRequest"
                         }
                     }
                 ],
@@ -2648,7 +2698,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_infra_http.CreateProjectResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.CreateWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2678,9 +2728,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/:workspaceId/project/:projectId": {
+        "/workspace/:workspaceId": {
             "get": {
-                "description": "Returns an accessible project in a workspace by its ID.",
+                "description": "Returns a workspace in an organization based in the authenticated user accesses.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2688,14 +2738,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "Workspace"
                 ],
-                "summary": "Get a project in a workspace",
+                "summary": "Get a workspace in an organization",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Project ID",
-                        "name": "projectId",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
                         "in": "path",
                         "required": true
                     }
@@ -2704,7 +2761,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_infra_http.GetProjectResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.GetWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2740,7 +2797,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Updates an accessible project in a workspace.",
+                "description": "Updates an existing workspace in an organization.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2748,14 +2805,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "Workspace"
                 ],
-                "summary": "Update a project in a workspace",
+                "summary": "Update a workspace in an organization",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Project ID",
-                        "name": "projectId",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
                         "in": "path",
                         "required": true
                     },
@@ -2765,7 +2829,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest"
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_workspace_infra_http_requests.UpdateWorkspaceRequest"
                         }
                     }
                 ],
@@ -2773,7 +2837,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_infra_http.UpdateProjectResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.UpdateWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2809,7 +2873,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deletes an accessible project in a workspace.",
+                "description": "Deletes an existing workspace in an organization.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2817,14 +2881,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Project"
+                    "Workspace"
                 ],
-                "summary": "Delete a project in a workspace",
+                "summary": "Delete a workspace in an organization",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Project ID",
-                        "name": "projectId",
+                        "description": "Organization ID",
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
                         "in": "path",
                         "required": true
                     }
@@ -2833,7 +2904,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_project_infra_http.DeleteProjectResponse"
+                            "$ref": "#/definitions/internal_workspace_infra_http.DeleteWorkspaceResponse"
                         }
                     },
                     "400": {
@@ -2871,6 +2942,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "github_com_gabrielmrtt_taski_internal_auth.UserAuthDto": {
+            "type": "object",
+            "properties": {
+                "lastAccessedOrganizationId": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_auth_infra_http_requests.UserLoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_team_TeamDto": {
             "type": "object",
             "properties": {
@@ -2888,6 +2984,23 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_core_http.EmptyHttpSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
                 }
             }
         },
@@ -3063,6 +3176,9 @@ const docTemplate = `{
                 },
                 "startAt": {
                     "type": "integer"
+                },
+                "workspaceId": {
+                    "type": "string"
                 }
             }
         },
@@ -3088,6 +3204,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "workspaceId": {
                     "type": "string"
                 }
             }
@@ -3292,17 +3411,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user.UserLoginDto": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
-                }
-            }
-        },
         "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.ChangeUserPasswordRequest": {
             "type": "object",
             "properties": {
@@ -3381,17 +3489,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.UserLoginRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
         "github_com_gabrielmrtt_taski_internal_user_infra_http_requests.VerifyUserRegistrationRequest": {
             "type": "object",
             "properties": {
@@ -3462,6 +3559,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_auth_infra_http.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_auth.UserAuthDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
                     "type": "string"
                 }
             }
@@ -4023,26 +4140,6 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_user_infra_http.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserLoginDto"
                 },
                 "message": {
                     "type": "string"

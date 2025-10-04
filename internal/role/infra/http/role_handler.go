@@ -49,18 +49,19 @@ type CreateRoleResponse = corehttp.HttpSuccessResponseWithData[role.RoleDto]
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/role [post]
+// @Router /role [post]
 func (c *RoleHandler) CreateRole(ctx *gin.Context) {
 	var request rolehttprequests.CreateRoleRequest
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var input roleservice.CreateRoleInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserCreatorIdentity = *authenticatedUserIdentity
 
@@ -89,19 +90,20 @@ type UpdateRoleResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/role/:roleId [put]
+// @Router /role/:roleId [put]
 func (c *RoleHandler) UpdateRole(ctx *gin.Context) {
 	var request rolehttprequests.UpdateRoleRequest
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var roleIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("roleId"))
+	var input roleservice.UpdateRoleInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserEditorIdentity = *authenticatedUserIdentity
 	input.RoleIdentity = roleIdentity
@@ -130,12 +132,11 @@ type DeleteRoleResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/role/:roleId [delete]
+// @Router /role/:roleId [delete]
 func (c *RoleHandler) DeleteRole(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
-
-	input := roleservice.DeleteRoleInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var roleIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("roleId"))
+	var input roleservice.DeleteRoleInput = roleservice.DeleteRoleInput{
 		RoleIdentity:         roleIdentity,
 		OrganizationIdentity: *organizationIdentity,
 	}
@@ -167,15 +168,16 @@ type ListRolesResponse = corehttp.HttpSuccessResponseWithData[role.RoleDto]
 // @Router /organization/:organizationId/role [get]
 func (c *RoleHandler) ListRoles(ctx *gin.Context) {
 	var request rolehttprequests.ListRolesRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var input roleservice.ListRolesInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.OrganizationIdentity = *organizationIdentity
+	input = request.ToInput()
+	input.Filters.OrganizationIdentity = *organizationIdentity
 
 	response, err := c.ListRolesService.Execute(input)
 	if err != nil {

@@ -22,7 +22,6 @@ func NewDeleteProjectService(
 
 type DeleteProjectInput struct {
 	OrganizationIdentity core.Identity
-	WorkspaceIdentity    core.Identity
 	ProjectIdentity      core.Identity
 }
 
@@ -44,7 +43,6 @@ func (s *DeleteProjectService) Execute(input DeleteProjectInput) error {
 
 	project, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
 		ProjectIdentity:      input.ProjectIdentity,
-		WorkspaceIdentity:    &input.WorkspaceIdentity,
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {

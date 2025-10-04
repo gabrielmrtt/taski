@@ -9,16 +9,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserMustBeInWorkspace is a middleware that checks if the authenticated user is part of the workspace
 func UserMustBeInWorkspace(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-		workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
+		var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		var workspaceIdentity *core.Identity = nil
+
+		pathWorkspaceId := ctx.Param("workspaceId")
+		if pathWorkspaceId != "" {
+			identity := core.NewIdentityFromPublic(pathWorkspaceId)
+			workspaceIdentity = &identity
+		}
 
 		repo := workspacedatabase.NewWorkspaceUserBunRepository(options.DbConnection)
 
 		workspaceUser, err := repo.GetWorkspaceUserByIdentity(workspacerepo.GetWorkspaceUserByIdentityParams{
-			WorkspaceIdentity: workspaceIdentity,
-			UserIdentity:      *userIdentity,
+			WorkspaceIdentity: *workspaceIdentity,
+			UserIdentity:      *authenticatedUserIdentity,
 		})
 		if err != nil {
 			corehttp.NewHttpErrorResponse(ctx, err)

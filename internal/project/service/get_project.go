@@ -18,7 +18,6 @@ func NewGetProjectService(projectRepository projectrepo.ProjectRepository) *GetP
 
 type GetProjectInput struct {
 	OrganizationIdentity core.Identity
-	WorkspaceIdentity    core.Identity
 	ProjectIdentity      core.Identity
 }
 
@@ -33,7 +32,6 @@ func (s *GetProjectService) Execute(input GetProjectInput) (*project.ProjectDto,
 
 	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
 		ProjectIdentity:      input.ProjectIdentity,
-		WorkspaceIdentity:    &input.WorkspaceIdentity,
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {

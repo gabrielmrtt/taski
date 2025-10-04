@@ -90,10 +90,10 @@ func (r *OrganizationBunRepository) applyFilters(selectQuery *bun.SelectQuery, f
 		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
 	}
 
-	if filters.LoggedUserIdentity != nil {
+	if filters.AuthenticatedUserIdentity != nil {
 		selectQuery = selectQuery.WhereGroup(" OR ", func(query *bun.SelectQuery) *bun.SelectQuery {
-			query = query.Where("user_creator_internal_id = ?", filters.LoggedUserIdentity.Internal.String())
-			query = query.WhereOr("internal_id IN (SELECT organization_internal_id FROM organization_user WHERE user_internal_id = ? AND organization_user.status = ?)", filters.LoggedUserIdentity.Internal.String(), organization.OrganizationUserStatusActive)
+			query = query.Where("user_creator_internal_id = ?", filters.AuthenticatedUserIdentity.Internal.String())
+			query = query.WhereOr("internal_id IN (SELECT organization_internal_id FROM organization_user WHERE user_internal_id = ? AND organization_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), organization.OrganizationUserStatusActive)
 			return query
 		})
 	}
@@ -211,7 +211,7 @@ func (r *OrganizationBunRepository) PaginateInvitedOrganizationsBy(params organi
 	}
 
 	selectQuery = selectQuery.Model(&organizations)
-	selectQuery = selectQuery.Where("organization.internal_id IN (SELECT organization_user.organization_internal_id FROM organization_user WHERE organization_user.user_internal_id = ? AND organization_user.status = ?)", params.LoggedUserIdentity.Internal.String(), organization.OrganizationUserStatusInvited)
+	selectQuery = selectQuery.Where("organization.internal_id IN (SELECT organization_user.organization_internal_id FROM organization_user WHERE organization_user.user_internal_id = ? AND organization_user.status = ?)", params.AuthenticatedUserIdentity.Internal.String(), organization.OrganizationUserStatusInvited)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err

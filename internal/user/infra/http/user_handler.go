@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
+	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	user "github.com/gabrielmrtt/taski/internal/user"
 	userhttprequests "github.com/gabrielmrtt/taski/internal/user/infra/http/requests"
@@ -51,15 +52,16 @@ type GetMeResponse = corehttp.HttpSuccessResponseWithData[user.UserDto]
 // @Router /me [get]
 func (c *UserHandler) GetMe(ctx *gin.Context) {
 	var request userhttprequests.GetMeRequest
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input userservice.GetMeInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-	input := request.ToInput()
-	input.LoggedUserIdentity = *authenticatedUserIdentity
+	input = request.ToInput()
+	input.AuthenticatedUserIdentity = *authenticatedUserIdentity
 
 	response, err := c.GetMeService.Execute(input)
 	if err != nil {
@@ -88,15 +90,15 @@ type ChangeUserPasswordResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /me/password [patch]
 func (c *UserHandler) ChangeUserPassword(ctx *gin.Context) {
 	var request userhttprequests.ChangeUserPasswordRequest
-
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input userservice.ChangeUserPasswordInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.UserIdentity = *authenticatedUserIdentity
 	err := c.ChangeUserPasswordService.Execute(input)
 	if err != nil {
@@ -125,16 +127,17 @@ type UpdateUserCredentialsResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /me/credentials [put]
 func (c *UserHandler) UpdateUserCredentials(ctx *gin.Context) {
 	var request userhttprequests.UpdateUserCredentialsRequest
-
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input userservice.UpdateUserCredentialsInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.UserIdentity = *authenticatedUserIdentity
+
 	err := c.UpdateUserCredentialsService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -162,16 +165,17 @@ type UpdateUserDataResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /me/data [put]
 func (c *UserHandler) UpdateUserData(ctx *gin.Context) {
 	var request userhttprequests.UpdateUserDataRequest
-
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input userservice.UpdateUserDataInput
 
 	if err := ctx.ShouldBind(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.UserIdentity = *authenticatedUserIdentity
+
 	err := c.UpdateUserDataService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -197,11 +201,11 @@ type DeleteUserResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /me [delete]
 func (c *UserHandler) DeleteUser(ctx *gin.Context) {
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-
-	input := userservice.DeleteUserInput{
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input userservice.DeleteUserInput = userservice.DeleteUserInput{
 		UserIdentity: *authenticatedUserIdentity,
 	}
+
 	err := c.DeleteUserService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)

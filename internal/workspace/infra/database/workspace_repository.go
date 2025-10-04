@@ -74,10 +74,12 @@ func (r *WorkspaceRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *WorkspaceRepository) applyFilters(selectQuery *bun.SelectQuery, filters workspacerepo.WorkspaceFilters) *bun.SelectQuery {
-	selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+	if filters.OrganizationIdentity != nil {
+		selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+	}
 
-	if filters.LoggedUserIdentity != nil {
-		selectQuery = selectQuery.Where("workspace.internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND workspace_user.status = ?)", filters.LoggedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
+	if filters.AuthenticatedUserIdentity != nil {
+		selectQuery = selectQuery.Where("workspace.internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND workspace_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
 	}
 
 	if filters.Name != nil {

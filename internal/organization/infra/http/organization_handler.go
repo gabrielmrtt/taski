@@ -55,15 +55,16 @@ type ListOrganizationsResponse = corehttp.HttpSuccessResponseWithData[organizati
 // @Router /organization [get]
 func (c *OrganizationHandler) ListOrganizations(ctx *gin.Context) {
 	var request organizationhttprequests.ListOrganizationsRequest
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input organizationservice.ListOrganizationsInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.Filters.LoggedUserIdentity = authenticatedUserIdentity
+	input = request.ToInput()
+	input.Filters.AuthenticatedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListOrganizationsService.Execute(input)
 	if err != nil {
@@ -91,8 +92,8 @@ type GetOrganizationResponse = corehttp.HttpSuccessResponseWithData[organization
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId [get]
 func (c *OrganizationHandler) GetOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	input := organizationservice.GetOrganizationInput{
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var input organizationservice.GetOrganizationInput = organizationservice.GetOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
 	}
 
@@ -122,14 +123,15 @@ type CreateOrganizationResponse = corehttp.HttpSuccessResponseWithData[organizat
 // @Router /organization [post]
 func (c *OrganizationHandler) CreateOrganization(ctx *gin.Context) {
 	var request organizationhttprequests.CreateOrganizationRequest
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input organizationservice.CreateOrganizationInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateOrganizationService.Execute(input)
@@ -160,15 +162,16 @@ type UpdateOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId [put]
 func (c *OrganizationHandler) UpdateOrganization(ctx *gin.Context) {
 	var request organizationhttprequests.UpdateOrganizationRequest
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input organizationservice.UpdateOrganizationInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 	input.UserEditorIdentity = *authenticatedUserIdentity
 
@@ -198,9 +201,8 @@ type DeleteOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId [delete]
 func (c *OrganizationHandler) DeleteOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-
-	input := organizationservice.DeleteOrganizationInput{
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var input organizationservice.DeleteOrganizationInput = organizationservice.DeleteOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
 	}
 
@@ -215,13 +217,14 @@ func (c *OrganizationHandler) DeleteOrganization(ctx *gin.Context) {
 
 func (c *OrganizationHandler) ListMyOrganizationInvites(ctx *gin.Context) {
 	var request organizationhttprequests.ListMyOrganizationInvitesRequest
+	var input organizationservice.ListMyOrganizationInvitesInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.AuthenticatedUserIdentity = *authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	response, err := c.ListMyOrganizationInvitesService.Execute(input)

@@ -16,15 +16,18 @@ import (
 type AuthHandler struct {
 	UserLoginService          *authservice.UserLoginService
 	AccessOrganizationService *authservice.AccessOrganizationService
+	TokenService              auth.TokenService
 }
 
 func NewAuthHandler(
 	userLoginService *authservice.UserLoginService,
 	accessOrganizationService *authservice.AccessOrganizationService,
+	tokenService auth.TokenService,
 ) *AuthHandler {
 	return &AuthHandler{
 		UserLoginService:          userLoginService,
 		AccessOrganizationService: accessOrganizationService,
+		TokenService:              tokenService,
 	}
 }
 
@@ -83,8 +86,8 @@ func (c *AuthHandler) AccessOrganization(ctx *gin.Context) {
 	organizationIdentity := ctx.Param("organizationId")
 
 	input := authservice.AccessOrganizationInput{
-		LoggedUserIdentity:   *authenticatedUserIdentity,
-		OrganizationIdentity: core.NewIdentityFromPublic(organizationIdentity),
+		AuthenticatedUserIdentity: *authenticatedUserIdentity,
+		OrganizationIdentity:      core.NewIdentityFromPublic(organizationIdentity),
 	}
 
 	token, err := c.AccessOrganizationService.Execute(input)

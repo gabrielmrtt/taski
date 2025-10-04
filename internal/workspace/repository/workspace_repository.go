@@ -6,15 +6,15 @@ import (
 )
 
 type WorkspaceFilters struct {
-	OrganizationIdentity core.Identity
-	LoggedUserIdentity   *core.Identity
-	Name                 *core.ComparableFilter[string]
-	Description          *core.ComparableFilter[string]
-	Color                *core.ComparableFilter[string]
-	Status               *core.ComparableFilter[workspace.WorkspaceStatuses]
-	CreatedAt            *core.ComparableFilter[int64]
-	UpdatedAt            *core.ComparableFilter[int64]
-	DeletedAt            *core.ComparableFilter[int64]
+	OrganizationIdentity      *core.Identity
+	AuthenticatedUserIdentity *core.Identity
+	Name                      *core.ComparableFilter[string]
+	Description               *core.ComparableFilter[string]
+	Color                     *core.ComparableFilter[string]
+	Status                    *core.ComparableFilter[workspace.WorkspaceStatuses]
+	CreatedAt                 *core.ComparableFilter[int64]
+	UpdatedAt                 *core.ComparableFilter[int64]
+	DeletedAt                 *core.ComparableFilter[int64]
 }
 
 type GetWorkspaceByIdentityParams struct {

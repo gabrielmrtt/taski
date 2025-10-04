@@ -10,6 +10,7 @@ import (
 )
 
 type ListProjectsRequest struct {
+	WorkspaceId   *string `json:"workspaceId"`
 	Name          *string `json:"name"`
 	Status        *string `json:"status"`
 	PriorityLevel *int8   `json:"priorityLevel"`
@@ -26,6 +27,12 @@ func (r *ListProjectsRequest) FromQuery(ctx *gin.Context) error {
 }
 
 func (r *ListProjectsRequest) ToInput() projectservice.ListProjectsInput {
+	var workspaceIdentity *core.Identity = nil
+	if r.WorkspaceId != nil {
+		identity := core.NewIdentityFromPublic(*r.WorkspaceId)
+		workspaceIdentity = &identity
+	}
+
 	var nameFilter *core.ComparableFilter[string] = nil
 	if r.Name != nil {
 		nameFilter = &core.ComparableFilter[string]{
@@ -56,9 +63,10 @@ func (r *ListProjectsRequest) ToInput() projectservice.ListProjectsInput {
 
 	return projectservice.ListProjectsInput{
 		Filters: projectrepo.ProjectFilters{
-			Name:          nameFilter,
-			Status:        statusFilter,
-			PriorityLevel: priorityLevelFilter,
+			WorkspaceIdentity: workspaceIdentity,
+			Name:              nameFilter,
+			Status:            statusFilter,
+			PriorityLevel:     priorityLevelFilter,
 		},
 		Pagination: &core.PaginationInput{
 			Page:    r.Page,

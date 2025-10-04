@@ -19,11 +19,10 @@ func NewListRolesService(
 }
 
 type ListRolesInput struct {
-	OrganizationIdentity core.Identity
-	Filters              rolerepo.RoleFilters
-	SortInput            *core.SortInput
-	Pagination           *core.PaginationInput
-	RelationsInput       core.RelationsInput
+	Filters        rolerepo.RoleFilters
+	SortInput      *core.SortInput
+	Pagination     *core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListRolesInput) Validate() error {
@@ -34,8 +33,6 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
-
-	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
 	roles, err := s.RoleRepository.PaginateRolesBy(rolerepo.PaginateRolesParams{
 		Filters:    input.Filters,

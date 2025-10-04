@@ -23,9 +23,9 @@ func NewUpdateProjectService(
 
 type UpdateProjectInput struct {
 	OrganizationIdentity core.Identity
-	WorkspaceIdentity    core.Identity
 	ProjectIdentity      core.Identity
 	UserEditorIdentity   core.Identity
+	WorkspaceIdentity    *core.Identity
 	Name                 *string
 	Description          *string
 	Color                *string
@@ -89,7 +89,7 @@ func (s *UpdateProjectService) Execute(input UpdateProjectInput) error {
 
 	project, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
 		ProjectIdentity:      input.ProjectIdentity,
-		WorkspaceIdentity:    &input.WorkspaceIdentity,
+		WorkspaceIdentity:    input.WorkspaceIdentity,
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {

@@ -6,12 +6,12 @@ import (
 )
 
 type OrganizationFilters struct {
-	Name               *core.ComparableFilter[string]
-	Status             *core.ComparableFilter[organization.OrganizationStatuses]
-	CreatedAt          *core.ComparableFilter[int64]
-	UpdatedAt          *core.ComparableFilter[int64]
-	DeletedAt          *core.ComparableFilter[int64]
-	LoggedUserIdentity *core.Identity
+	Name                      *core.ComparableFilter[string]
+	Status                    *core.ComparableFilter[organization.OrganizationStatuses]
+	CreatedAt                 *core.ComparableFilter[int64]
+	UpdatedAt                 *core.ComparableFilter[int64]
+	DeletedAt                 *core.ComparableFilter[int64]
+	AuthenticatedUserIdentity *core.Identity
 }
 
 type GetOrganizationByIdentityParams struct {
@@ -26,9 +26,9 @@ type PaginateOrganizationsParams struct {
 }
 
 type PaginateInvitedOrganizationsParams struct {
-	LoggedUserIdentity core.Identity
-	SortInput          *core.SortInput
-	Pagination         *core.PaginationInput
+	AuthenticatedUserIdentity core.Identity
+	SortInput                 *core.SortInput
+	Pagination                *core.PaginationInput
 }
 
 type StoreOrganizationParams struct {

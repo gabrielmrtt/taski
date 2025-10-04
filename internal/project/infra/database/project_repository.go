@@ -84,10 +84,15 @@ func (r *ProjectBunRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *ProjectBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters projectrepo.ProjectFilters) *bun.SelectQuery {
-	selectQuery = selectQuery.Where("workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
+	if filters.WorkspaceIdentity != nil {
+		selectQuery = selectQuery.Where("workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
+		if filters.AuthenticatedUserIdentity != nil {
+			selectQuery = selectQuery.Where("workspace_internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
+		}
+	}
 
-	if filters.LoggedUserIdentity != nil {
-		selectQuery = selectQuery.Where("internal_id IN (SELECT project_internal_id FROM project_user WHERE user_internal_id = ? AND status = ?)", filters.LoggedUserIdentity.Internal.String(), project.ProjectUserStatusActive)
+	if filters.AuthenticatedUserIdentity != nil {
+		selectQuery = selectQuery.Where("internal_id IN (SELECT project_internal_id FROM project_user WHERE user_internal_id = ? AND status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), project.ProjectUserStatusActive)
 	}
 
 	if filters.Name != nil {

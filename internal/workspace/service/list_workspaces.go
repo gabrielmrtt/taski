@@ -19,12 +19,11 @@ func NewListWorkspacesService(
 }
 
 type ListWorkspacesInput struct {
-	OrganizationIdentity core.Identity
-	Filters              workspacerepo.WorkspaceFilters
-	SortInput            *core.SortInput
-	Pagination           *core.PaginationInput
-	RelationsInput       core.RelationsInput
-	ShowDeleted          bool
+	Filters        workspacerepo.WorkspaceFilters
+	SortInput      *core.SortInput
+	Pagination     *core.PaginationInput
+	RelationsInput core.RelationsInput
+	ShowDeleted    bool
 }
 
 func (i ListWorkspacesInput) Validate() error {
@@ -35,8 +34,6 @@ func (s *ListWorkspacesService) Execute(input ListWorkspacesInput) (*core.Pagina
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
-
-	input.Filters.OrganizationIdentity = input.OrganizationIdentity
 
 	workspaces, err := s.WorkspaceRepository.PaginateWorkspacesBy(workspacerepo.PaginateWorkspacesParams{
 		Filters:     input.Filters,

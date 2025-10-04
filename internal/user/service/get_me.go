@@ -19,8 +19,8 @@ func NewGetMeService(
 }
 
 type GetMeInput struct {
-	LoggedUserIdentity core.Identity
-	RelationsInput     core.RelationsInput
+	AuthenticatedUserIdentity core.Identity
+	RelationsInput            core.RelationsInput
 }
 
 func (i GetMeInput) Validate() error {
@@ -32,7 +32,7 @@ func (s *GetMeService) Execute(input GetMeInput) (*user.UserDto, error) {
 		return nil, err
 	}
 
-	usr, err := s.UserRepository.GetUserByIdentity(userrepo.GetUserByIdentityParams{UserIdentity: input.LoggedUserIdentity})
+	usr, err := s.UserRepository.GetUserByIdentity(userrepo.GetUserByIdentityParams{UserIdentity: input.AuthenticatedUserIdentity})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

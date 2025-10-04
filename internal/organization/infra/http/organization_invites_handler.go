@@ -48,14 +48,15 @@ type ListMyOrganizationInvitesResponse = corehttp.HttpSuccessResponseWithData[or
 // @Router /organization-invites [get]
 func (c *OrganizationInvitesHandler) ListMyOrganizationInvites(ctx *gin.Context) {
 	var request organizationhttprequests.ListMyOrganizationInvitesRequest
-
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input organizationservice.ListMyOrganizationInvitesInput
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.AuthenticatedUserIdentity = *authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	input = request.ToInput()
+	input.AuthenticatedUserIdentity = *authenticatedUserIdentity
 
 	response, err := c.ListMyOrganizationInvitesService.Execute(input)
 	if err != nil {
@@ -83,16 +84,9 @@ type AcceptOrganizationUserInvitationResponse = corehttp.EmptyHttpSuccessRespons
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization-invites/:organizationId/user/:userId/accept-invitation [patch]
 func (c *OrganizationInvitesHandler) AcceptOrganizationUserInvitation(ctx *gin.Context) {
-	var organizationIdentity core.Identity
-	var userIdentity core.Identity
-
-	organizationId := ctx.Param("organizationId")
-	userId := ctx.Param("userId")
-
-	organizationIdentity = core.NewIdentityFromPublic(organizationId)
-	userIdentity = core.NewIdentityFromPublic(userId)
-
-	input := organizationservice.AcceptOrganizationUserInvitationInput{
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var userIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("userId"))
+	var input organizationservice.AcceptOrganizationUserInvitationInput = organizationservice.AcceptOrganizationUserInvitationInput{
 		OrganizationIdentity: organizationIdentity,
 		UserIdentity:         userIdentity,
 	}
@@ -123,16 +117,9 @@ type RefuseOrganizationUserInvitationResponse = corehttp.EmptyHttpSuccessRespons
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization-invites/:organizationId/user/:userId/refuse-invitation [patch]
 func (c *OrganizationInvitesHandler) RefuseOrganizationUserInvitation(ctx *gin.Context) {
-	var organizationIdentity core.Identity
-	var userIdentity core.Identity
-
-	organizationId := ctx.Param("organizationId")
-	userId := ctx.Param("userId")
-
-	organizationIdentity = core.NewIdentityFromPublic(organizationId)
-	userIdentity = core.NewIdentityFromPublic(userId)
-
-	input := organizationservice.RefuseOrganizationUserInvitationInput{
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var userIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("userId"))
+	var input organizationservice.RefuseOrganizationUserInvitationInput = organizationservice.RefuseOrganizationUserInvitationInput{
 		OrganizationIdentity: organizationIdentity,
 		UserIdentity:         userIdentity,
 	}

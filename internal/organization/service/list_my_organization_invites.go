@@ -33,9 +33,9 @@ func (s *ListMyOrganizationInvitesService) Execute(input ListMyOrganizationInvit
 	}
 
 	organizations, err := s.OrganizationRepository.PaginateInvitedOrganizationsBy(organizationrepo.PaginateInvitedOrganizationsParams{
-		LoggedUserIdentity: input.AuthenticatedUserIdentity,
-		SortInput:          input.SortInput,
-		Pagination:         input.Pagination,
+		AuthenticatedUserIdentity: input.AuthenticatedUserIdentity,
+		SortInput:                 input.SortInput,
+		Pagination:                input.Pagination,
 	})
 	if err != nil {
 		return nil, err

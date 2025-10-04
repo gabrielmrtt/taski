@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserMustHavePermission is a middleware that checks if the user is part of the organization and has the permission to execute an action
 func UserMustHavePermission(permissionSlug string, options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var permission role.PermissionSlugs = role.PermissionSlugs(permissionSlug)
@@ -19,13 +20,15 @@ func UserMustHavePermission(permissionSlug string, options corehttp.MiddlewareOp
 			return
 		}
 
-		pathOrgnizationId := ctx.Param("organizationId")
-		organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-		authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		var organizationIdentity *core.Identity = nil
+		var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
-		if pathOrgnizationId != "" {
-			pathOrganizationIdentity := core.NewIdentityFromPublic(pathOrgnizationId)
-			organizationIdentity = &pathOrganizationIdentity
+		pathOrganizationId := ctx.Param("organizationId")
+		if pathOrganizationId != "" {
+			identity := core.NewIdentityFromPublic(pathOrganizationId)
+			organizationIdentity = &identity
+		} else {
+			organizationIdentity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 		}
 
 		repo := organizationdatabase.NewOrganizationUserBunRepository(options.DbConnection)
@@ -56,21 +59,26 @@ func UserMustHavePermission(permissionSlug string, options corehttp.MiddlewareOp
 	}
 }
 
+// UserMustBeSame is a middleware that checks if the authenticated user is the same as the organization user from the path parameter
 func UserMustBeSame(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-		userId := ctx.Param("userId")
-		authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		var organizationIdentity *core.Identity = nil
+		var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
-		if organizationIdentity.IsEmpty() || userId == "" {
-			ctx.Next()
-			return
+		pathOrganizationId := ctx.Param("organizationId")
+		if pathOrganizationId != "" {
+			identity := core.NewIdentityFromPublic(pathOrganizationId)
+			organizationIdentity = &identity
+		} else {
+			organizationIdentity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 		}
+
+		userId := ctx.Param("userId")
 
 		repo := organizationdatabase.NewOrganizationUserBunRepository(options.DbConnection)
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
-			OrganizationIdentity: organizationIdentity,
+			OrganizationIdentity: *organizationIdentity,
 			UserIdentity:         *authenticatedUserIdentity,
 		})
 		if err != nil {

@@ -56,13 +56,15 @@ type ListOrganizationUsersResponse = corehttp.HttpSuccessResponseWithData[organi
 // @Router /organization/:organizationId/user [get]
 func (c *OrganizationUserHandler) ListOrganizationUsers(ctx *gin.Context) {
 	var request organizationhttprequests.ListOrganizationUsersRequest
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var input organizationservice.ListOrganizationUsersInput
+
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.Filters.OrganizationIdentity = organizationIdentity
 
 	response, err := c.ListOrganizationUsersService.Execute(input)
@@ -93,15 +95,15 @@ type InviteUserToOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId/user [post]
 func (c *OrganizationUserHandler) InviteUserToOrganization(ctx *gin.Context) {
 	var request organizationhttprequests.InviteUserToOrganizationRequest
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var input organizationservice.InviteUserToOrganizationInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 
 	err := c.InviteUserToOrganizationService.Execute(input)
@@ -131,10 +133,9 @@ type RemoveUserFromOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId/user/:userId [delete]
 func (c *OrganizationUserHandler) RemoveUserFromOrganization(ctx *gin.Context) {
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
-
-	input := organizationservice.RemoveUserFromOrganizationInput{
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var userIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("userId"))
+	var input organizationservice.RemoveUserFromOrganizationInput = organizationservice.RemoveUserFromOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
 		UserIdentity:         userIdentity,
 	}
@@ -167,16 +168,16 @@ type GetOrganizationUserResponse = corehttp.HttpSuccessResponseWithData[organiza
 // @Router /organization/:organizationId/user/:userId [get]
 func (c *OrganizationUserHandler) GetOrganizationUser(ctx *gin.Context) {
 	var request organizationhttprequests.GetOrganizationUserRequest
-
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var userIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("userId"))
+	var input organizationservice.GetOrganizationUserInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 	input.UserIdentity = userIdentity
 
@@ -208,16 +209,16 @@ type UpdateOrganizationUserResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId/user/:userId [put]
 func (c *OrganizationUserHandler) UpdateOrganizationUser(ctx *gin.Context) {
 	var request organizationhttprequests.UpdateOrganizationUserRequest
-
-	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	userIdentity := core.NewIdentityFromPublic(ctx.Param("userId"))
+	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	var userIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("userId"))
+	var input organizationservice.UpdateOrganizationUserInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 	input.UserIdentity = userIdentity
 

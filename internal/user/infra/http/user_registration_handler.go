@@ -47,13 +47,16 @@ type RegisterUserResponse = corehttp.HttpSuccessResponseWithData[user.UserDto]
 // @Router /user-registration [post]
 func (c *UserRegistrationHandler) RegisterUser(ctx *gin.Context) {
 	var request userhttprequests.RegisterUserRequest
+	var input userservice.RegisterUserInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	response, err := c.RegisterUserService.Execute(request.ToInput())
+	input = request.ToInput()
+
+	response, err := c.RegisterUserService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
@@ -79,13 +82,16 @@ type VerifyUserRegistrationResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /user-registration/verify [post]
 func (c *UserRegistrationHandler) VerifyUserRegistration(ctx *gin.Context) {
 	var request userhttprequests.VerifyUserRegistrationRequest
+	var input userservice.VerifyUserRegistrationInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	err := c.VerifyUserRegistrationService.Execute(request.ToInput())
+	input = request.ToInput()
+
+	err := c.VerifyUserRegistrationService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
@@ -111,13 +117,16 @@ type ForgotUserPasswordResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /user-registration/forgot-password [post]
 func (c *UserRegistrationHandler) ForgotUserPassword(ctx *gin.Context) {
 	var request userhttprequests.ForgotUserPasswordRequest
+	var input userservice.ForgotUserPasswordInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	err := c.ForgotUserPasswordService.Execute(request.ToInput())
+	input = request.ToInput()
+
+	err := c.ForgotUserPasswordService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
@@ -143,13 +152,16 @@ type RecoverUserPasswordResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /user-registration/recover-password [post]
 func (c *UserRegistrationHandler) RecoverUserPassword(ctx *gin.Context) {
 	var request userhttprequests.RecoverUserPasswordRequest
+	var input userservice.RecoverUserPasswordInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	err := c.RecoverUserPasswordService.Execute(request.ToInput())
+	input = request.ToInput()
+
+	err := c.RecoverUserPasswordService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return

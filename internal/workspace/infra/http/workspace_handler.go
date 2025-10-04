@@ -53,20 +53,21 @@ type ListWorkspacesResponse = corehttp.HttpSuccessResponseWithData[workspace.Wor
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/workspace [get]
+// @Router /workspace [get]
 func (c *WorkspaceHandler) ListWorkspaces(ctx *gin.Context) {
 	var request workspacehttprequests.ListWorkspacesRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input workspaceservice.ListWorkspacesInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.OrganizationIdentity = *organizationIdentity
-	input.Filters.LoggedUserIdentity = authenticatedUserIdentity
+	input = request.ToInput()
+	input.Filters.OrganizationIdentity = organizationIdentity
+	input.Filters.AuthenticatedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListWorkspacesService.Execute(input)
 	if err != nil {
@@ -93,12 +94,11 @@ type GetWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Works
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/workspace/:workspaceId [get]
+// @Router /workspace/:workspaceId [get]
 func (c *WorkspaceHandler) GetWorkspace(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-
-	input := workspaceservice.GetWorkspaceInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var workspaceIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("workspaceId"))
+	var input workspaceservice.GetWorkspaceInput = workspaceservice.GetWorkspaceInput{
 		OrganizationIdentity: *organizationIdentity,
 		WorkspaceIdentity:    workspaceIdentity,
 	}
@@ -127,18 +127,22 @@ type CreateWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Wo
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/workspace [post]
+// @Router /workspace [post]
 func (c *WorkspaceHandler) CreateWorkspace(ctx *gin.Context) {
 	var request workspacehttprequests.CreateWorkspaceRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input workspaceservice.CreateWorkspaceInput = workspaceservice.CreateWorkspaceInput{
+		OrganizationIdentity: *organizationIdentity,
+		UserCreatorIdentity:  *authenticatedUserIdentity,
+	}
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserCreatorIdentity = *authenticatedUserIdentity
 
@@ -168,19 +172,20 @@ type UpdateWorkspaceResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/workspace/:workspaceId [put]
+// @Router /workspace/:workspaceId [put]
 func (c *WorkspaceHandler) UpdateWorkspace(ctx *gin.Context) {
 	var request workspacehttprequests.UpdateWorkspaceRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var workspaceIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("workspaceId"))
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input workspaceservice.UpdateWorkspaceInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.WorkspaceIdentity = workspaceIdentity
 	input.UserEditorIdentity = *authenticatedUserIdentity
@@ -210,12 +215,11 @@ type DeleteWorkspaceResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/workspace/:workspaceId [delete]
+// @Router /workspace/:workspaceId [delete]
 func (c *WorkspaceHandler) DeleteWorkspace(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-
-	input := workspaceservice.DeleteWorkspaceInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var workspaceIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("workspaceId"))
+	var input workspaceservice.DeleteWorkspaceInput = workspaceservice.DeleteWorkspaceInput{
 		OrganizationIdentity: *organizationIdentity,
 		WorkspaceIdentity:    workspaceIdentity,
 	}

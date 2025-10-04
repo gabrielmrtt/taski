@@ -19,8 +19,8 @@ func NewAccessOrganizationService(organizationUserRepository organizationrepo.Or
 }
 
 type AccessOrganizationInput struct {
-	LoggedUserIdentity   core.Identity
-	OrganizationIdentity core.Identity
+	AuthenticatedUserIdentity core.Identity
+	OrganizationIdentity      core.Identity
 }
 
 func (i AccessOrganizationInput) Validate() error {
@@ -34,7 +34,7 @@ func (s *AccessOrganizationService) Execute(input AccessOrganizationInput) (*str
 
 	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
-		UserIdentity:         input.LoggedUserIdentity,
+		UserIdentity:         input.AuthenticatedUserIdentity,
 	})
 	if err != nil {
 		return nil, err

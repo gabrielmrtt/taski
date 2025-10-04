@@ -6,16 +6,17 @@ import (
 )
 
 type ProjectFilters struct {
-	WorkspaceIdentity  core.Identity
-	LoggedUserIdentity *core.Identity
-	Name               *core.ComparableFilter[string]
-	Description        *core.ComparableFilter[string]
-	Color              *core.ComparableFilter[string]
-	PriorityLevel      *core.ComparableFilter[project.ProjectPriorityLevels]
-	Status             *core.ComparableFilter[project.ProjectStatuses]
-	CreatedAt          *core.ComparableFilter[int64]
-	UpdatedAt          *core.ComparableFilter[int64]
-	DeletedAt          *core.ComparableFilter[int64]
+	OrganizationIdentity      *core.Identity
+	WorkspaceIdentity         *core.Identity
+	AuthenticatedUserIdentity *core.Identity
+	Name                      *core.ComparableFilter[string]
+	Description               *core.ComparableFilter[string]
+	Color                     *core.ComparableFilter[string]
+	PriorityLevel             *core.ComparableFilter[project.ProjectPriorityLevels]
+	Status                    *core.ComparableFilter[project.ProjectStatuses]
+	CreatedAt                 *core.ComparableFilter[int64]
+	UpdatedAt                 *core.ComparableFilter[int64]
+	DeletedAt                 *core.ComparableFilter[int64]
 }
 
 type GetProjectByIdentityParams struct {

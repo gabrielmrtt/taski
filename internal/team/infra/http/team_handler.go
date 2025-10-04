@@ -52,19 +52,19 @@ type ListTeamsResponse = corehttp.HttpSuccessResponseWithData[core.PaginationOut
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/team [get]
+// @Router /team [get]
 func (c *TeamHandler) ListTeams(ctx *gin.Context) {
 	var request teamhttprequests.ListTeamsRequest
-
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var input teamservice.ListTeamsInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.OrganizationIdentity = *organizationIdentity
+	input = request.ToInput()
+	input.Filters.OrganizationIdentity = *organizationIdentity
 
 	response, err := c.ListTeamsService.Execute(input)
 	if err != nil {
@@ -90,12 +90,11 @@ type GetTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/team/:teamId [get]
+// @Router /team/:teamId [get]
 func (c *TeamHandler) GetTeam(ctx *gin.Context) {
-	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-
-	input := teamservice.GetTeamInput{
+	var teamIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("teamId"))
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var input teamservice.GetTeamInput = teamservice.GetTeamInput{
 		TeamIdentity:         teamIdentity,
 		OrganizationIdentity: *organizationIdentity,
 	}
@@ -126,15 +125,16 @@ type CreateTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 // @Router /organization/:organizationId/team [post]
 func (c *TeamHandler) CreateTeam(ctx *gin.Context) {
 	var request teamhttprequests.CreateTeamRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input teamservice.CreateTeamInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserCreatorIdentity = *authenticatedUserIdentity
 
@@ -163,20 +163,20 @@ type UpdateTeamResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/team/:teamId [put]
+// @Router /team/:teamId [put]
 func (c *TeamHandler) UpdateTeam(ctx *gin.Context) {
 	var request teamhttprequests.UpdateTeamRequest
-
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var teamIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("teamId"))
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input teamservice.UpdateTeamInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.TeamIdentity = teamIdentity
 	input.UserEditorIdentity = *authenticatedUserIdentity
@@ -205,12 +205,11 @@ type DeleteTeamResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /organization/:organizationId/team/:teamId [delete]
+// @Router /team/:teamId [delete]
 func (c *TeamHandler) DeleteTeam(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
-
-	input := teamservice.DeleteTeamInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var teamIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("teamId"))
+	var input teamservice.DeleteTeamInput = teamservice.DeleteTeamInput{
 		TeamIdentity:         teamIdentity,
 		OrganizationIdentity: *organizationIdentity,
 	}

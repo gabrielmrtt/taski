@@ -24,7 +24,7 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	workspaceRepository := workspacedatabase.NewWorkspaceBunRepository(options.DbConnection)
 	transactionRepository := coredatabase.NewTransactionBunRepository(options.DbConnection)
 
-	listProjectsService := projectservice.NewListProjectsService(projectRepository, workspaceRepository)
+	listProjectsService := projectservice.NewListProjectsService(projectRepository)
 	getProjectService := projectservice.NewGetProjectService(projectRepository)
 	createProjectService := projectservice.NewCreateProjectService(projectRepository, projectUserRepository, userRepository, workspaceRepository, transactionRepository)
 	updateProjectService := projectservice.NewUpdateProjectService(projectRepository, transactionRepository)

@@ -11,7 +11,6 @@ import (
 	projecthttpmiddlewares "github.com/gabrielmrtt/taski/internal/project/infra/http/middlewares"
 	projecthttprequests "github.com/gabrielmrtt/taski/internal/project/infra/http/requests"
 	projectservice "github.com/gabrielmrtt/taski/internal/project/service"
-	workspacehttpmiddlewares "github.com/gabrielmrtt/taski/internal/workspace/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,23 +52,21 @@ type ListProjectsResponse = corehttp.HttpSuccessResponseWithData[project.Project
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /workspace/:workspaceId/project [get]
+// @Router /project [get]
 func (c *ProjectHandler) ListProjects(ctx *gin.Context) {
 	var request projecthttprequests.ListProjectsRequest
-
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input projectservice.ListProjectsInput
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.WorkspaceIdentity = workspaceIdentity
-	input.OrganizationIdentity = *organizationIdentity
-	input.Filters.LoggedUserIdentity = authenticatedUserIdentity
+	input = request.ToInput()
+	input.Filters.OrganizationIdentity = organizationIdentity
+	input.Filters.AuthenticatedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListProjectsService.Execute(input)
 	if err != nil {
@@ -95,15 +92,12 @@ type GetProjectResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDt
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /workspace/:workspaceId/project/:projectId [get]
+// @Router /project/:projectId [get]
 func (c *ProjectHandler) GetProject(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	projectIdentity := core.NewIdentityFromPublic(ctx.Param("projectId"))
-
-	input := projectservice.GetProjectInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var input projectservice.GetProjectInput = projectservice.GetProjectInput{
 		OrganizationIdentity: *organizationIdentity,
-		WorkspaceIdentity:    workspaceIdentity,
 		ProjectIdentity:      projectIdentity,
 	}
 
@@ -130,20 +124,19 @@ type CreateProjectResponse = corehttp.HttpSuccessResponseWithData[project.Projec
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /workspace/:workspaceId/project [post]
+// @Router /project [post]
 func (c *ProjectHandler) CreateProject(ctx *gin.Context) {
 	var request projecthttprequests.CreateProjectRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input projectservice.CreateProjectInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.WorkspaceIdentity = workspaceIdentity
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserCreatorIdentity = *authenticatedUserIdentity
 
@@ -172,21 +165,20 @@ type UpdateProjectResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /workspace/:workspaceId/project/:projectId [put]
+// @Router /project/:projectId [put]
 func (c *ProjectHandler) UpdateProject(ctx *gin.Context) {
 	var request projecthttprequests.UpdateProjectRequest
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	projectIdentity := core.NewIdentityFromPublic(ctx.Param("projectId"))
-	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	var input projectservice.UpdateProjectInput
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
-	input := request.ToInput()
-	input.WorkspaceIdentity = workspaceIdentity
+	input = request.ToInput()
 	input.OrganizationIdentity = *organizationIdentity
 	input.UserEditorIdentity = *authenticatedUserIdentity
 	input.ProjectIdentity = projectIdentity
@@ -215,15 +207,12 @@ type DeleteProjectResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /workspace/:workspaceId/project/:projectId [delete]
+// @Router /project/:projectId [delete]
 func (c *ProjectHandler) DeleteProject(ctx *gin.Context) {
-	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	projectIdentity := core.NewIdentityFromPublic(ctx.Param("projectId"))
-
-	input := projectservice.DeleteProjectInput{
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var input projectservice.DeleteProjectInput = projectservice.DeleteProjectInput{
 		OrganizationIdentity: *organizationIdentity,
-		WorkspaceIdentity:    workspaceIdentity,
 		ProjectIdentity:      projectIdentity,
 	}
 
@@ -241,10 +230,9 @@ func (c *ProjectHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions
 		DbConnection: options.DbConnection,
 	}
 
-	g := options.RouterGroup.Group("/workspace/:workspaceId/project")
+	g := options.RouterGroup.Group("/project")
 	{
 		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
-		g.Use(workspacehttpmiddlewares.UserMustBeInWorkspace(middlewareOptions))
 
 		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), c.ListProjects)
 		g.GET("/:projectId", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), projecthttpmiddlewares.UserMustBeInProject(middlewareOptions), c.GetProject)
