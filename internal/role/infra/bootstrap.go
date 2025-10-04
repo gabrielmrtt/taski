@@ -2,6 +2,7 @@ package roleinfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	roledatabase "github.com/gabrielmrtt/taski/internal/role/infra/database"
 	rolehttp "github.com/gabrielmrtt/taski/internal/role/infra/http"
 	roleservice "github.com/gabrielmrtt/taski/internal/role/service"
@@ -24,7 +25,11 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	deleteRoleService := roleservice.NewDeleteRoleService(roleRepository, transactionRepository)
 	listRolesService := roleservice.NewListRolesService(roleRepository)
 
-	RoleHandler := rolehttp.NewRoleHandler(createRoleService, updateRoleService, deleteRoleService, listRolesService)
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
 
-	RoleHandler.ConfigureRoutes(options.RouterGroup)
+	RoleHandler := rolehttp.NewRoleHandler(createRoleService, updateRoleService, deleteRoleService, listRolesService)
+	RoleHandler.ConfigureRoutes(configureRoutesOptions)
 }

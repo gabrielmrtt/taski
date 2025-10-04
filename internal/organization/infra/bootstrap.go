@@ -2,6 +2,7 @@ package organizationinfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationdatabase "github.com/gabrielmrtt/taski/internal/organization/infra/database"
 	organizationhttp "github.com/gabrielmrtt/taski/internal/organization/infra/http"
 	organizationservice "github.com/gabrielmrtt/taski/internal/organization/service"
@@ -47,7 +48,12 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	OrganizationUserHandler := organizationhttp.NewOrganizationUserHandler(listOrganizationUsersService, inviteUserToOrganizationService, removeUserFromOrganizationService, getOrganizationUserService, updateOrganizationUserService)
 	OrganizationInvitesHandler := organizationhttp.NewOrganizationInvitesHandler(listMyOrganizationInvitesService, acceptOrganizationUserInvitationService, refuseOrganizationUserInvitationService)
 
-	OrganizationHandler.ConfigureRoutes(options.RouterGroup)
-	OrganizationUserHandler.ConfigureRoutes(options.RouterGroup)
-	OrganizationInvitesHandler.ConfigureRoutes(options.RouterGroup)
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
+
+	OrganizationHandler.ConfigureRoutes(configureRoutesOptions)
+	OrganizationUserHandler.ConfigureRoutes(configureRoutesOptions)
+	OrganizationInvitesHandler.ConfigureRoutes(configureRoutesOptions)
 }

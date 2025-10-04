@@ -158,8 +158,8 @@ func (c *UserRegistrationHandler) RecoverUserPassword(ctx *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *UserRegistrationHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/user-registration")
+func (c *UserRegistrationHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	g := options.RouterGroup.Group("/user-registration")
 	{
 		g.POST("/", c.RegisterUser)
 		g.POST("/verify", c.VerifyUserRegistration)

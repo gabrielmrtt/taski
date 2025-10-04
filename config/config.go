@@ -28,34 +28,43 @@ type Config struct {
 	StorageLocalBasePath string
 }
 
+func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
 func loadConfig() *Config {
 	cfg := &Config{}
 
 	if err := godotenv.Load(); err != nil {
-		panic(fmt.Errorf("failed to load environment file: %w", err))
+		fmt.Printf("Warning: Could not load .env file: %v\n", err)
+		fmt.Println("Continuing with system environment variables...")
 	}
 
-	cfg.Env = os.Getenv("ENV")
-	cfg.ApiVersion = os.Getenv("API_VERSION")
-	cfg.AppPort = os.Getenv("APP_PORT")
-	cfg.PostgresHost = os.Getenv("POSTGRES_HOST")
-	cfg.PostgresPort = os.Getenv("POSTGRES_PORT")
-	cfg.PostgresUsername = os.Getenv("POSTGRES_USER")
-	cfg.PostgresPassword = os.Getenv("POSTGRES_PASSWORD")
-	cfg.PostgresName = os.Getenv("POSTGRES_DATABASE")
-	cfg.MailHost = os.Getenv("MAIL_HOST")
-	cfg.MailPort = os.Getenv("MAIL_PORT")
-	cfg.MailUsername = os.Getenv("MAIL_USERNAME")
-	cfg.MailPassword = os.Getenv("MAIL_PASSWORD")
-	cfg.MailFrom = os.Getenv("MAIL_FROM")
-	cfg.JwtSecret = os.Getenv("JWT_SECRET")
-	cfg.StorageLocalBasePath = os.Getenv("STORAGE_LOCAL_BASE_PATH")
-	expirationMinutes, err := strconv.ParseInt(os.Getenv("JWT_EXPIRATION_MINUTES"), 10, 64)
+	cfg.Env = getEnvOrDefault("ENV", "development")
+	cfg.ApiVersion = getEnvOrDefault("API_VERSION", "v1")
+	cfg.AppPort = getEnvOrDefault("APP_PORT", "8080")
+	cfg.PostgresHost = getEnvOrDefault("POSTGRES_HOST", "localhost")
+	cfg.PostgresPort = getEnvOrDefault("POSTGRES_PORT", "5432")
+	cfg.PostgresUsername = getEnvOrDefault("POSTGRES_USER", "postgres")
+	cfg.PostgresPassword = getEnvOrDefault("POSTGRES_PASSWORD", "password")
+	cfg.PostgresName = getEnvOrDefault("POSTGRES_DATABASE", "taski")
+	cfg.MailHost = getEnvOrDefault("MAIL_HOST", "smtp.gmail.com")
+	cfg.MailPort = getEnvOrDefault("MAIL_PORT", "587")
+	cfg.MailUsername = getEnvOrDefault("MAIL_USERNAME", "")
+	cfg.MailPassword = getEnvOrDefault("MAIL_PASSWORD", "")
+	cfg.MailFrom = getEnvOrDefault("MAIL_FROM", "noreply@taski.com")
+	cfg.JwtSecret = getEnvOrDefault("JWT_SECRET", "default-jwt-secret-for-development")
+	cfg.StorageLocalBasePath = getEnvOrDefault("STORAGE_LOCAL_BASE_PATH", "./storage")
+
+	expirationMinutesStr := getEnvOrDefault("JWT_EXPIRATION_MINUTES", "60")
+	expirationMinutes, err := strconv.ParseInt(expirationMinutesStr, 10, 64)
 	if err != nil {
-		panic(fmt.Errorf("failed to parse JWT_EXPIRATION_TIME: %w", err))
+		panic(fmt.Errorf("failed to parse JWT_EXPIRATION_MINUTES: %w", err))
 	}
 	cfg.JwtExpirationMinutes = expirationMinutes
-	cfg.StorageLocalBasePath = os.Getenv("STORAGE_LOCAL_BASE_PATH")
 
 	return cfg
 }
@@ -64,7 +73,7 @@ var lock = &sync.Mutex{}
 
 var instance *Config = loadConfig()
 
-func GetConfig() *Config {
+func GetInstance() *Config {
 	if instance == nil {
 		lock.Lock()
 		defer lock.Unlock()

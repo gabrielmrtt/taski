@@ -1,25 +1,24 @@
 package projecthttpmiddlewares
 
 import (
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	projectdatabase "github.com/gabrielmrtt/taski/internal/project/infra/database"
 	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
-func UserMustBeInProject() gin.HandlerFunc {
+func UserMustBeInProject(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		projectIdentity := core.NewIdentityFromPublic(ctx.Param("projectId"))
-		authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
-		repo := projectdatabase.NewProjectUserBunRepository(coredatabase.GetPostgresConnection())
+		repo := projectdatabase.NewProjectUserBunRepository(options.DbConnection)
 
 		projectUser, err := repo.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
 			ProjectIdentity: projectIdentity,
-			UserIdentity:    authenticatedUserIdentity,
+			UserIdentity:    *authenticatedUserIdentity,
 		})
 
 		if err != nil {

@@ -3,20 +3,26 @@ package authservice
 import (
 	"github.com/gabrielmrtt/taski/internal/auth"
 	"github.com/gabrielmrtt/taski/internal/core"
+	organizationrepo "github.com/gabrielmrtt/taski/internal/organization/repository"
 	user "github.com/gabrielmrtt/taski/internal/user"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	userrepo "github.com/gabrielmrtt/taski/internal/user/repository"
 )
 
 type UserLoginService struct {
-	UserRepository userrepo.UserRepository
+	UserRepository             userrepo.UserRepository
+	OrganizationUserRepository organizationrepo.OrganizationUserRepository
+	TokenService               auth.TokenService
 }
 
 func NewUserLoginService(
 	userRepository userrepo.UserRepository,
+	organizationUserRepository organizationrepo.OrganizationUserRepository,
+	tokenService auth.TokenService,
 ) *UserLoginService {
 	return &UserLoginService{
-		UserRepository: userRepository,
+		UserRepository:             userRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		TokenService:               tokenService,
 	}
 }
 
@@ -78,10 +84,30 @@ func (s *UserLoginService) Execute(input UserLoginInput) (*auth.UserAuthDto, err
 		return nil, core.NewUnauthorizedError("user is not activated")
 	}
 
-	jwtToken, err := userhttpmiddlewares.GenerateJwtToken(usr.Identity)
+	organizationUser, err := s.OrganizationUserRepository.GetLastAccessedOrganizationUserByUserIdentity(organizationrepo.GetLastAccessedOrganizationUserByUserIdentityParams{
+		UserIdentity: usr.Identity,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var organizationIdentity *core.Identity = nil
+	if organizationUser != nil {
+		organizationIdentity = &organizationUser.OrganizationIdentity
+	}
+
+	var organizationIdentityPublic *string = nil
+	if organizationIdentity != nil {
+		organizationIdentityPublic = &organizationIdentity.Public
+	}
+
+	jwtToken, err := s.TokenService.GenerateToken(auth.TokenClaims{
+		AuthenticatedUserId:             usr.Identity.Public,
+		AuthenticatedUserOrganizationId: organizationIdentityPublic,
+	})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}
 
-	return auth.UserAuthToDto(usr, jwtToken), nil
+	return auth.UserAuthToDto(usr, jwtToken, organizationIdentityPublic), nil
 }

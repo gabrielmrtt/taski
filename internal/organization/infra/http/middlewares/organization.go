@@ -1,17 +1,16 @@
 package organizationhttpmiddlewares
 
 import (
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationdatabase "github.com/gabrielmrtt/taski/internal/organization/infra/database"
 	organizationrepo "github.com/gabrielmrtt/taski/internal/organization/repository"
 	"github.com/gabrielmrtt/taski/internal/role"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
-func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
+func UserMustHavePermission(permissionSlug string, options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var permission role.PermissionSlugs = role.PermissionSlugs(permissionSlug)
 		if permission == "" {
@@ -20,20 +19,20 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 			return
 		}
 
-		organizationIdentity := GetOrganizationIdentityFromPath(ctx)
-		if organizationIdentity.IsEmpty() {
-			corehttp.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("organizationId path parameter is required"))
-			ctx.Abort()
-			return
+		pathOrgnizationId := ctx.Param("organizationId")
+		organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+		authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+
+		if pathOrgnizationId != "" {
+			pathOrganizationIdentity := core.NewIdentityFromPublic(pathOrgnizationId)
+			organizationIdentity = &pathOrganizationIdentity
 		}
 
-		authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-
-		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.GetPostgresConnection())
+		repo := organizationdatabase.NewOrganizationUserBunRepository(options.DbConnection)
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
-			OrganizationIdentity: organizationIdentity,
-			UserIdentity:         authenticatedUserIdentity,
+			OrganizationIdentity: *organizationIdentity,
+			UserIdentity:         *authenticatedUserIdentity,
 		})
 		if err != nil {
 			corehttp.NewHttpErrorResponse(ctx, err)
@@ -57,31 +56,22 @@ func UserMustHavePermission(permissionSlug string) gin.HandlerFunc {
 	}
 }
 
-func GetOrganizationIdentityFromPath(ctx *gin.Context) core.Identity {
-	organizationId := ctx.Param("organizationId")
-	if organizationId == "" {
-		return core.Identity{}
-	}
-
-	return core.NewIdentityFromPublic(organizationId)
-}
-
-func UserMustBeSame() gin.HandlerFunc {
+func UserMustBeSame(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		organizationIdentity := GetOrganizationIdentityFromPath(ctx)
+		organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
 		userId := ctx.Param("userId")
-		authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 		if organizationIdentity.IsEmpty() || userId == "" {
 			ctx.Next()
 			return
 		}
 
-		repo := organizationdatabase.NewOrganizationUserBunRepository(coredatabase.GetPostgresConnection())
+		repo := organizationdatabase.NewOrganizationUserBunRepository(options.DbConnection)
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
 			OrganizationIdentity: organizationIdentity,
-			UserIdentity:         authenticatedUserIdentity,
+			UserIdentity:         *authenticatedUserIdentity,
 		})
 		if err != nil {
 			corehttp.NewHttpErrorResponse(ctx, err)
@@ -97,7 +87,7 @@ func UserMustBeSame() gin.HandlerFunc {
 
 		userIdentity := core.NewIdentityFromPublic(userId)
 
-		if !userIdentity.Equals(authenticatedUserIdentity) {
+		if !userIdentity.Equals(*authenticatedUserIdentity) {
 			corehttp.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you can't execute this action"))
 			ctx.Abort()
 			return

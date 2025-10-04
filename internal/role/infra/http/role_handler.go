@@ -3,13 +3,13 @@ package rolehttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationhttpmiddlewares "github.com/gabrielmrtt/taski/internal/organization/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/role"
 	rolehttprequests "github.com/gabrielmrtt/taski/internal/role/infra/http/requests"
 	roleservice "github.com/gabrielmrtt/taski/internal/role/service"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,8 +52,8 @@ type CreateRoleResponse = corehttp.HttpSuccessResponseWithData[role.RoleDto]
 // @Router /organization/:organizationId/role [post]
 func (c *RoleHandler) CreateRole(ctx *gin.Context) {
 	var request rolehttprequests.CreateRoleRequest
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -61,8 +61,8 @@ func (c *RoleHandler) CreateRole(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
-	input.UserCreatorIdentity = authenticatedUserIdentity
+	input.OrganizationIdentity = *organizationIdentity
+	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateRoleService.Execute(input)
 	if err != nil {
@@ -92,8 +92,8 @@ type UpdateRoleResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId/role/:roleId [put]
 func (c *RoleHandler) UpdateRole(ctx *gin.Context) {
 	var request rolehttprequests.UpdateRoleRequest
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -102,8 +102,8 @@ func (c *RoleHandler) UpdateRole(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
-	input.UserEditorIdentity = authenticatedUserIdentity
+	input.OrganizationIdentity = *organizationIdentity
+	input.UserEditorIdentity = *authenticatedUserIdentity
 	input.RoleIdentity = roleIdentity
 
 	err := c.UpdateRoleService.Execute(input)
@@ -132,12 +132,12 @@ type DeleteRoleResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId/role/:roleId [delete]
 func (c *RoleHandler) DeleteRole(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	roleIdentity := core.NewIdentityFromPublic(ctx.Param("roleId"))
 
 	input := roleservice.DeleteRoleInput{
 		RoleIdentity:         roleIdentity,
-		OrganizationIdentity: organizationIdentity,
+		OrganizationIdentity: *organizationIdentity,
 	}
 
 	err := c.DeleteRoleService.Execute(input)
@@ -167,7 +167,7 @@ type ListRolesResponse = corehttp.HttpSuccessResponseWithData[role.RoleDto]
 // @Router /organization/:organizationId/role [get]
 func (c *RoleHandler) ListRoles(ctx *gin.Context) {
 	var request rolehttprequests.ListRolesRequest
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -175,7 +175,7 @@ func (c *RoleHandler) ListRoles(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
+	input.OrganizationIdentity = *organizationIdentity
 
 	response, err := c.ListRolesService.Execute(input)
 	if err != nil {
@@ -186,15 +186,19 @@ func (c *RoleHandler) ListRoles(ctx *gin.Context) {
 	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
-func (c *RoleHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization/:organizationId/role")
-	{
-		g.Use(userhttpmiddlewares.AuthMiddleware())
+func (c *RoleHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
+	}
 
-		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("roles:view"), c.ListRoles)
-		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("roles:create"), c.CreateRole)
-		g.PUT("/:roleId", organizationhttpmiddlewares.UserMustHavePermission("roles:update"), c.UpdateRole)
-		g.DELETE("/:roleId", organizationhttpmiddlewares.UserMustHavePermission("roles:delete"), c.DeleteRole)
+	g := options.RouterGroup.Group("/role")
+	{
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
+
+		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("roles:view", middlewareOptions), c.ListRoles)
+		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("roles:create", middlewareOptions), c.CreateRole)
+		g.PUT("/:roleId", organizationhttpmiddlewares.UserMustHavePermission("roles:update", middlewareOptions), c.UpdateRole)
+		g.DELETE("/:roleId", organizationhttpmiddlewares.UserMustHavePermission("roles:delete", middlewareOptions), c.DeleteRole)
 	}
 
 	return g

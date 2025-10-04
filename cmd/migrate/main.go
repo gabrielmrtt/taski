@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gabrielmrtt/taski/config"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
 )
 
 type MigrationConfig struct {
@@ -25,23 +25,19 @@ type DatabaseConfig struct {
 func getDatabaseConfig(env string) DatabaseConfig {
 	switch env {
 	case "default":
-		coredatabase.GetPostgresConnection()
+		shareddatabase.GetPostgresConnection()
 		return DatabaseConfig{
 			ConnectionURL: fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-				config.GetConfig().PostgresUsername,
-				config.GetConfig().PostgresPassword,
-				config.GetConfig().PostgresHost,
-				config.GetConfig().PostgresPort,
-				config.GetConfig().PostgresName,
+				config.GetInstance().PostgresUsername,
+				config.GetInstance().PostgresPassword,
+				config.GetInstance().PostgresHost,
+				config.GetInstance().PostgresPort,
+				config.GetInstance().PostgresName,
 			),
 			Type: "postgres",
 		}
 	case "test":
-		coredatabase.GetSQLiteConnection()
-		return DatabaseConfig{
-			ConnectionURL: fmt.Sprintf("sqlite3://%s", "test.db"),
-			Type:          "sqlite",
-		}
+		return DatabaseConfig{}
 	default:
 		log.Fatalf("Invalid environment: %s", env)
 		return DatabaseConfig{}
@@ -58,9 +54,19 @@ func executeMigration(config MigrationConfig) {
 	var cmd *exec.Cmd
 
 	if config.Method == "up" {
-		cmd = exec.Command("migrate", "-path", "internal/core/database/migrations", "-database", dbConfig.ConnectionURL, "up")
+		cmd = exec.Command(
+			"migrate",
+			"-path", "internal/shared/database/migrations",
+			"-database", dbConfig.ConnectionURL,
+			"up",
+		)
 	} else {
-		cmd = exec.Command("migrate", "-path", "internal/core/database/migrations", "-database", dbConfig.ConnectionURL, "down", strconv.Itoa(config.Step))
+		cmd = exec.Command(
+			"migrate",
+			"-path", "internal/shared/database/migrations",
+			"-database", dbConfig.ConnectionURL,
+			"down", strconv.Itoa(config.Step),
+		)
 	}
 
 	cmd.Stdout = os.Stdout
@@ -90,13 +96,13 @@ func parseArguments() MigrationConfig {
 		config.Method = os.Args[2]
 
 		if config.Method == "down" && len(os.Args) < 4 {
-			log.Fatalf("Step is required for down method")
+			log.Fatalf("Downgrade step is required when downgrading migrations")
 		}
 
 		if len(os.Args) >= 4 {
 			step, err := strconv.Atoi(os.Args[3])
 			if err != nil {
-				log.Fatalf("Invalid step: %v", err)
+				log.Fatalf("Invalid downgrade step: %v", err)
 			}
 			config.Step = step
 		}

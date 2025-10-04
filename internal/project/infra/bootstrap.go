@@ -2,6 +2,7 @@ package projectinfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	projectdatabase "github.com/gabrielmrtt/taski/internal/project/infra/database"
 	projecthttp "github.com/gabrielmrtt/taski/internal/project/infra/http"
 	projectservice "github.com/gabrielmrtt/taski/internal/project/service"
@@ -29,6 +30,11 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	updateProjectService := projectservice.NewUpdateProjectService(projectRepository, transactionRepository)
 	deleteProjectService := projectservice.NewDeleteProjectService(projectRepository, transactionRepository)
 
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
+
 	projectController := projecthttp.NewProjectHandler(listProjectsService, getProjectService, createProjectService, updateProjectService, deleteProjectService)
-	projectController.ConfigureRoutes(options.RouterGroup)
+	projectController.ConfigureRoutes(configureRoutesOptions)
 }

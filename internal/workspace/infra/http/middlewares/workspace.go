@@ -1,25 +1,24 @@
 package workspacehttpmiddlewares
 
 import (
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	workspacedatabase "github.com/gabrielmrtt/taski/internal/workspace/infra/database"
 	workspacerepo "github.com/gabrielmrtt/taski/internal/workspace/repository"
 	"github.com/gin-gonic/gin"
 )
 
-func UserMustBeInWorkspace() gin.HandlerFunc {
+func UserMustBeInWorkspace(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+		userIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 		workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 
-		repo := workspacedatabase.NewWorkspaceUserBunRepository(coredatabase.GetPostgresConnection())
+		repo := workspacedatabase.NewWorkspaceUserBunRepository(options.DbConnection)
 
 		workspaceUser, err := repo.GetWorkspaceUserByIdentity(workspacerepo.GetWorkspaceUserByIdentityParams{
 			WorkspaceIdentity: workspaceIdentity,
-			UserIdentity:      userIdentity,
+			UserIdentity:      *userIdentity,
 		})
 		if err != nil {
 			corehttp.NewHttpErrorResponse(ctx, err)

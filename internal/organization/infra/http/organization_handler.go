@@ -3,12 +3,13 @@ package organizationhttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
+	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	"github.com/gabrielmrtt/taski/internal/organization"
 	organizationhttpmiddlewares "github.com/gabrielmrtt/taski/internal/organization/infra/http/middlewares"
 	organizationhttprequests "github.com/gabrielmrtt/taski/internal/organization/infra/http/requests"
 	organizationservice "github.com/gabrielmrtt/taski/internal/organization/service"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,7 +55,7 @@ type ListOrganizationsResponse = corehttp.HttpSuccessResponseWithData[organizati
 // @Router /organization [get]
 func (c *OrganizationHandler) ListOrganizations(ctx *gin.Context) {
 	var request organizationhttprequests.ListOrganizationsRequest
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -62,7 +63,7 @@ func (c *OrganizationHandler) ListOrganizations(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.Filters.LoggedUserIdentity = &authenticatedUserIdentity
+	input.Filters.LoggedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListOrganizationsService.Execute(input)
 	if err != nil {
@@ -90,7 +91,7 @@ type GetOrganizationResponse = corehttp.HttpSuccessResponseWithData[organization
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId [get]
 func (c *OrganizationHandler) GetOrganization(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
 	input := organizationservice.GetOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
 	}
@@ -121,7 +122,7 @@ type CreateOrganizationResponse = corehttp.HttpSuccessResponseWithData[organizat
 // @Router /organization [post]
 func (c *OrganizationHandler) CreateOrganization(ctx *gin.Context) {
 	var request organizationhttprequests.CreateOrganizationRequest
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -129,7 +130,7 @@ func (c *OrganizationHandler) CreateOrganization(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.UserCreatorIdentity = authenticatedUserIdentity
+	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateOrganizationService.Execute(input)
 	if err != nil {
@@ -159,8 +160,8 @@ type UpdateOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId [put]
 func (c *OrganizationHandler) UpdateOrganization(ctx *gin.Context) {
 	var request organizationhttprequests.UpdateOrganizationRequest
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -169,7 +170,7 @@ func (c *OrganizationHandler) UpdateOrganization(ctx *gin.Context) {
 
 	input := request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
-	input.UserEditorIdentity = authenticatedUserIdentity
+	input.UserEditorIdentity = *authenticatedUserIdentity
 
 	err := c.UpdateOrganizationService.Execute(input)
 	if err != nil {
@@ -197,7 +198,7 @@ type DeleteOrganizationResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId [delete]
 func (c *OrganizationHandler) DeleteOrganization(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := core.NewIdentityFromPublic(ctx.Param("organizationId"))
 
 	input := organizationservice.DeleteOrganizationInput{
 		OrganizationIdentity: organizationIdentity,
@@ -221,7 +222,7 @@ func (c *OrganizationHandler) ListMyOrganizationInvites(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.AuthenticatedUserIdentity = userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	input.AuthenticatedUserIdentity = *authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	response, err := c.ListMyOrganizationInvitesService.Execute(input)
 	if err != nil {
@@ -232,16 +233,20 @@ func (c *OrganizationHandler) ListMyOrganizationInvites(ctx *gin.Context) {
 	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
-func (c *OrganizationHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization")
+func (c *OrganizationHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
+	}
+
+	g := options.RouterGroup.Group("/organization")
 	{
-		g.Use(userhttpmiddlewares.AuthMiddleware())
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
 
 		g.GET("", c.ListOrganizations)
 		g.POST("", c.CreateOrganization)
-		g.GET("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:view"), c.GetOrganization)
-		g.PUT("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:update"), c.UpdateOrganization)
-		g.DELETE("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:delete"), c.DeleteOrganization)
+		g.GET("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:view", middlewareOptions), c.GetOrganization)
+		g.PUT("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:update", middlewareOptions), c.UpdateOrganization)
+		g.DELETE("/:organizationId", organizationhttpmiddlewares.UserMustHavePermission("organizations:delete", middlewareOptions), c.DeleteOrganization)
 	}
 
 	return g

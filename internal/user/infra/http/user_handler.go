@@ -3,9 +3,9 @@ package userhttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	user "github.com/gabrielmrtt/taski/internal/user"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	userhttprequests "github.com/gabrielmrtt/taski/internal/user/infra/http/requests"
 	userservice "github.com/gabrielmrtt/taski/internal/user/service"
 	"github.com/gin-gonic/gin"
@@ -57,9 +57,9 @@ func (c *UserHandler) GetMe(ctx *gin.Context) {
 		return
 	}
 
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 	input := request.ToInput()
-	input.LoggedUserIdentity = authenticatedUserIdentity
+	input.LoggedUserIdentity = *authenticatedUserIdentity
 
 	response, err := c.GetMeService.Execute(input)
 	if err != nil {
@@ -89,7 +89,7 @@ type ChangeUserPasswordResponse = corehttp.EmptyHttpSuccessResponse
 func (c *UserHandler) ChangeUserPassword(ctx *gin.Context) {
 	var request userhttprequests.ChangeUserPasswordRequest
 
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -97,7 +97,7 @@ func (c *UserHandler) ChangeUserPassword(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.UserIdentity = authenticatedUserIdentity
+	input.UserIdentity = *authenticatedUserIdentity
 	err := c.ChangeUserPasswordService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -126,7 +126,7 @@ type UpdateUserCredentialsResponse = corehttp.EmptyHttpSuccessResponse
 func (c *UserHandler) UpdateUserCredentials(ctx *gin.Context) {
 	var request userhttprequests.UpdateUserCredentialsRequest
 
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -134,7 +134,7 @@ func (c *UserHandler) UpdateUserCredentials(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.UserIdentity = authenticatedUserIdentity
+	input.UserIdentity = *authenticatedUserIdentity
 	err := c.UpdateUserCredentialsService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -163,7 +163,7 @@ type UpdateUserDataResponse = corehttp.EmptyHttpSuccessResponse
 func (c *UserHandler) UpdateUserData(ctx *gin.Context) {
 	var request userhttprequests.UpdateUserDataRequest
 
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBind(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -171,7 +171,7 @@ func (c *UserHandler) UpdateUserData(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.UserIdentity = authenticatedUserIdentity
+	input.UserIdentity = *authenticatedUserIdentity
 	err := c.UpdateUserDataService.Execute(input)
 	if err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -197,10 +197,10 @@ type DeleteUserResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /me [delete]
 func (c *UserHandler) DeleteUser(ctx *gin.Context) {
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	input := userservice.DeleteUserInput{
-		UserIdentity: authenticatedUserIdentity,
+		UserIdentity: *authenticatedUserIdentity,
 	}
 	err := c.DeleteUserService.Execute(input)
 	if err != nil {
@@ -211,10 +211,14 @@ func (c *UserHandler) DeleteUser(ctx *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *UserHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/me")
+func (c *UserHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
+	}
+
+	g := options.RouterGroup.Group("/me")
 	{
-		g.Use(userhttpmiddlewares.AuthMiddleware())
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
 
 		g.GET("", c.GetMe)
 		g.PATCH("/password", c.ChangeUserPassword)

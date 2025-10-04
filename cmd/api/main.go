@@ -6,10 +6,10 @@ import (
 	"github.com/gabrielmrtt/taski/config"
 	"github.com/gabrielmrtt/taski/docs"
 	authinfra "github.com/gabrielmrtt/taski/internal/auth/infra"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	organizationinfra "github.com/gabrielmrtt/taski/internal/organization/infra"
 	projectinfra "github.com/gabrielmrtt/taski/internal/project/infra"
 	roleinfra "github.com/gabrielmrtt/taski/internal/role/infra"
+	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
 	teaminfra "github.com/gabrielmrtt/taski/internal/team/infra"
 	userinfra "github.com/gabrielmrtt/taski/internal/user/infra"
 	workspaceinfra "github.com/gabrielmrtt/taski/internal/workspace/infra"
@@ -21,8 +21,8 @@ import (
 func bootstrapApplication() {
 	engine := gin.New()
 
-	apiVersion := config.GetConfig().ApiVersion
-	appPort := config.GetConfig().AppPort
+	apiVersion := config.GetInstance().ApiVersion
+	appPort := config.GetInstance().AppPort
 
 	engine.Use(gin.Recovery())
 	engine.Use(gin.Logger())
@@ -30,35 +30,37 @@ func bootstrapApplication() {
 
 	docs.SwaggerInfo.BasePath = fmt.Sprintf("/api/%s", apiVersion)
 
+	dbConnection := shareddatabase.GetPostgresConnection()
+
 	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{
 		authinfra.BootstrapInfra(authinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		userinfra.BootstrapInfra(userinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		organizationinfra.BootstrapInfra(organizationinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		workspaceinfra.BootstrapInfra(workspaceinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		projectinfra.BootstrapInfra(projectinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		roleinfra.BootstrapInfra(roleinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 		teaminfra.BootstrapInfra(teaminfra.BootstrapInfraOptions{
 			RouterGroup:  g,
-			DbConnection: coredatabase.GetPostgresConnection(),
+			DbConnection: dbConnection,
 		})
 	}
 

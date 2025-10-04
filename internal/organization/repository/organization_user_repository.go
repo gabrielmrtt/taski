@@ -39,9 +39,14 @@ type DeleteOrganizationUserParams struct {
 	UserIdentity         core.Identity
 }
 
+type GetLastAccessedOrganizationUserByUserIdentityParams struct {
+	UserIdentity core.Identity
+}
+
 type OrganizationUserRepository interface {
 	SetTransaction(tx core.Transaction) error
 
+	GetLastAccessedOrganizationUserByUserIdentity(params GetLastAccessedOrganizationUserByUserIdentityParams) (*organization.OrganizationUser, error)
 	GetOrganizationUserByIdentity(params GetOrganizationUserByIdentityParams) (*organization.OrganizationUser, error)
 	PaginateOrganizationUsersBy(params PaginateOrganizationUsersParams) (*core.PaginationOutput[organization.OrganizationUser], error)
 

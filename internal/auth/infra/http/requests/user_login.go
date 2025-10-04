@@ -1,8 +1,6 @@
 package authhttprequests
 
-import (
-	authservice "github.com/gabrielmrtt/taski/internal/auth/service"
-)
+import authservice "github.com/gabrielmrtt/taski/internal/auth/service"
 
 type UserLoginRequest struct {
 	Email    string `json:"email"`

@@ -1,0 +1,1 @@
+ALTER TABLE organization_user ADD COLUMN last_access_at BIGINT;

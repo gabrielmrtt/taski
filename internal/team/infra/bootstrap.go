@@ -2,6 +2,7 @@ package teaminfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationdatabase "github.com/gabrielmrtt/taski/internal/organization/infra/database"
 	teamdatabase "github.com/gabrielmrtt/taski/internal/team/infra/database"
 	teamhttp "github.com/gabrielmrtt/taski/internal/team/infra/http"
@@ -28,5 +29,10 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 
 	TeamHandler := teamhttp.NewTeamHandler(listTeamsService, getTeamService, createTeamService, updateTeamService, deleteTeamService)
 
-	TeamHandler.ConfigureRoutes(options.RouterGroup)
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
+
+	TeamHandler.ConfigureRoutes(configureRoutesOptions)
 }

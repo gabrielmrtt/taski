@@ -23,6 +23,7 @@ type OrganizationUserTable struct {
 	UserInternalId         string `bun:"user_internal_id,pk,notnull,type:uuid"`
 	RoleInternalId         string `bun:"role_internal_id,notnull,type:uuid"`
 	Status                 string `bun:"status,notnull,type:varchar(100)"`
+	LastAccessAt           *int64 `bun:"last_access_at,type:bigint"`
 
 	User *userdatabase.UserTable `bun:"rel:has-one,join:user_internal_id=internal_id"`
 	Role *roledatabase.RoleTable `bun:"rel:has-one,join:role_internal_id=internal_id"`
@@ -45,6 +46,7 @@ func (o *OrganizationUserTable) ToEntity() *organization.OrganizationUser {
 		User:                 *user,
 		Role:                 *role,
 		Status:               organization.OrganizationUserStatuses(o.Status),
+		LastAccessAt:         o.LastAccessAt,
 	}
 }
 
@@ -86,6 +88,38 @@ func (r *OrganizationUserBunRepository) applyFilters(selectQuery *bun.SelectQuer
 	}
 
 	return selectQuery
+}
+
+func (r *OrganizationUserBunRepository) GetLastAccessedOrganizationUserByUserIdentity(params organizationrepo.GetLastAccessedOrganizationUserByUserIdentityParams) (*organization.OrganizationUser, error) {
+	var organizationUser *OrganizationUserTable = new(OrganizationUserTable)
+
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(organizationUser)
+	selectQuery = selectQuery.Where("organization_user.user_internal_id = ?", params.UserIdentity.Internal.String())
+	selectQuery = selectQuery.Order("organization_user.last_access_at DESC")
+	selectQuery = selectQuery.Limit(1)
+
+	err := selectQuery.Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	if organizationUser.OrganizationInternalId == "" {
+		return nil, nil
+	}
+
+	return organizationUser.ToEntity(), nil
 }
 
 func (r *OrganizationUserBunRepository) GetOrganizationUserByIdentity(params organizationrepo.GetOrganizationUserByIdentityParams) (*organization.OrganizationUser, error) {
@@ -195,6 +229,7 @@ func (r *OrganizationUserBunRepository) StoreOrganizationUser(params organizatio
 		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
 		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
 		Status:                 string(params.OrganizationUser.Status),
+		LastAccessAt:           params.OrganizationUser.LastAccessAt,
 	}
 
 	_, err := tx.NewInsert().Model(organizationUserTable).Exec(context.Background())
@@ -237,6 +272,7 @@ func (r *OrganizationUserBunRepository) UpdateOrganizationUser(params organizati
 		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
 		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
 		Status:                 string(params.OrganizationUser.Status),
+		LastAccessAt:           params.OrganizationUser.LastAccessAt,
 	}
 
 	_, err := tx.NewUpdate().Model(organizationUserTable).Where("user_internal_id = ? AND organization_internal_id = ?", params.OrganizationUser.User.Identity.Internal.String(), params.OrganizationUser.OrganizationIdentity.Internal.String()).Exec(context.Background())

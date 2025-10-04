@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/gabrielmrtt/taski/cmd/seed/seeders"
-	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	roledatabase "github.com/gabrielmrtt/taski/internal/role/infra/database"
+	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
 	"github.com/uptrace/bun"
 )
 
@@ -31,13 +31,11 @@ func getDatabaseRepositories(env string) (DatabaseRepositories, *bun.DB) {
 
 	switch env {
 	case "default":
-		connection = coredatabase.GetPostgresConnection()
+		connection = shareddatabase.GetPostgresConnection()
 		permissionRepository = roledatabase.NewPermissionBunRepository(connection)
 		roleRepository = roledatabase.NewRoleBunRepository(connection)
 	case "test":
-		connection = coredatabase.GetSQLiteConnection()
-		permissionRepository = roledatabase.NewPermissionBunRepository(connection)
-		roleRepository = roledatabase.NewRoleBunRepository(connection)
+		log.Fatalf("Test environment is not supported for seeding")
 	default:
 		log.Fatalf("Invalid environment: %s", env)
 	}

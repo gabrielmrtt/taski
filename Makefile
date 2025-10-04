@@ -5,7 +5,7 @@ build:
 	@go build -o bin/taski cmd/api/main.go
 
 new-migration:
-	@migrate create -ext sql -dir internal/core/database/migrations -seq $(name)
+	@migrate create -ext sql -dir internal/shared/database/migrations -seq $(name)
 
 migrate-up:
 ifeq ($(env),test)
@@ -36,3 +36,6 @@ endif
 
 swagger:
 	@swag init -g cmd/api/main.go -d . -o docs --parseDependency --parseInternal
+
+test:
+	@go test ./...

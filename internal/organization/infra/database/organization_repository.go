@@ -375,6 +375,9 @@ func (r *OrganizationBunRepository) DeleteOrganization(params organizationrepo.D
 
 	if shouldCommit {
 		err = tx.Commit()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

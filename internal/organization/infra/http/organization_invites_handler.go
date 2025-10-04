@@ -3,13 +3,13 @@ package organizationhttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	"github.com/gabrielmrtt/taski/internal/organization"
 	organizationhttpmiddlewares "github.com/gabrielmrtt/taski/internal/organization/infra/http/middlewares"
 	organizationhttprequests "github.com/gabrielmrtt/taski/internal/organization/infra/http/requests"
 	organizationservice "github.com/gabrielmrtt/taski/internal/organization/service"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -55,7 +55,7 @@ func (c *OrganizationInvitesHandler) ListMyOrganizationInvites(ctx *gin.Context)
 	}
 
 	input := request.ToInput()
-	input.AuthenticatedUserIdentity = userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	input.AuthenticatedUserIdentity = *authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	response, err := c.ListMyOrganizationInvitesService.Execute(input)
 	if err != nil {
@@ -146,11 +146,15 @@ func (c *OrganizationInvitesHandler) RefuseOrganizationUserInvitation(ctx *gin.C
 	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *OrganizationInvitesHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization-invites")
+func (c *OrganizationInvitesHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
+	}
+
+	g := options.RouterGroup.Group("/organization-invites")
 	{
-		g.Use(userhttpmiddlewares.AuthMiddleware())
-		g.Use(organizationhttpmiddlewares.UserMustBeSame())
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
+		g.Use(organizationhttpmiddlewares.UserMustBeSame(middlewareOptions))
 
 		g.GET("", c.ListMyOrganizationInvites)
 		g.PATCH("/:organizationId/user/:userId/accept-invitation", c.AcceptOrganizationUserInvitation)

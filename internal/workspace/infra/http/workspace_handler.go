@@ -3,10 +3,10 @@ package workspacehttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationhttpmiddlewares "github.com/gabrielmrtt/taski/internal/organization/infra/http/middlewares"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/workspace"
 	workspacehttpmiddlewares "github.com/gabrielmrtt/taski/internal/workspace/infra/http/middlewares"
 	workspacehttprequests "github.com/gabrielmrtt/taski/internal/workspace/infra/http/requests"
@@ -56,8 +56,8 @@ type ListWorkspacesResponse = corehttp.HttpSuccessResponseWithData[workspace.Wor
 // @Router /organization/:organizationId/workspace [get]
 func (c *WorkspaceHandler) ListWorkspaces(ctx *gin.Context) {
 	var request workspacehttprequests.ListWorkspacesRequest
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -65,8 +65,8 @@ func (c *WorkspaceHandler) ListWorkspaces(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
-	input.Filters.LoggedUserIdentity = &authenticatedUserIdentity
+	input.OrganizationIdentity = *organizationIdentity
+	input.Filters.LoggedUserIdentity = authenticatedUserIdentity
 
 	response, err := c.ListWorkspacesService.Execute(input)
 	if err != nil {
@@ -95,11 +95,11 @@ type GetWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Works
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId/workspace/:workspaceId [get]
 func (c *WorkspaceHandler) GetWorkspace(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 
 	input := workspaceservice.GetWorkspaceInput{
-		OrganizationIdentity: organizationIdentity,
+		OrganizationIdentity: *organizationIdentity,
 		WorkspaceIdentity:    workspaceIdentity,
 	}
 
@@ -130,8 +130,8 @@ type CreateWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Wo
 // @Router /organization/:organizationId/workspace [post]
 func (c *WorkspaceHandler) CreateWorkspace(ctx *gin.Context) {
 	var request workspacehttprequests.CreateWorkspaceRequest
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -139,8 +139,8 @@ func (c *WorkspaceHandler) CreateWorkspace(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
-	input.UserCreatorIdentity = authenticatedUserIdentity
+	input.OrganizationIdentity = *organizationIdentity
+	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateWorkspaceService.Execute(input)
 	if err != nil {
@@ -171,9 +171,9 @@ type UpdateWorkspaceResponse = corehttp.EmptyHttpSuccessResponse
 // @Router /organization/:organizationId/workspace/:workspaceId [put]
 func (c *WorkspaceHandler) UpdateWorkspace(ctx *gin.Context) {
 	var request workspacehttprequests.UpdateWorkspaceRequest
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -181,9 +181,9 @@ func (c *WorkspaceHandler) UpdateWorkspace(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
+	input.OrganizationIdentity = *organizationIdentity
 	input.WorkspaceIdentity = workspaceIdentity
-	input.UserEditorIdentity = authenticatedUserIdentity
+	input.UserEditorIdentity = *authenticatedUserIdentity
 
 	err := c.UpdateWorkspaceService.Execute(input)
 	if err != nil {
@@ -212,11 +212,11 @@ type DeleteWorkspaceResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId/workspace/:workspaceId [delete]
 func (c *WorkspaceHandler) DeleteWorkspace(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	workspaceIdentity := core.NewIdentityFromPublic(ctx.Param("workspaceId"))
 
 	input := workspaceservice.DeleteWorkspaceInput{
-		OrganizationIdentity: organizationIdentity,
+		OrganizationIdentity: *organizationIdentity,
 		WorkspaceIdentity:    workspaceIdentity,
 	}
 
@@ -229,16 +229,20 @@ func (c *WorkspaceHandler) DeleteWorkspace(ctx *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *WorkspaceHandler) ConfigureRoutes(group *gin.RouterGroup) *gin.RouterGroup {
-	g := group.Group("/organization/:organizationId/workspace")
-	{
-		g.Use(userhttpmiddlewares.AuthMiddleware())
+func (c *WorkspaceHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
+	}
 
-		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("workspaces:view"), c.ListWorkspaces)
-		g.GET("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:view"), workspacehttpmiddlewares.UserMustBeInWorkspace(), c.GetWorkspace)
-		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("workspaces:create"), c.CreateWorkspace)
-		g.PUT("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:update"), workspacehttpmiddlewares.UserMustBeInWorkspace(), c.UpdateWorkspace)
-		g.DELETE("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:delete"), workspacehttpmiddlewares.UserMustBeInWorkspace(), c.DeleteWorkspace)
+	g := options.RouterGroup.Group("/workspace")
+	{
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
+
+		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("workspaces:view", middlewareOptions), c.ListWorkspaces)
+		g.GET("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:view", middlewareOptions), workspacehttpmiddlewares.UserMustBeInWorkspace(middlewareOptions), c.GetWorkspace)
+		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("workspaces:create", middlewareOptions), c.CreateWorkspace)
+		g.PUT("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:update", middlewareOptions), workspacehttpmiddlewares.UserMustBeInWorkspace(middlewareOptions), c.UpdateWorkspace)
+		g.DELETE("/:workspaceId", organizationhttpmiddlewares.UserMustHavePermission("workspaces:delete", middlewareOptions), workspacehttpmiddlewares.UserMustBeInWorkspace(middlewareOptions), c.DeleteWorkspace)
 	}
 
 	return g

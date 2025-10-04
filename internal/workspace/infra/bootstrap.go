@@ -2,6 +2,7 @@ package workspaceinfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	workspacedatabase "github.com/gabrielmrtt/taski/internal/workspace/infra/database"
 	workspacehttp "github.com/gabrielmrtt/taski/internal/workspace/infra/http"
@@ -27,6 +28,11 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	updateWorkspaceService := workspaceservice.NewUpdateWorkspaceService(workspaceRepository, transactionRepository)
 	deleteWorkspaceService := workspaceservice.NewDeleteWorkspaceService(workspaceRepository, transactionRepository)
 
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
+
 	WorkspaceHandler := workspacehttp.NewWorkspaceHandler(listWorkspacesService, getWorkspaceService, createWorkspaceService, updateWorkspaceService, deleteWorkspaceService)
-	WorkspaceHandler.ConfigureRoutes(options.RouterGroup)
+	WorkspaceHandler.ConfigureRoutes(configureRoutesOptions)
 }

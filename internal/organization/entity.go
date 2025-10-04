@@ -74,6 +74,7 @@ type OrganizationUser struct {
 	User                 user.User
 	Role                 role.Role
 	Status               OrganizationUserStatuses
+	LastAccessAt         *int64
 }
 
 type NewOrganizationUserInput struct {
@@ -84,11 +85,14 @@ type NewOrganizationUserInput struct {
 }
 
 func NewOrganizationUser(input NewOrganizationUserInput) (*OrganizationUser, error) {
+	now := datetimeutils.EpochNow()
+
 	return &OrganizationUser{
 		OrganizationIdentity: input.OrganizationIdentity,
 		User:                 input.User,
 		Role:                 input.Role,
 		Status:               input.Status,
+		LastAccessAt:         &now,
 	}, nil
 }
 
@@ -118,6 +122,8 @@ func (o *OrganizationUser) Invite() {
 
 func (o *OrganizationUser) AcceptInvitation() {
 	o.Status = OrganizationUserStatusActive
+	now := datetimeutils.EpochNow()
+	o.LastAccessAt = &now
 }
 
 func (o *OrganizationUser) RefuseInvitation() {
@@ -130,4 +136,9 @@ func (o *OrganizationUser) ChangeRole(role role.Role) {
 
 func (o *OrganizationUser) CanExecuteAction(permissionSlug role.PermissionSlugs) bool {
 	return o.Role.HasPermission(permissionSlug)
+}
+
+func (o *OrganizationUser) Access() {
+	now := datetimeutils.EpochNow()
+	o.LastAccessAt = &now
 }

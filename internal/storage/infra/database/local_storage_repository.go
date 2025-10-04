@@ -12,7 +12,7 @@ type LocalStorageRepository struct {
 }
 
 func NewLocalStorageRepository() *LocalStorageRepository {
-	basePath := config.GetConfig().StorageLocalBasePath
+	basePath := config.GetInstance().StorageLocalBasePath
 
 	return &LocalStorageRepository{
 		basePath: basePath,

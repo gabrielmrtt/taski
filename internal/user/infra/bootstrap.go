@@ -2,6 +2,7 @@ package userinfra
 
 import (
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	storagedatabase "github.com/gabrielmrtt/taski/internal/storage/infra/database"
 	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	userhttp "github.com/gabrielmrtt/taski/internal/user/infra/http"
@@ -36,6 +37,11 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	userController := userhttp.NewUserHandler(getMeService, changeUserPasswordService, updateUserCredentialsService, updateUserDataService, deleteUserService)
 	userRegistrationController := userhttp.NewUserRegistrationHandler(registerUserService, verifyUserRegistrationService, forgotUserPasswordService, recoverUserPasswordService)
 
-	userController.ConfigureRoutes(options.RouterGroup)
-	userRegistrationController.ConfigureRoutes(options.RouterGroup)
+	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
+		DbConnection: options.DbConnection,
+		RouterGroup:  options.RouterGroup,
+	}
+
+	userController.ConfigureRoutes(configureRoutesOptions)
+	userRegistrationController.ConfigureRoutes(configureRoutesOptions)
 }

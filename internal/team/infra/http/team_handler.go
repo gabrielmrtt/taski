@@ -3,13 +3,13 @@ package teamhttp
 import (
 	"net/http"
 
+	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/core"
 	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationhttpmiddlewares "github.com/gabrielmrtt/taski/internal/organization/infra/http/middlewares"
 	"github.com/gabrielmrtt/taski/internal/team"
 	teamhttprequests "github.com/gabrielmrtt/taski/internal/team/infra/http/requests"
 	teamservice "github.com/gabrielmrtt/taski/internal/team/service"
-	userhttpmiddlewares "github.com/gabrielmrtt/taski/internal/user/infra/http/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,7 +56,7 @@ type ListTeamsResponse = corehttp.HttpSuccessResponseWithData[core.PaginationOut
 func (c *TeamHandler) ListTeams(ctx *gin.Context) {
 	var request teamhttprequests.ListTeamsRequest
 
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 
 	if err := request.FromQuery(ctx); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -64,7 +64,7 @@ func (c *TeamHandler) ListTeams(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
+	input.OrganizationIdentity = *organizationIdentity
 
 	response, err := c.ListTeamsService.Execute(input)
 	if err != nil {
@@ -93,11 +93,11 @@ type GetTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 // @Router /organization/:organizationId/team/:teamId [get]
 func (c *TeamHandler) GetTeam(ctx *gin.Context) {
 	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 
 	input := teamservice.GetTeamInput{
 		TeamIdentity:         teamIdentity,
-		OrganizationIdentity: organizationIdentity,
+		OrganizationIdentity: *organizationIdentity,
 	}
 
 	response, err := c.GetTeamService.Execute(input)
@@ -126,9 +126,8 @@ type CreateTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 // @Router /organization/:organizationId/team [post]
 func (c *TeamHandler) CreateTeam(ctx *gin.Context) {
 	var request teamhttprequests.CreateTeamRequest
-
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -136,8 +135,8 @@ func (c *TeamHandler) CreateTeam(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
-	input.UserCreatorIdentity = authenticatedUserIdentity
+	input.OrganizationIdentity = *organizationIdentity
+	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateTeamService.Execute(input)
 	if err != nil {
@@ -168,9 +167,9 @@ type UpdateTeamResponse = corehttp.EmptyHttpSuccessResponse
 func (c *TeamHandler) UpdateTeam(ctx *gin.Context) {
 	var request teamhttprequests.UpdateTeamRequest
 
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
-	authenticatedUserIdentity := userhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
+	authenticatedUserIdentity := authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
@@ -178,9 +177,9 @@ func (c *TeamHandler) UpdateTeam(ctx *gin.Context) {
 	}
 
 	input := request.ToInput()
-	input.OrganizationIdentity = organizationIdentity
+	input.OrganizationIdentity = *organizationIdentity
 	input.TeamIdentity = teamIdentity
-	input.UserEditorIdentity = authenticatedUserIdentity
+	input.UserEditorIdentity = *authenticatedUserIdentity
 
 	err := c.UpdateTeamService.Execute(input)
 	if err != nil {
@@ -208,12 +207,12 @@ type DeleteTeamResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
 // @Router /organization/:organizationId/team/:teamId [delete]
 func (c *TeamHandler) DeleteTeam(ctx *gin.Context) {
-	organizationIdentity := organizationhttpmiddlewares.GetOrganizationIdentityFromPath(ctx)
+	organizationIdentity := authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	teamIdentity := core.NewIdentityFromPublic(ctx.Param("teamId"))
 
 	input := teamservice.DeleteTeamInput{
 		TeamIdentity:         teamIdentity,
-		OrganizationIdentity: organizationIdentity,
+		OrganizationIdentity: *organizationIdentity,
 	}
 
 	err := c.DeleteTeamService.Execute(input)
@@ -225,17 +224,21 @@ func (c *TeamHandler) DeleteTeam(ctx *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(ctx, http.StatusOK)
 }
 
-func (c *TeamHandler) ConfigureRoutes(g *gin.RouterGroup) *gin.RouterGroup {
-	group := g.Group("/organization/:organizationId/team")
-	{
-		group.Use(userhttpmiddlewares.AuthMiddleware())
-
-		group.GET("", organizationhttpmiddlewares.UserMustHavePermission("teams:view"), c.ListTeams)
-		group.GET("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:view"), c.GetTeam)
-		group.POST("", organizationhttpmiddlewares.UserMustHavePermission("teams:create"), c.CreateTeam)
-		group.PUT("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:update"), c.UpdateTeam)
-		group.DELETE("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:delete"), c.DeleteTeam)
+func (c *TeamHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
+	middlewareOptions := corehttp.MiddlewareOptions{
+		DbConnection: options.DbConnection,
 	}
 
-	return group
+	g := options.RouterGroup.Group("/team")
+	{
+		g.Use(authhttpmiddlewares.AuthMiddleware(middlewareOptions))
+
+		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("teams:view", middlewareOptions), c.ListTeams)
+		g.GET("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:view", middlewareOptions), c.GetTeam)
+		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("teams:create", middlewareOptions), c.CreateTeam)
+		g.PUT("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:update", middlewareOptions), c.UpdateTeam)
+		g.DELETE("/:teamId", organizationhttpmiddlewares.UserMustHavePermission("teams:delete", middlewareOptions), c.DeleteTeam)
+	}
+
+	return g
 }
