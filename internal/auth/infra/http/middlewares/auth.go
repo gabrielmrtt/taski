@@ -74,7 +74,7 @@ func AuthMiddleware(options corehttp.MiddlewareOptions) gin.HandlerFunc {
 		}
 
 		ctx.Set("authenticated_user_id", claims.AuthenticatedUserId)
-		ctx.Set("authenticated_user_organization_id", claims.AuthenticatedUserOrganizationId)
+		ctx.Set("authenticated_user_organization_id", *claims.AuthenticatedUserOrganizationId)
 		ctx.Next()
 	}
 }

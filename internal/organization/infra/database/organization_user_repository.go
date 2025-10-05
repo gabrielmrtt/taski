@@ -102,6 +102,7 @@ func (r *OrganizationUserBunRepository) GetLastAccessedOrganizationUserByUserIde
 	}
 
 	selectQuery = selectQuery.Model(organizationUser)
+	selectQuery = selectQuery.Relation("Role.RolePermissions.Permission").Relation("User.Credentials").Relation("User.Data")
 	selectQuery = selectQuery.Where("organization_user.user_internal_id = ?", params.UserIdentity.Internal.String())
 	selectQuery = selectQuery.Order("organization_user.last_access_at DESC")
 	selectQuery = selectQuery.Limit(1)
