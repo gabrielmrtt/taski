@@ -43,17 +43,15 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 		return nil, err
 	}
 
-	var rolesDto []role.RoleDto
+	var rolesDto []role.RoleDto = make([]role.RoleDto, 0)
 	for _, rol := range roles.Data {
 		rolesDto = append(rolesDto, *role.RoleToDto(&rol))
 	}
 
-	paginationOutput := core.PaginationOutput[role.RoleDto]{
+	return &core.PaginationOutput[role.RoleDto]{
 		Data:    rolesDto,
 		Page:    roles.Page,
 		HasMore: roles.HasMore,
 		Total:   roles.Total,
-	}
-
-	return &paginationOutput, nil
+	}, nil
 }
