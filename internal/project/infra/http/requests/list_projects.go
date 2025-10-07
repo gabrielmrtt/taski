@@ -68,11 +68,11 @@ func (r *ListProjectsRequest) ToInput() projectservice.ListProjectsInput {
 			Status:            statusFilter,
 			PriorityLevel:     priorityLevelFilter,
 		},
-		Pagination: &core.PaginationInput{
+		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,
 		},
-		SortInput: &core.SortInput{
+		SortInput: core.SortInput{
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},

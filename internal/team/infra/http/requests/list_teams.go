@@ -51,11 +51,11 @@ func (r *ListTeamsRequest) ToInput() teamservice.ListTeamsInput {
 			Name:   nameFilter,
 			Status: statusFilter,
 		},
-		Pagination: &core.PaginationInput{
+		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,
 		},
-		SortInput: &core.SortInput{
+		SortInput: core.SortInput{
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},

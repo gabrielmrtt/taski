@@ -156,12 +156,12 @@ func (r *OrganizationBunRepository) PaginateOrganizationsBy(params organizationr
 		selectQuery = selectQuery.Where("deleted_at IS NULL")
 	}
 
-	selectQuery = coredatabase.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
 	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
 	if err != nil {

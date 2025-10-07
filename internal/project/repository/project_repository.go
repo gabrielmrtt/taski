@@ -27,9 +27,10 @@ type GetProjectByIdentityParams struct {
 }
 
 type PaginateProjectsParams struct {
+	ShowDeleted    bool
 	Filters        ProjectFilters
-	SortInput      *core.SortInput
-	Pagination     *core.PaginationInput
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
 	RelationsInput core.RelationsInput
 }
 

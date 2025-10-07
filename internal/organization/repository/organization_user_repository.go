@@ -22,8 +22,8 @@ type GetOrganizationUserByIdentityParams struct {
 
 type PaginateOrganizationUsersParams struct {
 	Filters    OrganizationUserFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 type StoreOrganizationUserParams struct {

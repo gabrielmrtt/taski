@@ -20,8 +20,8 @@ func NewListRolesService(
 
 type ListRolesInput struct {
 	Filters        rolerepo.RoleFilters
-	SortInput      *core.SortInput
-	Pagination     *core.PaginationInput
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
 	RelationsInput core.RelationsInput
 }
 

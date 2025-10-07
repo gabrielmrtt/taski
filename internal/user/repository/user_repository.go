@@ -25,8 +25,8 @@ type GetUserByEmailParams struct {
 
 type PaginateUsersParams struct {
 	Filters    UserFilters
-	Pagination *core.PaginationInput
-	SortInput  *core.SortInput
+	Pagination core.PaginationInput
+	SortInput  core.SortInput
 }
 
 type StoreUserParams struct {

@@ -21,8 +21,8 @@ func NewListOrganizationsService(
 type ListOrganizationsInput struct {
 	Filters        organizationrepo.OrganizationFilters
 	ShowDeleted    bool
-	Pagination     *core.PaginationInput
-	SortInput      *core.SortInput
+	Pagination     core.PaginationInput
+	SortInput      core.SortInput
 	RelationsInput core.RelationsInput
 }
 

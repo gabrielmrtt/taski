@@ -18,8 +18,8 @@ func NewListMyOrganizationInvitesService(organizationRepository organizationrepo
 
 type ListMyOrganizationInvitesInput struct {
 	AuthenticatedUserIdentity core.Identity
-	Pagination                *core.PaginationInput
-	SortInput                 *core.SortInput
+	Pagination                core.PaginationInput
+	SortInput                 core.SortInput
 	RelationsInput            core.RelationsInput
 }
 

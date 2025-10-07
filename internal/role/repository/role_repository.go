@@ -6,7 +6,7 @@ import (
 )
 
 type RoleFilters struct {
-	OrganizationIdentity core.Identity
+	OrganizationIdentity *core.Identity
 	Name                 *core.ComparableFilter[string]
 	Description          *core.ComparableFilter[string]
 	CreatedAt            *core.ComparableFilter[int64]
@@ -29,8 +29,8 @@ type GetDefaultRoleParams struct {
 
 type PaginateRolesParams struct {
 	Filters    RoleFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 type StoreRoleParams struct {

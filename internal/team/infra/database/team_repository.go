@@ -161,12 +161,12 @@ func (r *TeamBunRepository) PaginateTeamsBy(params teamrepo.PaginateTeamsParams)
 	selectQuery = selectQuery.Model(&teams)
 	selectQuery = selectQuery.Relation("Members.User").Relation("Members.User.Credentials").Relation("Members.User.Data")
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
-	selectQuery = coredatabase.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
 	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
 	if err != nil {

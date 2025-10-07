@@ -24,8 +24,8 @@ type ListPermissionsParams struct {
 
 type PaginatePermissionsParams struct {
 	Filters    PermissionFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 type StorePermissionParams struct {

@@ -36,11 +36,11 @@ func (r *ListMyOrganizationInvitesRequest) ToInput() organizationservice.ListMyO
 	}
 
 	return organizationservice.ListMyOrganizationInvitesInput{
-		Pagination: &core.PaginationInput{
+		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,
 		},
-		SortInput: &core.SortInput{
+		SortInput: core.SortInput{
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},

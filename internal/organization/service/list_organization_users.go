@@ -20,8 +20,8 @@ func NewListOrganizationUsersService(
 
 type ListOrganizationUsersInput struct {
 	Filters        organizationrepo.OrganizationUserFilters
-	Pagination     *core.PaginationInput
-	SortInput      *core.SortInput
+	Pagination     core.PaginationInput
+	SortInput      core.SortInput
 	RelationsInput core.RelationsInput
 }
 

@@ -23,10 +23,10 @@ type GetWorkspaceByIdentityParams struct {
 }
 
 type PaginateWorkspacesParams struct {
-	Filters     WorkspaceFilters
-	SortInput   *core.SortInput
-	Pagination  *core.PaginationInput
 	ShowDeleted bool
+	Filters     WorkspaceFilters
+	SortInput   core.SortInput
+	Pagination  core.PaginationInput
 }
 
 type StoreWorkspaceParams struct {

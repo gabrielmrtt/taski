@@ -64,7 +64,7 @@ func (c *TeamHandler) ListTeams(ctx *gin.Context) {
 	}
 
 	input = request.ToInput()
-	input.Filters.OrganizationIdentity = *organizationIdentity
+	input.Filters.OrganizationIdentity = organizationIdentity
 
 	response, err := c.ListTeamsService.Execute(input)
 	if err != nil {

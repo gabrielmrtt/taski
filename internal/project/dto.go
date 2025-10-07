@@ -64,3 +64,37 @@ func ProjectToDto(project *Project) *ProjectDto {
 		UpdatedAt:     updatedAt,
 	}
 }
+
+type ProjectTaskStatusDto struct {
+	Id                       string `json:"id"`
+	Name                     string `json:"name"`
+	Color                    string `json:"color"`
+	Order                    *int8  `json:"order"`
+	ShouldSetTaskToCompleted bool   `json:"shouldSetTaskToCompleted"`
+	IsDefault                bool   `json:"isDefault"`
+}
+
+func ProjectTaskStatusToDto(projectTaskStatus *ProjectTaskStatus) *ProjectTaskStatusDto {
+	return &ProjectTaskStatusDto{
+		Id:                       projectTaskStatus.Identity.Public,
+		Name:                     projectTaskStatus.Name,
+		Color:                    projectTaskStatus.Color,
+		Order:                    projectTaskStatus.Order,
+		ShouldSetTaskToCompleted: projectTaskStatus.ShouldSetTaskToCompleted,
+		IsDefault:                projectTaskStatus.IsDefault,
+	}
+}
+
+type ProjectTaskCategoryDto struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+func ProjectTaskCategoryToDto(projectTaskCategory *ProjectTaskCategory) *ProjectTaskCategoryDto {
+	return &ProjectTaskCategoryDto{
+		Id:    projectTaskCategory.Identity.Public,
+		Name:  projectTaskCategory.Name,
+		Color: projectTaskCategory.Color,
+	}
+}

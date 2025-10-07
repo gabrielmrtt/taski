@@ -211,12 +211,12 @@ func (r *UserBunRepository) PaginateUsersBy(params userrepo.PaginateUsersParams)
 	selectQuery = selectQuery.Model(&users)
 	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
-	selectQuery = coredatabase.ApplySort(selectQuery, *params.SortInput)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
 	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
 	if err != nil {

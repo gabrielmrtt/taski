@@ -9,8 +9,8 @@ type FileInput struct {
 type SortDirection string
 
 const (
-	SortDirectionAsc SortDirection = "asc"
-	SortDirectionDec SortDirection = "desc"
+	SortDirectionAsc  SortDirection = "asc"
+	SortDirectionDesc SortDirection = "desc"
 )
 
 type SortInput struct {
@@ -24,12 +24,14 @@ type PaginationInput struct {
 }
 
 type ComparableFilter[T any] struct {
-	GreaterThan *T
-	LessThan    *T
-	Equals      *T
-	Like        *T
-	In          *[]T
-	Negate      *bool
+	GreaterThan        *T
+	GreaterThanOrEqual *T
+	LessThan           *T
+	LessThanOrEqual    *T
+	Equals             *T
+	Like               *T
+	In                 *[]T
+	Negate             *bool
 }
 
 type ServiceInput interface {

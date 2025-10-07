@@ -177,7 +177,7 @@ func (c *RoleHandler) ListRoles(ctx *gin.Context) {
 	}
 
 	input = request.ToInput()
-	input.Filters.OrganizationIdentity = *organizationIdentity
+	input.Filters.OrganizationIdentity = organizationIdentity
 
 	response, err := c.ListRolesService.Execute(input)
 	if err != nil {

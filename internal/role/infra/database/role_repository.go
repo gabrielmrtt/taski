@@ -252,6 +252,7 @@ func (r *RoleBunRepository) PaginateRolesBy(params rolerepo.PaginateRolesParams)
 		return nil, err
 	}
 
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
 	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
 	if err != nil {

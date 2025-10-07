@@ -18,8 +18,8 @@ func NewListTeamsService(teamRepository teamrepo.TeamRepository) *ListTeamsServi
 
 type ListTeamsInput struct {
 	Filters    teamrepo.TeamFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 func (i ListTeamsInput) Validate() error {

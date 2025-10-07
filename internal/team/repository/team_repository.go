@@ -6,7 +6,7 @@ import (
 )
 
 type TeamFilters struct {
-	OrganizationIdentity core.Identity
+	OrganizationIdentity *core.Identity
 	Name                 *core.ComparableFilter[string]
 	Status               *core.ComparableFilter[team.TeamStatuses]
 	CreatedAt            *core.ComparableFilter[int64]
@@ -20,8 +20,8 @@ type GetTeamByIdentityParams struct {
 
 type PaginateTeamsParams struct {
 	Filters    TeamFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 type StoreTeamParams struct {

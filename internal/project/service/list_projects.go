@@ -20,8 +20,8 @@ func NewListProjectsService(
 
 type ListProjectsInput struct {
 	Filters    projectrepo.ProjectFilters
-	SortInput  *core.SortInput
-	Pagination *core.PaginationInput
+	SortInput  core.SortInput
+	Pagination core.PaginationInput
 }
 
 func (i ListProjectsInput) Validate() error {
@@ -34,9 +34,10 @@ func (s *ListProjectsService) Execute(input ListProjectsInput) (*core.Pagination
 	}
 
 	prjs, err := s.ProjectRepository.PaginateProjectsBy(projectrepo.PaginateProjectsParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:     input.Filters,
+		SortInput:   input.SortInput,
+		Pagination:  input.Pagination,
+		ShowDeleted: false,
 	})
 	if err != nil {
 		return nil, err

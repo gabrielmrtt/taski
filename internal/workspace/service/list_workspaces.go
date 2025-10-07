@@ -20,10 +20,9 @@ func NewListWorkspacesService(
 
 type ListWorkspacesInput struct {
 	Filters        workspacerepo.WorkspaceFilters
-	SortInput      *core.SortInput
-	Pagination     *core.PaginationInput
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
 	RelationsInput core.RelationsInput
-	ShowDeleted    bool
 }
 
 func (i ListWorkspacesInput) Validate() error {
@@ -39,7 +38,7 @@ func (s *ListWorkspacesService) Execute(input ListWorkspacesInput) (*core.Pagina
 		Filters:     input.Filters,
 		SortInput:   input.SortInput,
 		Pagination:  input.Pagination,
-		ShowDeleted: input.ShowDeleted,
+		ShowDeleted: false,
 	})
 	if err != nil {
 		return nil, err

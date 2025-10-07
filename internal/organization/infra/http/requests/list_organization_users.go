@@ -90,11 +90,11 @@ func (r *ListOrganizationUsersRequest) ToInput() organizationservice.ListOrganiz
 			RolePublicId: roleIdFilter,
 			Status:       statusFilter,
 		},
-		Pagination: &core.PaginationInput{
+		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,
 		},
-		SortInput: &core.SortInput{
+		SortInput: core.SortInput{
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},

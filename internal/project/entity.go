@@ -270,3 +270,145 @@ func (p *ProjectUser) AcceptInvitation() {
 func (p *ProjectUser) RefuseInvitation() {
 	p.Status = ProjectUserStatusRefused
 }
+
+type ProjectTaskStatus struct {
+	Identity                 core.Identity
+	ProjectIdentity          core.Identity
+	Name                     string
+	Color                    string
+	Order                    *int8
+	ShouldSetTaskToCompleted bool
+	IsDefault                bool
+	DeletedAt                *int64
+}
+
+type NewProjectTaskStatusInput struct {
+	Name                     string
+	Color                    string
+	Order                    *int8
+	ShouldSetTaskToCompleted bool
+	IsDefault                bool
+	ProjectIdentity          core.Identity
+}
+
+func NewProjectTaskStatus(input NewProjectTaskStatusInput) (*ProjectTaskStatus, error) {
+	if _, err := core.NewName(input.Name); err != nil {
+		return nil, err
+	}
+
+	if _, err := core.NewColor(input.Color); err != nil {
+		return nil, err
+	}
+
+	if input.IsDefault && input.ShouldSetTaskToCompleted {
+		return nil, core.NewConflictError("project status should not be set to completed and default at the same time")
+	}
+
+	return &ProjectTaskStatus{
+		Identity:                 core.NewIdentity(ProjectTaskStatusIdentityPrefix),
+		ProjectIdentity:          input.ProjectIdentity,
+		Name:                     input.Name,
+		Color:                    input.Color,
+		Order:                    input.Order,
+		ShouldSetTaskToCompleted: input.ShouldSetTaskToCompleted,
+		IsDefault:                input.IsDefault,
+		DeletedAt:                nil,
+	}, nil
+}
+
+func (s *ProjectTaskStatus) ChangeName(name string) error {
+	if _, err := core.NewName(name); err != nil {
+		return err
+	}
+
+	s.Name = name
+
+	return nil
+}
+
+func (s *ProjectTaskStatus) ChangeColor(color string) error {
+	if _, err := core.NewColor(color); err != nil {
+		return err
+	}
+
+	s.Color = color
+
+	return nil
+}
+
+func (s *ProjectTaskStatus) ChangeOrder(order int8) error {
+	s.Order = &order
+	return nil
+}
+
+func (s *ProjectTaskStatus) SetTaskToCompleted(v bool) error {
+	s.ShouldSetTaskToCompleted = v
+	return nil
+}
+
+func (s *ProjectTaskStatus) SetIsDefault(v bool) error {
+	if s.ShouldSetTaskToCompleted && v {
+		return core.NewConflictError("project status should not be set to completed and default at the same time")
+	}
+
+	s.IsDefault = v
+	return nil
+}
+
+func (s *ProjectTaskStatus) Delete() {
+	now := datetimeutils.EpochNow()
+	s.DeletedAt = &now
+}
+
+type ProjectTaskCategory struct {
+	Identity        core.Identity
+	ProjectIdentity core.Identity
+	Name            string
+	Color           string
+	DeletedAt       *int64
+}
+
+type NewProjectTaskCategoryInput struct {
+	Name  string
+	Color string
+}
+
+func NewProjectTaskCategory(input NewProjectTaskCategoryInput) (*ProjectTaskCategory, error) {
+	if _, err := core.NewName(input.Name); err != nil {
+		return nil, err
+	}
+
+	if _, err := core.NewColor(input.Color); err != nil {
+		return nil, err
+	}
+
+	return &ProjectTaskCategory{
+		Identity:  core.NewIdentity(ProjectTaskCategoryIdentityPrefix),
+		Name:      input.Name,
+		Color:     input.Color,
+		DeletedAt: nil,
+	}, nil
+}
+
+func (c *ProjectTaskCategory) ChangeName(name string) error {
+	if _, err := core.NewName(name); err != nil {
+		return err
+	}
+
+	c.Name = name
+	return nil
+}
+
+func (c *ProjectTaskCategory) ChangeColor(color string) error {
+	if _, err := core.NewColor(color); err != nil {
+		return err
+	}
+
+	c.Color = color
+	return nil
+}
+
+func (c *ProjectTaskCategory) Delete() {
+	now := datetimeutils.EpochNow()
+	c.DeletedAt = &now
+}

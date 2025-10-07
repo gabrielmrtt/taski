@@ -190,11 +190,17 @@ func (r *ProjectBunRepository) PaginateProjectsBy(params projectrepo.PaginatePro
 	selectQuery = selectQuery.Model(&projects)
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
+
+	if !params.ShowDeleted {
+		selectQuery = selectQuery.Where("deleted_at IS NULL")
+	}
+
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
 	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
 	err = selectQuery.Scan(context.Background())
 	if err != nil {

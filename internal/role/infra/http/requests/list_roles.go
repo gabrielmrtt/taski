@@ -57,11 +57,11 @@ func (r *ListRolesRequest) ToInput() roleservice.ListRolesInput {
 			Name:        nameFilter,
 			Description: descriptionFilter,
 		},
-		Pagination: &core.PaginationInput{
+		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,
 		},
-		SortInput: &core.SortInput{
+		SortInput: core.SortInput{
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},

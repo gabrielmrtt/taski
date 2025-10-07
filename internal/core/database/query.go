@@ -49,11 +49,27 @@ func ApplyComparableFilter[T any](query *bun.SelectQuery, field string, filter *
 		}
 	}
 
+	if filter.GreaterThanOrEqual != nil {
+		if filter.Negate != nil {
+			query.Where(fmt.Sprintf("%s < ?", field), filter.GreaterThanOrEqual)
+		} else {
+			query.Where(fmt.Sprintf("%s >= ?", field), filter.GreaterThanOrEqual)
+		}
+	}
+
+	if filter.LessThanOrEqual != nil {
+		if filter.Negate != nil {
+			query.Where(fmt.Sprintf("%s > ?", field), filter.LessThanOrEqual)
+		} else {
+			query.Where(fmt.Sprintf("%s <= ?", field), filter.LessThanOrEqual)
+		}
+	}
+
 	return query
 }
 
 // ApplyPagination applies the pagination to the bun query
-func ApplyPagination(query *bun.SelectQuery, pagination *core.PaginationInput) *bun.SelectQuery {
+func ApplyPagination(query *bun.SelectQuery, pagination core.PaginationInput) *bun.SelectQuery {
 	var offset int = 0
 	var limit int = 10
 
