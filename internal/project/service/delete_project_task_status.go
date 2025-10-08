@@ -6,15 +6,18 @@ import (
 )
 
 type DeleteProjectTaskStatusService struct {
+	ProjectRepository           projectrepo.ProjectRepository
 	ProjectTaskStatusRepository projectrepo.ProjectTaskStatusRepository
 	TransactionRepository       core.TransactionRepository
 }
 
 func NewDeleteProjectTaskStatusService(
+	projectRepository projectrepo.ProjectRepository,
 	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
 	transactionRepository core.TransactionRepository,
 ) *DeleteProjectTaskStatusService {
 	return &DeleteProjectTaskStatusService{
+		ProjectRepository:           projectRepository,
 		ProjectTaskStatusRepository: projectTaskStatusRepository,
 		TransactionRepository:       transactionRepository,
 	}
@@ -41,10 +44,23 @@ func (s *DeleteProjectTaskStatusService) Execute(input DeleteProjectTaskStatusIn
 	}
 
 	s.ProjectTaskStatusRepository.SetTransaction(tx)
+	s.ProjectRepository.SetTransaction(tx)
+
+	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
+		ProjectIdentity:      input.ProjectIdentity,
+		OrganizationIdentity: &input.OrganizationIdentity,
+	})
+	if err != nil {
+		return err
+	}
+
+	if prj == nil {
+		return core.NewNotFoundError("project not found")
+	}
 
 	projectTaskStatus, err := s.ProjectTaskStatusRepository.GetProjectTaskStatusByIdentity(projectrepo.GetProjectTaskStatusByIdentityParams{
 		ProjectTaskStatusIdentity: &input.ProjectTaskStatusIdentity,
-		ProjectIdentity:           &input.ProjectIdentity,
+		ProjectIdentity:           &prj.Identity,
 	})
 	if err != nil {
 		return err

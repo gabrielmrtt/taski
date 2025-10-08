@@ -127,6 +127,30 @@ definitions:
       workspaceId:
         type: string
     type: object
+  github_com_gabrielmrtt_taski_internal_project.ProjectTaskCategoryDto:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project.ProjectTaskStatusDto:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      isDefault:
+        type: boolean
+      name:
+        type: string
+      order:
+        type: integer
+      shouldSetTaskToCompleted:
+        type: boolean
+    type: object
   github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest:
     properties:
       color:
@@ -143,6 +167,26 @@ definitions:
         type: integer
       workspaceId:
         type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectTaskCategoryRequest:
+    properties:
+      color:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectTaskStatusRequest:
+    properties:
+      color:
+        type: string
+      isDefault:
+        type: boolean
+      name:
+        type: string
+      shouldSetTaskToCompleted:
+        type: boolean
+      shouldUseOrder:
+        type: boolean
     type: object
   github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest:
     properties:
@@ -162,6 +206,26 @@ definitions:
         type: string
       workspaceId:
         type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectTaskCategoryRequest:
+    properties:
+      color:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectTaskStatusRequest:
+    properties:
+      color:
+        type: string
+      isDefault:
+        type: boolean
+      name:
+        type: string
+      order:
+        type: integer
+      shouldSetTaskToCompleted:
+        type: boolean
     type: object
   github_com_gabrielmrtt_taski_internal_role.RoleDto:
     properties:
@@ -585,7 +649,55 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_project_infra_http.CreateProjectTaskCategoryResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskCategoryDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.CreateProjectTaskStatusResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskStatusDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   internal_project_infra_http.DeleteProjectResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.DeleteProjectTaskCategoryResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.DeleteProjectTaskStatusResponse:
     properties:
       message:
         type: string
@@ -609,6 +721,32 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_project_infra_http.ListProjectTaskCategoriesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskCategoryDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.ListProjectTaskStatusesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskStatusDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   internal_project_infra_http.ListProjectsResponse:
     properties:
       data:
@@ -623,6 +761,28 @@ definitions:
         type: string
     type: object
   internal_project_infra_http.UpdateProjectResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.UpdateProjectTaskCategoryResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.UpdateProjectTaskStatusResponse:
     properties:
       message:
         type: string
@@ -2150,6 +2310,352 @@ paths:
       summary: Update a project
       tags:
       - Project
+  /project/:projectId/task-category:
+    get:
+      consumes:
+      - application/json
+      description: Returns all project task categories.
+      parameters:
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.ListProjectTaskCategoriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List project task categories
+      tags:
+      - Project Task Category
+    post:
+      consumes:
+      - application/json
+      description: Creates a new project task category.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectTaskCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.CreateProjectTaskCategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a project task category
+      tags:
+      - Project Task Category
+  /project/:projectId/task-category/:taskCategoryId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing project task category.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Task Category ID
+        in: path
+        name: taskCategoryId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.DeleteProjectTaskCategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a project task category
+      tags:
+      - Project Task Category
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing project task category.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Task Category ID
+        in: path
+        name: taskCategoryId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectTaskCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.UpdateProjectTaskCategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a project task category
+      tags:
+      - Project Task Category
+  /project/:projectId/task-status:
+    get:
+      consumes:
+      - application/json
+      description: Returns all project task statuses.
+      parameters:
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.ListProjectTaskStatusesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List project task statuses
+      tags:
+      - Project Task Status
+    post:
+      consumes:
+      - application/json
+      description: Creates a new project task status.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectTaskStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.CreateProjectTaskStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a project task status
+      tags:
+      - Project Task Status
+  /project/:projectId/task-status/:taskStatusId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing project task status.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Task Status ID
+        in: path
+        name: taskStatusId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.DeleteProjectTaskStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a project task status
+      tags:
+      - Project Task Status
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing project task status.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Task Status ID
+        in: path
+        name: taskStatusId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectTaskStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.UpdateProjectTaskStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a project task status
+      tags:
+      - Project Task Status
   /role:
     post:
       consumes:

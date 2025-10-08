@@ -23,12 +23,24 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	userRepository := userdatabase.NewUserBunRepository(options.DbConnection)
 	workspaceRepository := workspacedatabase.NewWorkspaceBunRepository(options.DbConnection)
 	transactionRepository := coredatabase.NewTransactionBunRepository(options.DbConnection)
+	projectTaskCategoryRepository := projectdatabase.NewProjectTaskCategoryBunRepository(options.DbConnection)
+	projectTaskStatusRepository := projectdatabase.NewProjectTaskStatusBunRepository(options.DbConnection)
 
 	listProjectsService := projectservice.NewListProjectsService(projectRepository)
 	getProjectService := projectservice.NewGetProjectService(projectRepository)
 	createProjectService := projectservice.NewCreateProjectService(projectRepository, projectUserRepository, userRepository, workspaceRepository, transactionRepository)
 	updateProjectService := projectservice.NewUpdateProjectService(projectRepository, transactionRepository)
 	deleteProjectService := projectservice.NewDeleteProjectService(projectRepository, transactionRepository)
+
+	listProjectTaskCategoriesService := projectservice.NewListProjectTaskCategoriesService(projectTaskCategoryRepository)
+	createProjectTaskCategoryService := projectservice.NewCreateProjectTaskCategoryService(projectRepository, projectTaskCategoryRepository, transactionRepository)
+	updateProjectTaskCategoryService := projectservice.NewUpdateProjectTaskCategoryService(projectRepository, projectTaskCategoryRepository, transactionRepository)
+	deleteProjectTaskCategoryService := projectservice.NewDeleteProjectTaskCategoryService(projectRepository, projectTaskCategoryRepository, transactionRepository)
+
+	listProjectTaskStatusesService := projectservice.NewListProjectTaskStatusesService(projectTaskStatusRepository)
+	createProjectTaskStatusService := projectservice.NewCreateProjectTaskStatusService(projectRepository, projectTaskStatusRepository, transactionRepository)
+	updateProjectTaskStatusService := projectservice.NewUpdateProjectTaskStatusService(projectRepository, projectTaskStatusRepository, transactionRepository)
+	deleteProjectTaskStatusService := projectservice.NewDeleteProjectTaskStatusService(projectRepository, projectTaskStatusRepository, transactionRepository)
 
 	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
 		DbConnection: options.DbConnection,
@@ -37,4 +49,10 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 
 	projectController := projecthttp.NewProjectHandler(listProjectsService, getProjectService, createProjectService, updateProjectService, deleteProjectService)
 	projectController.ConfigureRoutes(configureRoutesOptions)
+
+	projectTaskCategoryController := projecthttp.NewProjectTaskCategoryHandler(listProjectTaskCategoriesService, createProjectTaskCategoryService, updateProjectTaskCategoryService, deleteProjectTaskCategoryService)
+	projectTaskCategoryController.ConfigureRoutes(configureRoutesOptions)
+
+	projectTaskStatusController := projecthttp.NewProjectTaskStatusHandler(listProjectTaskStatusesService, createProjectTaskStatusService, updateProjectTaskStatusService, deleteProjectTaskStatusService)
+	projectTaskStatusController.ConfigureRoutes(configureRoutesOptions)
 }
