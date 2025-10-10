@@ -98,3 +98,56 @@ func ProjectTaskCategoryToDto(projectTaskCategory *ProjectTaskCategory) *Project
 		Color: projectTaskCategory.Color,
 	}
 }
+
+type ProjectDocumentVersionDto struct {
+	Id                       string                   `json:"id"`
+	ProjectDocumentVersionId string                   `json:"projectDocumentVersionId"`
+	Version                  string                   `json:"version"`
+	Latest                   bool                     `json:"latest"`
+	Title                    string                   `json:"title"`
+	Content                  string                   `json:"content"`
+	Files                    []ProjectDocumentFileDto `json:"files"`
+	UserCreatorId            string                   `json:"userCreatorId"`
+	UserEditorId             *string                  `json:"userEditorId"`
+	CreatedAt                string                   `json:"createdAt"`
+	UpdatedAt                *string                  `json:"updatedAt"`
+}
+
+type ProjectDocumentFileDto struct {
+	FileId string `json:"fileId"`
+}
+
+func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion) *ProjectDocumentVersionDto {
+	var files []ProjectDocumentFileDto = make([]ProjectDocumentFileDto, len(projectDocumentVersion.Document.Files))
+
+	for i, file := range projectDocumentVersion.Document.Files {
+		files[i] = ProjectDocumentFileDto{
+			FileId: file.FileIdentity.Public,
+		}
+	}
+
+	var userEditorId *string = nil
+	if projectDocumentVersion.UserEditorIdentity != nil {
+		userEditorId = &projectDocumentVersion.UserEditorIdentity.Public
+	}
+
+	var updatedAt *string = nil
+	if projectDocumentVersion.Timestamps.UpdatedAt != nil {
+		updatedAtString := datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.UpdatedAt)
+		updatedAt = &updatedAtString
+	}
+
+	return &ProjectDocumentVersionDto{
+		Id:                       projectDocumentVersion.Identity.Public,
+		ProjectDocumentVersionId: projectDocumentVersion.ProjectDocumentVersionManagerIdentity.Public,
+		Version:                  projectDocumentVersion.Version,
+		Latest:                   projectDocumentVersion.Latest,
+		Title:                    projectDocumentVersion.Document.Title,
+		Content:                  projectDocumentVersion.Document.Content,
+		Files:                    files,
+		UserCreatorId:            projectDocumentVersion.UserCreatorIdentity.Public,
+		UserEditorId:             userEditorId,
+		CreatedAt:                datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.CreatedAt),
+		UpdatedAt:                updatedAt,
+	}
+}

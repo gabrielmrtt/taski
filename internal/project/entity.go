@@ -427,7 +427,6 @@ type ProjectDocumentVersionManager struct {
 	Identity        core.Identity
 	ProjectIdentity core.Identity
 	LatestVersion   *ProjectDocumentVersion
-	DeletedAt       *int64
 }
 
 type ProjectDocumentVersion struct {
@@ -439,7 +438,6 @@ type ProjectDocumentVersion struct {
 	UserEditorIdentity                    *core.Identity
 	Latest                                bool
 	Timestamps                            core.Timestamps
-	DeletedAt                             *int64
 }
 
 type ProjectDocument struct {
@@ -455,15 +453,16 @@ type ProjectDocumentFile struct {
 }
 
 type NewProjectDocumentInput struct {
-	ProjectIdentity     core.Identity
-	Title               string
-	Content             string
-	Version             string
-	Files               []ProjectDocumentFile
-	UserCreatorIdentity *core.Identity
+	ProjectIdentity                       core.Identity
+	ProjectDocumentVersionManagerIdentity core.Identity
+	Title                                 string
+	Content                               string
+	Version                               string
+	Files                                 []ProjectDocumentFile
+	UserCreatorIdentity                   *core.Identity
 }
 
-func NewProjectDocument(input NewProjectDocumentInput) (*ProjectDocumentVersionManager, error) {
+func NewProjectDocument(input NewProjectDocumentInput) (*ProjectDocumentVersion, error) {
 	if _, err := NewProjectDocumentTitle(input.Title); err != nil {
 		return nil, err
 	}
@@ -482,24 +481,19 @@ func NewProjectDocument(input NewProjectDocumentInput) (*ProjectDocumentVersionM
 	}
 
 	projectDocumentVersion := &ProjectDocumentVersion{
-		Identity:            core.NewIdentity(ProjectDocumentVersionIdentityPrefix),
-		Document:            *projectDocument,
-		UserCreatorIdentity: input.UserCreatorIdentity,
-		Latest:              true,
-		Version:             input.Version,
+		Identity:                              core.NewIdentity(ProjectDocumentVersionIdentityPrefix),
+		ProjectDocumentVersionManagerIdentity: input.ProjectDocumentVersionManagerIdentity,
+		Document:                              *projectDocument,
+		UserCreatorIdentity:                   input.UserCreatorIdentity,
+		Latest:                                true,
+		Version:                               input.Version,
 		Timestamps: core.Timestamps{
 			CreatedAt: &now,
 			UpdatedAt: nil,
 		},
-		DeletedAt: nil,
 	}
 
-	return &ProjectDocumentVersionManager{
-		Identity:        core.NewIdentity(ProjectDocumentVersionManagerIdentityPrefix),
-		ProjectIdentity: input.ProjectIdentity,
-		LatestVersion:   projectDocumentVersion,
-		DeletedAt:       nil,
-	}, nil
+	return projectDocumentVersion, nil
 }
 
 func (v *ProjectDocumentVersion) ChangeTitle(title string, userEditorIdentity *core.Identity) error {
@@ -546,22 +540,14 @@ func (v *ProjectDocumentVersion) RemoveFile(file ProjectDocumentFile) {
 	v.Timestamps.UpdatedAt = &now
 }
 
-func (v *ProjectDocumentVersion) Delete() {
-	now := datetimeutils.EpochNow()
-	v.DeletedAt = &now
-}
-
-func (v *ProjectDocumentVersion) IsDeleted() bool {
-	return v.DeletedAt != nil
-}
-
 func (v *ProjectDocumentVersion) IsLatest() bool {
 	return v.Latest
 }
 
-func (v *ProjectDocumentVersion) Clone(version string) *ProjectDocumentVersion {
+func (v *ProjectDocumentVersion) NewVersion(version string) *ProjectDocumentVersion {
 	now := datetimeutils.EpochNow()
 
+	v.Latest = false
 	return &ProjectDocumentVersion{
 		Identity:                              core.NewIdentity(ProjectDocumentVersionIdentityPrefix),
 		ProjectDocumentVersionManagerIdentity: v.ProjectDocumentVersionManagerIdentity,
@@ -569,11 +555,10 @@ func (v *ProjectDocumentVersion) Clone(version string) *ProjectDocumentVersion {
 		Document:                              v.Document,
 		UserCreatorIdentity:                   v.UserCreatorIdentity,
 		UserEditorIdentity:                    v.UserEditorIdentity,
-		Latest:                                v.Latest,
+		Latest:                                true,
 		Timestamps: core.Timestamps{
 			CreatedAt: &now,
 			UpdatedAt: nil,
 		},
-		DeletedAt: nil,
 	}
 }
