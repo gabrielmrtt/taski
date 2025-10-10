@@ -1,9 +1,9 @@
 package user
 
 import (
-	"errors"
 	"regexp"
 
+	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -23,13 +23,21 @@ func NewEmail(value string) (Email, error) {
 
 func (e Email) Validate() error {
 	if e.Value == "" {
-		return errors.New("email cannot be empty")
+		field := core.InvalidInputErrorField{
+			Field: "email",
+			Error: "email cannot be empty",
+		}
+		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
 	}
 
 	reg := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
 
 	if !reg.MatchString(e.Value) {
-		return errors.New("invalid email format")
+		field := core.InvalidInputErrorField{
+			Field: "email",
+			Error: "invalid email format",
+		}
+		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -67,7 +75,11 @@ func NewPassword(value string) (Password, error) {
 
 func (p Password) Validate() error {
 	if len(p.Value) < 12 || len(p.Value) > 64 {
-		return errors.New("password must be between 12 and 64 characters")
+		field := core.InvalidInputErrorField{
+			Field: "password",
+			Error: "password must be between 12 and 64 characters",
+		}
+		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
 	}
 
 	hasUppercase, _ := regexp.MatchString(`[A-Z]`, p.Value)
@@ -76,7 +88,11 @@ func (p Password) Validate() error {
 	hasSpecial, _ := regexp.MatchString(`[^A-Za-z0-9]`, p.Value)
 
 	if !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial {
-		return errors.New("password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+		field := core.InvalidInputErrorField{
+			Field: "password",
+			Error: "password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+		}
+		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -119,7 +135,11 @@ func (p PhoneNumber) Validate() error {
 	length := len(digits)
 
 	if length < 10 || length > 11 {
-		return errors.New("invalid phone number: must have 10 or 11 digits")
+		field := core.InvalidInputErrorField{
+			Field: "phone_number",
+			Error: "invalid phone number: must have 10 or 11 digits",
+		}
+		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
 	}
 
 	return nil

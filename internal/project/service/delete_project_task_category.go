@@ -54,7 +54,7 @@ func (s *DeleteProjectTaskCategoryService) Execute(input DeleteProjectTaskCatego
 		return err
 	}
 
-	if projectTaskCategory == nil {
+	if projectTaskCategory == nil || projectTaskCategory.IsDeleted() {
 		return core.NewNotFoundError("project task category not found")
 	}
 

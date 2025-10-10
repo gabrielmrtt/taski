@@ -6,6 +6,10 @@ const ProjectTaskStatusIdentityPrefix = "prs"
 
 const ProjectTaskCategoryIdentityPrefix = "ptc"
 
+const ProjectDocumentVersionIdentityPrefix = "pdv"
+
+const ProjectDocumentVersionManagerIdentityPrefix = "pdm"
+
 type ProjectStatuses string
 
 const (

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -109,11 +108,19 @@ func NewName(value string) (Name, error) {
 
 func (n Name) Validate() error {
 	if n.Value == "" {
-		return errors.New("name cannot be empty")
+		field := InvalidInputErrorField{
+			Field: "name",
+			Error: "name cannot be empty",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	if len(n.Value) < 3 || len(n.Value) > 255 {
-		return errors.New("name must be between 3 and 255 characters")
+		field := InvalidInputErrorField{
+			Field: "name",
+			Error: "name must be between 3 and 255 characters",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -151,11 +158,19 @@ func NewDescription(value string) (Description, error) {
 
 func (d Description) Validate() error {
 	if d.Value == "" {
-		return errors.New("description cannot be empty")
+		field := InvalidInputErrorField{
+			Field: "description",
+			Error: "description cannot be empty",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	if len(d.Value) > 510 {
-		return errors.New("description must be less than 510 characters")
+		field := InvalidInputErrorField{
+			Field: "description",
+			Error: "description must be less than 510 characters",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -193,11 +208,19 @@ func NewColor(value string) (Color, error) {
 
 func (c Color) Validate() error {
 	if c.Value == "" {
-		return errors.New("color cannot be empty")
+		field := InvalidInputErrorField{
+			Field: "color",
+			Error: "color cannot be empty",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	if len(c.Value) != 7 || c.Value[0] != '#' {
-		return errors.New("color must be a valid hex color")
+		field := InvalidInputErrorField{
+			Field: "color",
+			Error: "color must be a valid hex color",
+		}
+		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
 	}
 
 	return nil

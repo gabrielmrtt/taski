@@ -66,7 +66,7 @@ func (s *DeleteProjectTaskStatusService) Execute(input DeleteProjectTaskStatusIn
 		return err
 	}
 
-	if projectTaskStatus == nil {
+	if projectTaskStatus == nil || projectTaskStatus.IsDeleted() {
 		return core.NewNotFoundError("project task status not found")
 	}
 

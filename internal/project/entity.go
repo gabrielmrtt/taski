@@ -1,6 +1,8 @@
 package project
 
 import (
+	"slices"
+
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
@@ -360,6 +362,10 @@ func (s *ProjectTaskStatus) Delete() {
 	s.DeletedAt = &now
 }
 
+func (s *ProjectTaskStatus) IsDeleted() bool {
+	return s.DeletedAt != nil
+}
+
 type ProjectTaskCategory struct {
 	Identity        core.Identity
 	ProjectIdentity core.Identity
@@ -411,4 +417,163 @@ func (c *ProjectTaskCategory) ChangeColor(color string) error {
 func (c *ProjectTaskCategory) Delete() {
 	now := datetimeutils.EpochNow()
 	c.DeletedAt = &now
+}
+
+func (c *ProjectTaskCategory) IsDeleted() bool {
+	return c.DeletedAt != nil
+}
+
+type ProjectDocumentVersionManager struct {
+	Identity        core.Identity
+	ProjectIdentity core.Identity
+	LatestVersion   *ProjectDocumentVersion
+	DeletedAt       *int64
+}
+
+type ProjectDocumentVersion struct {
+	Identity                              core.Identity
+	ProjectDocumentVersionManagerIdentity core.Identity
+	Version                               string
+	Document                              ProjectDocument
+	UserCreatorIdentity                   *core.Identity
+	UserEditorIdentity                    *core.Identity
+	Latest                                bool
+	Timestamps                            core.Timestamps
+	DeletedAt                             *int64
+}
+
+type ProjectDocument struct {
+	Identity core.Identity
+	Title    string
+	Content  string
+	Files    []ProjectDocumentFile
+}
+
+type ProjectDocumentFile struct {
+	Identity     core.Identity
+	FileIdentity core.Identity
+}
+
+type NewProjectDocumentInput struct {
+	ProjectIdentity     core.Identity
+	Title               string
+	Content             string
+	Version             string
+	Files               []ProjectDocumentFile
+	UserCreatorIdentity *core.Identity
+}
+
+func NewProjectDocument(input NewProjectDocumentInput) (*ProjectDocumentVersionManager, error) {
+	if _, err := NewProjectDocumentTitle(input.Title); err != nil {
+		return nil, err
+	}
+
+	if _, err := NewProjectDocumentContent(input.Content); err != nil {
+		return nil, err
+	}
+
+	now := datetimeutils.EpochNow()
+
+	projectDocument := &ProjectDocument{
+		Identity: core.NewIdentityWithoutPublic(),
+		Title:    input.Title,
+		Content:  input.Content,
+		Files:    input.Files,
+	}
+
+	projectDocumentVersion := &ProjectDocumentVersion{
+		Identity:            core.NewIdentity(ProjectDocumentVersionIdentityPrefix),
+		Document:            *projectDocument,
+		UserCreatorIdentity: input.UserCreatorIdentity,
+		Latest:              true,
+		Version:             input.Version,
+		Timestamps: core.Timestamps{
+			CreatedAt: &now,
+			UpdatedAt: nil,
+		},
+		DeletedAt: nil,
+	}
+
+	return &ProjectDocumentVersionManager{
+		Identity:        core.NewIdentity(ProjectDocumentVersionManagerIdentityPrefix),
+		ProjectIdentity: input.ProjectIdentity,
+		LatestVersion:   projectDocumentVersion,
+		DeletedAt:       nil,
+	}, nil
+}
+
+func (v *ProjectDocumentVersion) ChangeTitle(title string, userEditorIdentity *core.Identity) error {
+	if _, err := NewProjectDocumentTitle(title); err != nil {
+		return err
+	}
+
+	v.Document.Title = title
+	v.UserEditorIdentity = userEditorIdentity
+	now := datetimeutils.EpochNow()
+	v.Timestamps.UpdatedAt = &now
+	return nil
+}
+
+func (v *ProjectDocumentVersion) ChangeContent(content string, userEditorIdentity *core.Identity) error {
+	if _, err := NewProjectDocumentContent(content); err != nil {
+		return err
+	}
+
+	v.Document.Content = content
+	v.UserEditorIdentity = userEditorIdentity
+	now := datetimeutils.EpochNow()
+	v.Timestamps.UpdatedAt = &now
+	return nil
+}
+
+func (v *ProjectDocumentVersion) ClearAllFiles() {
+	v.Document.Files = []ProjectDocumentFile{}
+	now := datetimeutils.EpochNow()
+	v.Timestamps.UpdatedAt = &now
+}
+
+func (v *ProjectDocumentVersion) AddFile(file ProjectDocumentFile) {
+	v.Document.Files = append(v.Document.Files, file)
+	now := datetimeutils.EpochNow()
+	v.Timestamps.UpdatedAt = &now
+}
+
+func (v *ProjectDocumentVersion) RemoveFile(file ProjectDocumentFile) {
+	v.Document.Files = slices.DeleteFunc(v.Document.Files, func(f ProjectDocumentFile) bool {
+		return f.Identity == file.Identity
+	})
+	now := datetimeutils.EpochNow()
+	v.Timestamps.UpdatedAt = &now
+}
+
+func (v *ProjectDocumentVersion) Delete() {
+	now := datetimeutils.EpochNow()
+	v.DeletedAt = &now
+}
+
+func (v *ProjectDocumentVersion) IsDeleted() bool {
+	return v.DeletedAt != nil
+}
+
+func (v *ProjectDocumentVersion) IsLatest() bool {
+	return v.Latest
+}
+
+func (v *ProjectDocumentVersion) Clone(version string) *ProjectDocumentVersion {
+	now := datetimeutils.EpochNow()
+
+	return &ProjectDocumentVersion{
+		Identity:                              core.NewIdentity(ProjectDocumentVersionIdentityPrefix),
+		ProjectDocumentVersionManagerIdentity: v.ProjectDocumentVersionManagerIdentity,
+		Version:                               version,
+		Document:                              v.Document,
+		UserCreatorIdentity:                   v.UserCreatorIdentity,
+		UserEditorIdentity:                    v.UserEditorIdentity,
+		Latest:                                v.Latest,
+		Timestamps: core.Timestamps{
+			CreatedAt: &now,
+			UpdatedAt: nil,
+		},
+		DeletedAt: nil,
+	}
 }
