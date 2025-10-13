@@ -6,6 +6,7 @@ import (
 	projectdatabase "github.com/gabrielmrtt/taski/internal/project/infra/database"
 	projecthttp "github.com/gabrielmrtt/taski/internal/project/infra/http"
 	projectservice "github.com/gabrielmrtt/taski/internal/project/service"
+	storagedatabase "github.com/gabrielmrtt/taski/internal/storage/infra/database"
 	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	workspacedatabase "github.com/gabrielmrtt/taski/internal/workspace/infra/database"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,9 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	transactionRepository := coredatabase.NewTransactionBunRepository(options.DbConnection)
 	projectTaskCategoryRepository := projectdatabase.NewProjectTaskCategoryBunRepository(options.DbConnection)
 	projectTaskStatusRepository := projectdatabase.NewProjectTaskStatusBunRepository(options.DbConnection)
+	projectDocumentRepository := projectdatabase.NewProjectDocumentBunRepository(options.DbConnection)
+	uploadedFileRepository := storagedatabase.NewUploadedFileBunRepository(options.DbConnection)
+	storageRepository := storagedatabase.NewLocalStorageRepository()
 
 	listProjectsService := projectservice.NewListProjectsService(projectRepository)
 	getProjectService := projectservice.NewGetProjectService(projectRepository)
@@ -42,6 +46,14 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	updateProjectTaskStatusService := projectservice.NewUpdateProjectTaskStatusService(projectRepository, projectTaskStatusRepository, transactionRepository)
 	deleteProjectTaskStatusService := projectservice.NewDeleteProjectTaskStatusService(projectRepository, projectTaskStatusRepository, transactionRepository)
 
+	listProjectDocumentsService := projectservice.NewListProjectDocumentsService(projectRepository, projectDocumentRepository)
+	listProjectDocumentVersionsService := projectservice.NewListProjectDocumentVersionsService(projectRepository, projectDocumentRepository)
+	getProjectDocumentVersionService := projectservice.NewGetProjectDocumentVersionService(projectRepository, projectDocumentRepository)
+	createProjectDocumentService := projectservice.NewCreateProjectDocumentService(projectRepository, projectDocumentRepository, uploadedFileRepository, storageRepository, transactionRepository)
+	updateProjectDocumentService := projectservice.NewUpdateProjectDocumentService(projectRepository, projectDocumentRepository, uploadedFileRepository, storageRepository, transactionRepository)
+	deleteProjectDocumentService := projectservice.NewDeleteProjectDocumentService(projectRepository, projectDocumentRepository, uploadedFileRepository, storageRepository, transactionRepository)
+	deleteProjectDocumentVersionService := projectservice.NewDeleteProjectDocumentVersionService(projectRepository, projectDocumentRepository, uploadedFileRepository, storageRepository, transactionRepository)
+
 	configureRoutesOptions := corehttp.ConfigureRoutesOptions{
 		DbConnection: options.DbConnection,
 		RouterGroup:  options.RouterGroup,
@@ -55,4 +67,7 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 
 	projectTaskStatusController := projecthttp.NewProjectTaskStatusHandler(listProjectTaskStatusesService, createProjectTaskStatusService, updateProjectTaskStatusService, deleteProjectTaskStatusService)
 	projectTaskStatusController.ConfigureRoutes(configureRoutesOptions)
+
+	projectDocumentController := projecthttp.NewProjectDocumentHandler(getProjectDocumentVersionService, listProjectDocumentsService, listProjectDocumentVersionsService, createProjectDocumentService, updateProjectDocumentService, deleteProjectDocumentService, deleteProjectDocumentVersionService)
+	projectDocumentController.ConfigureRoutes(configureRoutesOptions)
 }

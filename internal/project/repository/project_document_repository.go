@@ -69,10 +69,10 @@ type ProjectDocumentRepository interface {
 	PaginateProjectDocumentVersionManagersBy(params PaginateProjectDocumentVersionManagersByParams) (*core.PaginationOutput[project.ProjectDocumentVersionManager], error)
 	PaginateProjectDocumentVersionsBy(params PaginateProjectDocumentVersionsByParams) (*core.PaginationOutput[project.ProjectDocumentVersion], error)
 	ListProjectDocumentVersionsByProjectDocumentVersionManagerIdentity(params ListProjectDocumentVersionsByProjectDocumentVersionManagerIdentityParams) ([]project.ProjectDocumentVersion, error)
-	GetProjectDocumentVersionByParams(params GetProjectDocumentVersionByParams) (*project.ProjectDocumentVersion, error)
+	GetProjectDocumentVersionBy(params GetProjectDocumentVersionByParams) (*project.ProjectDocumentVersion, error)
 
 	StoreProjectDocumentVersionManager(params StoreProjectDocumentVersionManagerParams) (*project.ProjectDocumentVersionManager, error)
-	GetProjectDocumentVersionManagerByParams(params GetProjectDocumentVersionManagerByParams) (*project.ProjectDocumentVersionManager, error)
+	GetProjectDocumentVersionManagerBy(params GetProjectDocumentVersionManagerByParams) (*project.ProjectDocumentVersionManager, error)
 	DeleteProjectDocumentVersionManager(params DeleteProjectDocumentVersionManagerParams) error
 
 	StoreProjectDocumentVersion(params StoreProjectDocumentVersionParams) (*project.ProjectDocumentVersion, error)

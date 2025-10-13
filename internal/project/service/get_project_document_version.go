@@ -43,7 +43,7 @@ func (s *GetProjectDocumentVersionService) Execute(input GetProjectDocumentVersi
 		return nil, core.NewNotFoundError("project not found")
 	}
 
-	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionByParams(projectrepo.GetProjectDocumentVersionByParams{
+	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
 		ProjectDocumentVersionIdentity: input.ProjectDocumentVersionIdentity,
 	})
 	if err != nil {

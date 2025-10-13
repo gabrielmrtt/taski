@@ -66,7 +66,7 @@ func (s *DeleteProjectDocumentService) Execute(input DeleteProjectDocumentInput)
 		return core.NewNotFoundError("project not found")
 	}
 
-	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionByParams(projectrepo.GetProjectDocumentVersionByParams{
+	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
 		ProjectDocumentVersionIdentity: input.ProjectDocumentVersionIdentity,
 	})
 	if err != nil {
@@ -79,7 +79,7 @@ func (s *DeleteProjectDocumentService) Execute(input DeleteProjectDocumentInput)
 		return core.NewNotFoundError("project document version not found")
 	}
 
-	projectDocumentVersionManager, err := s.ProjectDocumentRepository.GetProjectDocumentVersionManagerByParams(projectrepo.GetProjectDocumentVersionManagerByParams{
+	projectDocumentVersionManager, err := s.ProjectDocumentRepository.GetProjectDocumentVersionManagerBy(projectrepo.GetProjectDocumentVersionManagerByParams{
 		ProjectDocumentVersionManagerIdentity: projectDocumentVersion.ProjectDocumentVersionManagerIdentity,
 	})
 	if err != nil {
