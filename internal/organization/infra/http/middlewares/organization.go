@@ -31,6 +31,12 @@ func UserMustHavePermission(permissionSlug string, options corehttp.MiddlewareOp
 			organizationIdentity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 		}
 
+		if organizationIdentity == nil {
+			corehttp.NewHttpErrorResponse(ctx, core.NewUnauthorizedError("you need to access an organization to execute this action"))
+			ctx.Abort()
+			return
+		}
+
 		repo := organizationdatabase.NewOrganizationUserBunRepository(options.DbConnection)
 
 		orgUser, err := repo.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
