@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS organization (
     CONSTRAINT fk_organizations_user_editor FOREIGN KEY (user_editor_internal_id) REFERENCES users(internal_id) ON DELETE SET NULL
 );
 
-ALTER TABLE role ADD CONSTRAINT fk_roles_organization FOREIGN KEY (organization_internal_id) REFERENCES organization(internal_id) ON DELETE CASCADE;
+ALTER TABLE roles ADD CONSTRAINT fk_roles_organization FOREIGN KEY (organization_internal_id) REFERENCES organization(internal_id) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS organization_user (
     organization_internal_id UUID NOT NULL,

@@ -81,6 +81,45 @@ func (c *ProjectDocumentHandler) ListProjectDocuments(ctx *gin.Context) {
 	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
 }
 
+type ListProjectDocumentVersionsResponse = corehttp.HttpSuccessResponseWithData[core.PaginationOutput[project.ProjectDocumentVersionDto]]
+
+// ListProjectDocumentVersions godoc
+// @Summary List project document versions
+// @Description Returns all project document versions.
+// @Tags Project Document
+// @Accept json
+// @Param projectId path string true "Project ID"
+// @Param documentVersionManagerId path string true "Document Version Manager ID"
+// @Produce json
+// @Success 200 {object} ListProjectDocumentVersionsResponse
+// @Failure 400 {object} corehttp.HttpErrorResponse
+// @Failure 401 {object} corehttp.HttpErrorResponse
+// @Failure 403 {object} corehttp.HttpErrorResponse
+// @Failure 500 {object} corehttp.HttpErrorResponse
+// @Router /project/:projectId/document/:documentVersionManagerId [get]
+func (c *ProjectDocumentHandler) ListProjectDocumentVersions(ctx *gin.Context) {
+	var request projecthttprequests.ListProjectDocumentVersionsRequest
+	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
+	var input projectservice.ListProjectDocumentVersionsInput
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	input = request.ToInput()
+	input.Filters.ProjectIdentity = &projectIdentity
+	input.Filters.ProjectDocumentVersionManagerIdentity = &documentVersionManagerIdentity
+
+	response, err := c.ListProjectDocumentVersionsService.Execute(input)
+	if err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
+	}
+
+	corehttp.NewHttpSuccessResponseWithData(ctx, http.StatusOK, response)
+}
+
 type GetProjectDocumentVersionResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDocumentVersionDto]
 
 // GetProjectDocumentVersion godoc
@@ -89,6 +128,7 @@ type GetProjectDocumentVersionResponse = corehttp.HttpSuccessResponseWithData[pr
 // @Tags Project Document
 // @Accept json
 // @Param projectId path string true "Project ID"
+// @Param documentVersionManagerId path string true "Document Version Manager ID"
 // @Param documentVersionId path string true "Document Version ID"
 // @Produce json
 // @Success 200 {object} GetProjectDocumentVersionResponse
@@ -97,13 +137,15 @@ type GetProjectDocumentVersionResponse = corehttp.HttpSuccessResponseWithData[pr
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /project/:projectId/document/:documentVersionId [get]
+// @Router /project/:projectId/document/:documentVersionManagerId/version/:documentVersionId [get]
 func (c *ProjectDocumentHandler) GetProjectDocumentVersion(ctx *gin.Context) {
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
 	var documentVersionIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionId"))
 	var input projectservice.GetProjectDocumentVersionInput = projectservice.GetProjectDocumentVersionInput{
-		ProjectIdentity:                projectIdentity,
-		ProjectDocumentVersionIdentity: documentVersionIdentity,
+		ProjectIdentity:                       projectIdentity,
+		ProjectDocumentVersionManagerIdentity: documentVersionManagerIdentity,
+		ProjectDocumentVersionIdentity:        documentVersionIdentity,
 	}
 
 	response, err := c.GetProjectDocumentVersionService.Execute(input)
@@ -161,6 +203,7 @@ type UpdateProjectDocumentResponse = corehttp.EmptyHttpSuccessResponse
 // @Tags Project Document
 // @Accept json
 // @Param projectId path string true "Project ID"
+// @Param documentVersionManagerId path string true "Document Version Manager ID"
 // @Param documentVersionId path string true "Document Version ID"
 // @Param request body projecthttprequests.UpdateProjectDocumentRequest true "Request body"
 // @Produce json
@@ -170,10 +213,11 @@ type UpdateProjectDocumentResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 404 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /project/:projectId/document/:documentVersionId [put]
+// @Router /project/:projectId/document/:documentVersionManagerId/version/:documentVersionId [put]
 func (c *ProjectDocumentHandler) UpdateProjectDocument(ctx *gin.Context) {
 	var request projecthttprequests.UpdateProjectDocumentRequest
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
 	var documentVersionIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionId"))
 	var input projectservice.UpdateProjectDocumentInput
 
@@ -184,6 +228,7 @@ func (c *ProjectDocumentHandler) UpdateProjectDocument(ctx *gin.Context) {
 
 	input = request.ToInput()
 	input.ProjectIdentity = projectIdentity
+	input.ProjectDocumentVersionManagerIdentity = documentVersionManagerIdentity
 	input.ProjectDocumentVersionIdentity = documentVersionIdentity
 
 	response, err := c.UpdateProjectDocumentService.Execute(input)
@@ -203,20 +248,20 @@ type DeleteProjectDocumentResponse = corehttp.EmptyHttpSuccessResponse
 // @Tags Project Document
 // @Accept json
 // @Param projectId path string true "Project ID"
-// @Param documentVersionId path string true "Document Version ID"
+// @Param documentVersionManagerId path string true "Document Version Manager ID"
 // @Produce json
 // @Success 200 {object} DeleteProjectDocumentResponse
 // @Failure 400 {object} corehttp.HttpErrorResponse
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /project/:projectId/document/:documentVersionId [delete]
+// @Router /project/:projectId/document/:documentVersionManagerId [delete]
 func (c *ProjectDocumentHandler) DeleteProjectDocument(ctx *gin.Context) {
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
-	var documentVersionIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionId"))
+	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
 	var input projectservice.DeleteProjectDocumentInput = projectservice.DeleteProjectDocumentInput{
-		ProjectIdentity:                projectIdentity,
-		ProjectDocumentVersionIdentity: documentVersionIdentity,
+		ProjectIdentity:                       projectIdentity,
+		ProjectDocumentVersionManagerIdentity: documentVersionManagerIdentity,
 	}
 
 	err := c.DeleteProjectDocumentService.Execute(input)
@@ -236,6 +281,7 @@ type DeleteProjectDocumentVersionResponse = corehttp.EmptyHttpSuccessResponse
 // @Tags Project Document
 // @Accept json
 // @Param projectId path string true "Project ID"
+// @Param documentVersionManagerId path string true "Document Version Manager ID"
 // @Param documentVersionId path string true "Document Version ID"
 // @Produce json
 // @Success 200 {object} DeleteProjectDocumentVersionResponse
@@ -243,13 +289,15 @@ type DeleteProjectDocumentVersionResponse = corehttp.EmptyHttpSuccessResponse
 // @Failure 401 {object} corehttp.HttpErrorResponse
 // @Failure 403 {object} corehttp.HttpErrorResponse
 // @Failure 500 {object} corehttp.HttpErrorResponse
-// @Router /project/:projectId/document/:documentVersionId [delete]
+// @Router /project/:projectId/document/:documentVersionManagerId/version/:documentVersionId [delete]
 func (c *ProjectDocumentHandler) DeleteProjectDocumentVersion(ctx *gin.Context) {
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
+	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
 	var documentVersionIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionId"))
 	var input projectservice.DeleteProjectDocumentVersionInput = projectservice.DeleteProjectDocumentVersionInput{
-		ProjectIdentity:                projectIdentity,
-		ProjectDocumentVersionIdentity: documentVersionIdentity,
+		ProjectIdentity:                       projectIdentity,
+		ProjectDocumentVersionManagerIdentity: documentVersionManagerIdentity,
+		ProjectDocumentVersionIdentity:        documentVersionIdentity,
 	}
 
 	err := c.DeleteProjectDocumentVersionService.Execute(input)
@@ -272,11 +320,12 @@ func (c *ProjectDocumentHandler) ConfigureRoutes(options corehttp.ConfigureRoute
 		g.Use(projecthttpmiddlewares.UserMustBeInProject(middlewareOptions))
 
 		g.GET("", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), c.ListProjectDocuments)
-		g.GET("/:documentVersionManagerId", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), c.GetProjectDocumentVersion)
+		g.GET("/:documentVersionManagerId", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), c.ListProjectDocumentVersions)
+		g.GET("/:documentVersionManagerId/version/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:view", middlewareOptions), c.GetProjectDocumentVersion)
 		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.CreateProjectDocument)
-		g.PUT("/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.UpdateProjectDocument)
-		g.DELETE("/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.DeleteProjectDocument)
-		g.DELETE("/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.DeleteProjectDocumentVersion)
+		g.PUT("/:documentVersionManagerId/version/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.UpdateProjectDocument)
+		g.DELETE("/:documentVersionManagerId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.DeleteProjectDocument)
+		g.DELETE("/:documentVersionManagerId/version/:documentVersionId", organizationhttpmiddlewares.UserMustHavePermission("projects:update", middlewareOptions), c.DeleteProjectDocumentVersion)
 	}
 
 	return g

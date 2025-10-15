@@ -33,13 +33,14 @@ func NewUpdateProjectDocumentService(
 }
 
 type UpdateProjectDocumentInput struct {
-	ProjectIdentity                core.Identity
-	ProjectDocumentVersionIdentity core.Identity
-	Version                        *string
-	Title                          *string
-	Content                        *string
-	Files                          []core.FileInput
-	UserEditorIdentity             core.Identity
+	ProjectIdentity                       core.Identity
+	ProjectDocumentVersionManagerIdentity core.Identity
+	ProjectDocumentVersionIdentity        core.Identity
+	Version                               *string
+	Title                                 *string
+	Content                               *string
+	Files                                 []core.FileInput
+	UserEditorIdentity                    core.Identity
 }
 
 func (i UpdateProjectDocumentInput) Validate() error {
@@ -99,7 +100,8 @@ func (s *UpdateProjectDocumentService) Execute(input UpdateProjectDocumentInput)
 	}
 
 	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
-		ProjectDocumentVersionIdentity: input.ProjectDocumentVersionIdentity,
+		ProjectDocumentVersionManagerIdentity: &input.ProjectDocumentVersionManagerIdentity,
+		ProjectDocumentVersionIdentity:        input.ProjectDocumentVersionIdentity,
 	})
 	if err != nil {
 		tx.Rollback()

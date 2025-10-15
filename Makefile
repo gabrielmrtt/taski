@@ -1,4 +1,6 @@
 dev:
+	@go mod tidy
+	@go mod download
 	@air --build.cmd="make build" --build.bin="bin/taski"
 
 build:

@@ -32,8 +32,8 @@ func NewDeleteProjectDocumentService(
 }
 
 type DeleteProjectDocumentInput struct {
-	ProjectIdentity                core.Identity
-	ProjectDocumentVersionIdentity core.Identity
+	ProjectIdentity                       core.Identity
+	ProjectDocumentVersionManagerIdentity core.Identity
 }
 
 func (i DeleteProjectDocumentInput) Validate() error {
@@ -66,21 +66,8 @@ func (s *DeleteProjectDocumentService) Execute(input DeleteProjectDocumentInput)
 		return core.NewNotFoundError("project not found")
 	}
 
-	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
-		ProjectDocumentVersionIdentity: input.ProjectDocumentVersionIdentity,
-	})
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	if projectDocumentVersion == nil {
-		tx.Rollback()
-		return core.NewNotFoundError("project document version not found")
-	}
-
 	projectDocumentVersionManager, err := s.ProjectDocumentRepository.GetProjectDocumentVersionManagerBy(projectrepo.GetProjectDocumentVersionManagerByParams{
-		ProjectDocumentVersionManagerIdentity: projectDocumentVersion.ProjectDocumentVersionManagerIdentity,
+		ProjectDocumentVersionManagerIdentity: input.ProjectDocumentVersionManagerIdentity,
 	})
 	if err != nil {
 		tx.Rollback()

@@ -32,8 +32,9 @@ func NewDeleteProjectDocumentVersionService(
 }
 
 type DeleteProjectDocumentVersionInput struct {
-	ProjectIdentity                core.Identity
-	ProjectDocumentVersionIdentity core.Identity
+	ProjectIdentity                       core.Identity
+	ProjectDocumentVersionManagerIdentity core.Identity
+	ProjectDocumentVersionIdentity        core.Identity
 }
 
 func (i DeleteProjectDocumentVersionInput) Validate() error {
@@ -67,7 +68,8 @@ func (s *DeleteProjectDocumentVersionService) Execute(input DeleteProjectDocumen
 	}
 
 	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
-		ProjectDocumentVersionIdentity: input.ProjectDocumentVersionIdentity,
+		ProjectDocumentVersionManagerIdentity: &input.ProjectDocumentVersionManagerIdentity,
+		ProjectDocumentVersionIdentity:        input.ProjectDocumentVersionIdentity,
 	})
 	if err != nil {
 		tx.Rollback()

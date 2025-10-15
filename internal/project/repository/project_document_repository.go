@@ -18,6 +18,7 @@ type PaginateProjectDocumentVersionManagersByParams struct {
 }
 
 type ProjectDocumentVersionFilters struct {
+	ProjectIdentity                       *core.Identity
 	ProjectDocumentVersionManagerIdentity *core.Identity
 	Version                               *core.ComparableFilter[string]
 	CreatedAt                             *core.ComparableFilter[int64]
