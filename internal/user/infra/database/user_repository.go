@@ -94,6 +94,10 @@ func NewUserBunRepository(connection *bun.DB) *UserBunRepository {
 }
 
 func (r *UserBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

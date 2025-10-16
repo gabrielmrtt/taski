@@ -81,8 +81,9 @@ func (s *CreateProjectTaskCategoryService) Execute(input CreateProjectTaskCatego
 	}
 
 	projectTaskCategory, err := project.NewProjectTaskCategory(project.NewProjectTaskCategoryInput{
-		Name:  input.Name,
-		Color: input.Color,
+		ProjectIdentity: input.ProjectIdentity,
+		Name:            input.Name,
+		Color:           input.Color,
 	})
 	if err != nil {
 		return nil, err

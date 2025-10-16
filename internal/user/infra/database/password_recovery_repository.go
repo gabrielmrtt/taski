@@ -46,6 +46,10 @@ func NewPasswordRecoveryBunRepository(connection *bun.DB) *PasswordRecoveryBunRe
 }
 
 func (r *PasswordRecoveryBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

@@ -50,6 +50,10 @@ func NewProjectTaskStatusBunRepository(connection *bun.DB) *ProjectTaskStatusBun
 }
 
 func (r *ProjectTaskStatusBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }
@@ -94,7 +98,7 @@ func (r *ProjectTaskStatusBunRepository) GetLastTaskStatusOrder(params projectre
 		selectQuery = selectQuery.Where("project_internal_id = ?", params.ProjectIdentity.Internal.String())
 	}
 
-	selectQuery = selectQuery.Order("status_order DESC")
+	selectQuery = selectQuery.Order("status_order DESC NULLS LAST")
 	selectQuery = selectQuery.Limit(1)
 
 	err := selectQuery.Scan(context.Background())
@@ -103,6 +107,10 @@ func (r *ProjectTaskStatusBunRepository) GetLastTaskStatusOrder(params projectre
 	}
 
 	if projectTaskStatus.InternalId == "" {
+		return 0, nil
+	}
+
+	if projectTaskStatus.StatusOrder == nil {
 		return 0, nil
 	}
 
@@ -281,8 +289,7 @@ func (r *ProjectTaskStatusBunRepository) UpdateProjectTaskStatus(params projectr
 	}
 
 	_, err := tx.NewUpdate().Model(&ProjectTaskStatusTable{
-		InternalId:               params.ProjectTaskStatus.Identity.Internal.String(),
-		PublicId:                 params.ProjectTaskStatus.Identity.Public,
+		ProjectInternalId:        params.ProjectTaskStatus.ProjectIdentity.Internal.String(),
 		Name:                     params.ProjectTaskStatus.Name,
 		Color:                    params.ProjectTaskStatus.Color,
 		StatusOrder:              params.ProjectTaskStatus.Order,

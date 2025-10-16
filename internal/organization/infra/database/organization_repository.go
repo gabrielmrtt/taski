@@ -65,6 +65,10 @@ func NewOrganizationBunRepository(connection *bun.DB) *OrganizationBunRepository
 }
 
 func (r *OrganizationBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

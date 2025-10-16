@@ -108,6 +108,10 @@ func NewRoleBunRepository(connection *bun.DB) *RoleBunRepository {
 }
 
 func (r *RoleBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

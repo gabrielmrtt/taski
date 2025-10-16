@@ -112,7 +112,7 @@ func (n Name) Validate() error {
 			Field: "name",
 			Error: "name cannot be empty",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("name cannot be empty", []InvalidInputErrorField{field})
 	}
 
 	if len(n.Value) < 3 || len(n.Value) > 255 {
@@ -120,7 +120,7 @@ func (n Name) Validate() error {
 			Field: "name",
 			Error: "name must be between 3 and 255 characters",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("name must be between 3 and 255 characters", []InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -162,7 +162,7 @@ func (d Description) Validate() error {
 			Field: "description",
 			Error: "description cannot be empty",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("description cannot be empty", []InvalidInputErrorField{field})
 	}
 
 	if len(d.Value) > 510 {
@@ -170,7 +170,7 @@ func (d Description) Validate() error {
 			Field: "description",
 			Error: "description must be less than 510 characters",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("description must be less than 510 characters", []InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -212,7 +212,7 @@ func (c Color) Validate() error {
 			Field: "color",
 			Error: "color cannot be empty",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("color cannot be empty", []InvalidInputErrorField{field})
 	}
 
 	if len(c.Value) != 7 || c.Value[0] != '#' {
@@ -220,7 +220,7 @@ func (c Color) Validate() error {
 			Field: "color",
 			Error: "color must be a valid hex color",
 		}
-		return NewInvalidInputError("invalid input", []InvalidInputErrorField{field})
+		return NewInvalidInputError("color must be a valid hex color", []InvalidInputErrorField{field})
 	}
 
 	return nil

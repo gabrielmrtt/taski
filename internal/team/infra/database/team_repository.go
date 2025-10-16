@@ -113,6 +113,10 @@ func (r *TeamBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters t
 }
 
 func (r *TeamBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

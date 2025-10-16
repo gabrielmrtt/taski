@@ -25,7 +25,7 @@ func (t ProjectDocumentTitle) Validate() error {
 			Field: "title",
 			Error: "title cannot be empty",
 		}
-		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
+		return core.NewInvalidInputError("title cannot be empty", []core.InvalidInputErrorField{field})
 	}
 
 	if len(t.Value) > 255 {
@@ -33,7 +33,7 @@ func (t ProjectDocumentTitle) Validate() error {
 			Field: "title",
 			Error: "title must be less than 255 characters",
 		}
-		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
+		return core.NewInvalidInputError("title must be less than 255 characters", []core.InvalidInputErrorField{field})
 	}
 
 	return nil
@@ -57,7 +57,7 @@ func (c ProjectDocumentContent) Validate() error {
 			Field: "content",
 			Error: "content cannot be empty",
 		}
-		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
+		return core.NewInvalidInputError("content cannot be empty", []core.InvalidInputErrorField{field})
 	}
 
 	doc, err := html.Parse(strings.NewReader(c.Value))
@@ -66,7 +66,7 @@ func (c ProjectDocumentContent) Validate() error {
 			Field: "content",
 			Error: "content must be valid HTML",
 		}
-		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
+		return core.NewInvalidInputError("content must be valid HTML", []core.InvalidInputErrorField{field})
 	}
 
 	if doc == nil || (doc.FirstChild == nil && doc.LastChild == nil) {
@@ -74,7 +74,7 @@ func (c ProjectDocumentContent) Validate() error {
 			Field: "content",
 			Error: "content must contain valid HTML elements",
 		}
-		return core.NewInvalidInputError("invalid input", []core.InvalidInputErrorField{field})
+		return core.NewInvalidInputError("content must contain valid HTML elements", []core.InvalidInputErrorField{field})
 	}
 
 	return nil

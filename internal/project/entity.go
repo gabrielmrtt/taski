@@ -375,8 +375,9 @@ type ProjectTaskCategory struct {
 }
 
 type NewProjectTaskCategoryInput struct {
-	Name  string
-	Color string
+	Name            string
+	Color           string
+	ProjectIdentity core.Identity
 }
 
 func NewProjectTaskCategory(input NewProjectTaskCategoryInput) (*ProjectTaskCategory, error) {
@@ -389,10 +390,11 @@ func NewProjectTaskCategory(input NewProjectTaskCategoryInput) (*ProjectTaskCate
 	}
 
 	return &ProjectTaskCategory{
-		Identity:  core.NewIdentity(ProjectTaskCategoryIdentityPrefix),
-		Name:      input.Name,
-		Color:     input.Color,
-		DeletedAt: nil,
+		Identity:        core.NewIdentity(ProjectTaskCategoryIdentityPrefix),
+		ProjectIdentity: input.ProjectIdentity,
+		Name:            input.Name,
+		Color:           input.Color,
+		DeletedAt:       nil,
 	}, nil
 }
 

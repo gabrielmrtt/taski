@@ -93,10 +93,12 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	if prj == nil {
+		tx.Rollback()
 		return core.NewNotFoundError("project not found")
 	}
 
@@ -105,16 +107,19 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 		ProjectIdentity:           &input.ProjectIdentity,
 	})
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	if projectTaskStatus == nil {
+		tx.Rollback()
 		return core.NewNotFoundError("project task status not found")
 	}
 
 	if input.Name != nil {
 		err = projectTaskStatus.ChangeName(*input.Name)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
@@ -122,6 +127,7 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 	if input.Color != nil {
 		err = projectTaskStatus.ChangeColor(*input.Color)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
@@ -129,6 +135,7 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 	if input.Order != nil {
 		err = projectTaskStatus.ChangeOrder(*input.Order)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 
@@ -141,6 +148,7 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 			},
 		})
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 
@@ -158,6 +166,7 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 
 				err = s.ProjectTaskStatusRepository.UpdateProjectTaskStatus(projectrepo.UpdateProjectTaskStatusParams{ProjectTaskStatus: &status})
 				if err != nil {
+					tx.Rollback()
 					return err
 				}
 			}
@@ -166,6 +175,13 @@ func (s *UpdateProjectTaskStatusService) Execute(input UpdateProjectTaskStatusIn
 
 	err = s.ProjectTaskStatusRepository.UpdateProjectTaskStatus(projectrepo.UpdateProjectTaskStatusParams{ProjectTaskStatus: projectTaskStatus})
 	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
 		return err
 	}
 

@@ -24,14 +24,19 @@ type ProjectDocumentVersionManagerTable struct {
 	ProjectInternalId string `bun:"project_internal_id,notnull,type:uuid"`
 
 	Project       *ProjectTable                `bun:"rel:has-one,join:project_internal_id=internal_id"`
-	LatestVersion *ProjectDocumentVersionTable `bun:"rel:has-one,join:project_document_version_manager_internal_id=internal_id,join:latest=true"`
+	LatestVersion *ProjectDocumentVersionTable `bun:"rel:has-one,join:internal_id=project_document_version_manager_internal_id"`
 }
 
 func (p *ProjectDocumentVersionManagerTable) ToEntity() *project.ProjectDocumentVersionManager {
+	var latestVersion *project.ProjectDocumentVersion
+	if p.LatestVersion != nil {
+		latestVersion = p.LatestVersion.ToEntity()
+	}
+
 	return &project.ProjectDocumentVersionManager{
 		Identity:        core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project.ProjectDocumentVersionManagerIdentityPrefix),
 		ProjectIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.ProjectInternalId), project.ProjectIdentityPrefix),
-		LatestVersion:   p.LatestVersion.ToEntity(),
+		LatestVersion:   latestVersion,
 	}
 }
 
@@ -118,6 +123,10 @@ func NewProjectDocumentBunRepository(connection *bun.DB) *ProjectDocumentBunRepo
 }
 
 func (r *ProjectDocumentBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }
@@ -165,6 +174,9 @@ func (r *ProjectDocumentBunRepository) GetProjectDocumentVersionManagerBy(params
 	}
 
 	selectQuery = selectQuery.Model(projectDocumentVersionManager)
+	selectQuery = selectQuery.Relation("LatestVersion.ProjectDocumentFiles", func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("latest = ?", true)
+	})
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectDocumentVersionManagerIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -256,6 +268,9 @@ func (r *ProjectDocumentBunRepository) PaginateProjectDocumentVersionManagersBy(
 	}
 
 	selectQuery = selectQuery.Model(&projectDocumentVersionManagers)
+	selectQuery = selectQuery.Relation("LatestVersion", func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("latest = ?", true)
+	})
 	selectQuery = r.applyProjectDocumentVersionManagerFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
@@ -303,6 +318,7 @@ func (r *ProjectDocumentBunRepository) PaginateProjectDocumentVersionsBy(params 
 	}
 
 	selectQuery = selectQuery.Model(&projectDocumentVersions)
+	selectQuery = selectQuery.Relation("ProjectDocumentFiles")
 	selectQuery = r.applyProjectDocumentVersionFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

@@ -32,7 +32,7 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 
 	listProjectsService := projectservice.NewListProjectsService(projectRepository)
 	getProjectService := projectservice.NewGetProjectService(projectRepository)
-	createProjectService := projectservice.NewCreateProjectService(projectRepository, projectUserRepository, userRepository, workspaceRepository, transactionRepository)
+	createProjectService := projectservice.NewCreateProjectService(projectRepository, projectUserRepository, projectTaskStatusRepository, userRepository, workspaceRepository, transactionRepository)
 	updateProjectService := projectservice.NewUpdateProjectService(projectRepository, transactionRepository)
 	deleteProjectService := projectservice.NewDeleteProjectService(projectRepository, transactionRepository)
 

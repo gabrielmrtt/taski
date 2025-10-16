@@ -9,26 +9,29 @@ import (
 )
 
 type CreateProjectService struct {
-	ProjectRepository     projectrepo.ProjectRepository
-	ProjectUserRepository projectrepo.ProjectUserRepository
-	UserRepository        userrepo.UserRepository
-	WorkspaceRepository   workspacerepo.WorkspaceRepository
-	TransactionRepository core.TransactionRepository
+	ProjectRepository           projectrepo.ProjectRepository
+	ProjectUserRepository       projectrepo.ProjectUserRepository
+	ProjectTaskStatusRepository projectrepo.ProjectTaskStatusRepository
+	UserRepository              userrepo.UserRepository
+	WorkspaceRepository         workspacerepo.WorkspaceRepository
+	TransactionRepository       core.TransactionRepository
 }
 
 func NewCreateProjectService(
 	projectRepository projectrepo.ProjectRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
+	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
 	userRepository userrepo.UserRepository,
 	workspaceRepository workspacerepo.WorkspaceRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateProjectService {
 	return &CreateProjectService{
-		ProjectRepository:     projectRepository,
-		ProjectUserRepository: projectUserRepository,
-		UserRepository:        userRepository,
-		WorkspaceRepository:   workspaceRepository,
-		TransactionRepository: transactionRepository,
+		ProjectRepository:           projectRepository,
+		ProjectUserRepository:       projectUserRepository,
+		ProjectTaskStatusRepository: projectTaskStatusRepository,
+		UserRepository:              userRepository,
+		WorkspaceRepository:         workspaceRepository,
+		TransactionRepository:       transactionRepository,
 	}
 }
 
@@ -88,6 +91,7 @@ func (s *CreateProjectService) Execute(input CreateProjectInput) (*project.Proje
 	s.ProjectRepository.SetTransaction(tx)
 	s.ProjectUserRepository.SetTransaction(tx)
 	s.UserRepository.SetTransaction(tx)
+	s.ProjectTaskStatusRepository.SetTransaction(tx)
 
 	user, err := s.UserRepository.GetUserByIdentity(userrepo.GetUserByIdentityParams{
 		UserIdentity: input.UserCreatorIdentity,
@@ -143,6 +147,15 @@ func (s *CreateProjectService) Execute(input CreateProjectInput) (*project.Proje
 	_, err = s.ProjectUserRepository.StoreProjectUser(projectrepo.StoreProjectUserParams{ProjectUser: projectUser})
 	if err != nil {
 		return nil, err
+	}
+
+	for _, status := range project.DefaultProjectTaskStatuses {
+		status.Identity = core.NewIdentity(project.ProjectTaskStatusIdentityPrefix)
+		status.ProjectIdentity = prj.Identity
+		_, err = s.ProjectTaskStatusRepository.StoreProjectTaskStatus(projectrepo.StoreProjectTaskStatusParams{ProjectTaskStatus: &status})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = tx.Commit()

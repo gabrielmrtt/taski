@@ -44,6 +44,10 @@ func NewProjectTaskCategoryBunRepository(connection *bun.DB) *ProjectTaskCategor
 }
 
 func (r *ProjectTaskCategoryBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }
@@ -195,9 +199,10 @@ func (r *ProjectTaskCategoryBunRepository) UpdateProjectTaskCategory(params proj
 	}
 
 	_, err := tx.NewUpdate().Model(&ProjectTaskCategoryTable{
-		InternalId: params.ProjectTaskCategory.Identity.Internal.String(),
-		Name:       params.ProjectTaskCategory.Name,
-		Color:      params.ProjectTaskCategory.Color,
+		ProjectInternalId: params.ProjectTaskCategory.ProjectIdentity.Internal.String(),
+		Name:              params.ProjectTaskCategory.Name,
+		Color:             params.ProjectTaskCategory.Color,
+		DeletedAt:         params.ProjectTaskCategory.DeletedAt,
 	}).Where("internal_id = ?", params.ProjectTaskCategory.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {

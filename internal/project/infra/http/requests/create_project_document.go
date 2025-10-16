@@ -9,10 +9,10 @@ import (
 )
 
 type CreateProjectDocumentRequest struct {
-	Title   string                 `json:"title"`
-	Content string                 `json:"content"`
-	Version string                 `json:"version"`
-	Files   []multipart.FileHeader `form:"files"`
+	Title   string                  `form:"title"`
+	Content string                  `form:"content"`
+	Version string                  `form:"version"`
+	Files   []*multipart.FileHeader `form:"files"`
 }
 
 func (r *CreateProjectDocumentRequest) ToInput() projectservice.CreateProjectDocumentInput {

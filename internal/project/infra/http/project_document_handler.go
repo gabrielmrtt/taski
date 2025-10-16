@@ -175,16 +175,18 @@ type CreateProjectDocumentResponse = corehttp.HttpSuccessResponseWithData[projec
 // @Router /project/:projectId/document [post]
 func (c *ProjectDocumentHandler) CreateProjectDocument(ctx *gin.Context) {
 	var request projecthttprequests.CreateProjectDocumentRequest
+	var authenticatedUserIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserIdentity(ctx)
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
 	var input projectservice.CreateProjectDocumentInput
 
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	if err := ctx.ShouldBind(&request); err != nil {
 		corehttp.NewHttpErrorResponse(ctx, err)
 		return
 	}
 
 	input = request.ToInput()
 	input.ProjectIdentity = projectIdentity
+	input.UserCreatorIdentity = *authenticatedUserIdentity
 
 	response, err := c.CreateProjectDocumentService.Execute(input)
 	if err != nil {

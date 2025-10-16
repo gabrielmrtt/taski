@@ -100,17 +100,17 @@ func ProjectTaskCategoryToDto(projectTaskCategory *ProjectTaskCategory) *Project
 }
 
 type ProjectDocumentVersionDto struct {
-	Id                       string                   `json:"id"`
-	ProjectDocumentVersionId string                   `json:"projectDocumentVersionId"`
-	Version                  string                   `json:"version"`
-	Latest                   bool                     `json:"latest"`
-	Title                    string                   `json:"title"`
-	Content                  string                   `json:"content"`
-	Files                    []ProjectDocumentFileDto `json:"files"`
-	UserCreatorId            string                   `json:"userCreatorId"`
-	UserEditorId             *string                  `json:"userEditorId"`
-	CreatedAt                string                   `json:"createdAt"`
-	UpdatedAt                *string                  `json:"updatedAt"`
+	Id                              string                   `json:"id"`
+	ProjectDocumentVersionManagerId string                   `json:"projectDocumentVersionManagerId"`
+	Version                         string                   `json:"version"`
+	Latest                          bool                     `json:"latest"`
+	Title                           string                   `json:"title"`
+	Content                         string                   `json:"content"`
+	Files                           []ProjectDocumentFileDto `json:"files"`
+	UserCreatorId                   string                   `json:"userCreatorId"`
+	UserEditorId                    *string                  `json:"userEditorId"`
+	CreatedAt                       string                   `json:"createdAt"`
+	UpdatedAt                       *string                  `json:"updatedAt"`
 }
 
 type ProjectDocumentFileDto struct {
@@ -138,16 +138,16 @@ func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion)
 	}
 
 	return &ProjectDocumentVersionDto{
-		Id:                       projectDocumentVersion.Identity.Public,
-		ProjectDocumentVersionId: projectDocumentVersion.ProjectDocumentVersionManagerIdentity.Public,
-		Version:                  projectDocumentVersion.Version,
-		Latest:                   projectDocumentVersion.Latest,
-		Title:                    projectDocumentVersion.Document.Title,
-		Content:                  projectDocumentVersion.Document.Content,
-		Files:                    files,
-		UserCreatorId:            projectDocumentVersion.UserCreatorIdentity.Public,
-		UserEditorId:             userEditorId,
-		CreatedAt:                datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.CreatedAt),
-		UpdatedAt:                updatedAt,
+		Id:                              projectDocumentVersion.Identity.Public,
+		ProjectDocumentVersionManagerId: projectDocumentVersion.ProjectDocumentVersionManagerIdentity.Public,
+		Version:                         projectDocumentVersion.Version,
+		Latest:                          projectDocumentVersion.Latest,
+		Title:                           projectDocumentVersion.Document.Title,
+		Content:                         projectDocumentVersion.Document.Content,
+		Files:                           files,
+		UserCreatorId:                   projectDocumentVersion.UserCreatorIdentity.Public,
+		UserEditorId:                    userEditorId,
+		CreatedAt:                       datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.CreatedAt),
+		UpdatedAt:                       updatedAt,
 	}
 }

@@ -69,6 +69,10 @@ func NewWorkspaceBunRepository(connection *bun.DB) *WorkspaceRepository {
 }
 
 func (r *WorkspaceRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }

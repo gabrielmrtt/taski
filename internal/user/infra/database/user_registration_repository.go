@@ -46,6 +46,10 @@ func NewUserRegistrationBunRepository(connection *bun.DB) *UserRegistrationBunRe
 }
 
 func (r *UserRegistrationBunRepository) SetTransaction(tx core.Transaction) error {
+	if r.tx != nil && !r.tx.IsClosed() {
+		return nil
+	}
+
 	r.tx = tx.(*coredatabase.TransactionBun)
 	return nil
 }
