@@ -2,6 +2,10 @@ package task
 
 var TaskIdentityPrefix = "tsk"
 
+var SubTaskIdentityPrefix = "sts"
+
+var TaskCommentIdentityPrefix = "tsc"
+
 type TaskPriorityLevels int8
 
 const (
@@ -11,4 +15,11 @@ const (
 	TaskPriorityLevelHigh     TaskPriorityLevels = 3
 	TaskPriorityLevelCritical TaskPriorityLevels = 4
 	TaskPriorityLevelUrgent   TaskPriorityLevels = 5
+)
+
+type TaskType string
+
+const (
+	TaskTypeNormal TaskType = "normal"
+	TaskTypeGroup  TaskType = "group"
 )

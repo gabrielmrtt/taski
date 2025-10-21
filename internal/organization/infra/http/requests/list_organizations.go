@@ -63,7 +63,6 @@ func (r *ListOrganizationsRequest) ToInput() organizationservice.ListOrganizatio
 			Name:   nameFilter,
 			Status: statusFilter,
 		},
-		ShowDeleted: false,
 		Pagination: core.PaginationInput{
 			Page:    r.Page,
 			PerPage: r.PerPage,

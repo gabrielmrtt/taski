@@ -20,7 +20,6 @@ func NewListOrganizationsService(
 
 type ListOrganizationsInput struct {
 	Filters        organizationrepo.OrganizationFilters
-	ShowDeleted    bool
 	Pagination     core.PaginationInput
 	SortInput      core.SortInput
 	RelationsInput core.RelationsInput
@@ -37,7 +36,7 @@ func (s *ListOrganizationsService) Execute(input ListOrganizationsInput) (*core.
 
 	organizations, err := s.OrganizationRepository.PaginateOrganizationsBy(organizationrepo.PaginateOrganizationsParams{
 		Filters:     input.Filters,
-		ShowDeleted: input.ShowDeleted,
+		ShowDeleted: false,
 		SortInput:   input.SortInput,
 		Pagination:  input.Pagination,
 	})
