@@ -177,6 +177,7 @@ func (r *ProjectDocumentBunRepository) GetProjectDocumentVersionManagerBy(params
 	selectQuery = selectQuery.Relation("LatestVersion.ProjectDocumentFiles", func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("latest = ?", true)
 	})
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectDocumentVersionManagerIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -205,6 +206,7 @@ func (r *ProjectDocumentBunRepository) GetProjectDocumentVersionBy(params projec
 	}
 
 	selectQuery = selectQuery.Model(projectDocumentVersion)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectDocumentVersionIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -233,6 +235,7 @@ func (r *ProjectDocumentBunRepository) ListProjectDocumentVersionsByProjectDocum
 	}
 
 	selectQuery = selectQuery.Model(&projectDocumentVersions)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("project_document_version_manager_internal_id = ?", params.ProjectDocumentVersionManagerIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -271,6 +274,7 @@ func (r *ProjectDocumentBunRepository) PaginateProjectDocumentVersionManagersBy(
 	selectQuery = selectQuery.Relation("LatestVersion", func(q *bun.SelectQuery) *bun.SelectQuery {
 		return q.Where("latest = ?", true)
 	})
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyProjectDocumentVersionManagerFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
@@ -319,6 +323,7 @@ func (r *ProjectDocumentBunRepository) PaginateProjectDocumentVersionsBy(params 
 
 	selectQuery = selectQuery.Model(&projectDocumentVersions)
 	selectQuery = selectQuery.Relation("ProjectDocumentFiles")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyProjectDocumentVersionFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

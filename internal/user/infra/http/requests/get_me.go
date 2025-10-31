@@ -1,11 +1,8 @@
 package userhttprequests
 
 import (
-	"strings"
-
-	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	userservice "github.com/gabrielmrtt/taski/internal/user/service"
-	"github.com/gabrielmrtt/taski/pkg/stringutils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
@@ -21,11 +18,7 @@ func (r *GetMeRequest) FromQuery(ctx *gin.Context) error {
 }
 
 func (r *GetMeRequest) ToInput() userservice.GetMeInput {
-	var relationsInput core.RelationsInput = make([]string, 0)
-	if r.Relations != "" {
-		relationsInput = strings.Split(stringutils.CamelCaseToPascalCase(r.Relations), ",")
-	}
 	return userservice.GetMeInput{
-		RelationsInput: relationsInput,
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

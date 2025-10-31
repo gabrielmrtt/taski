@@ -2,6 +2,7 @@ package projecthttprequests
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	projectservice "github.com/gabrielmrtt/taski/internal/project/service"
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ type ListProjectTaskStatusesRequest struct {
 	PerPage       *int    `json:"perPage"`
 	SortBy        *string `json:"sortBy"`
 	SortDirection *string `json:"sortDirection"`
+	Relations     *string `json:"relations"`
 }
 
 func (r *ListProjectTaskStatusesRequest) FromQuery(ctx *gin.Context) error {
@@ -47,5 +49,6 @@ func (r *ListProjectTaskStatusesRequest) ToInput() projectservice.ListProjectTas
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
+		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

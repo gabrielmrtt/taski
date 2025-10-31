@@ -20,6 +20,7 @@ func NewGetOrganizationService(
 
 type GetOrganizationInput struct {
 	OrganizationIdentity core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i GetOrganizationInput) Validate() error {
@@ -31,7 +32,10 @@ func (s *GetOrganizationService) Execute(input GetOrganizationInput) (*organizat
 		return nil, err
 	}
 
-	org, err := s.OrganizationRepository.GetOrganizationByIdentity(organizationrepo.GetOrganizationByIdentityParams{OrganizationIdentity: input.OrganizationIdentity})
+	org, err := s.OrganizationRepository.GetOrganizationByIdentity(organizationrepo.GetOrganizationByIdentityParams{
+		OrganizationIdentity: input.OrganizationIdentity,
+		RelationsInput:       input.RelationsInput,
+	})
 	if err != nil {
 		return nil, core.NewInternalError(err.Error())
 	}

@@ -35,9 +35,11 @@ func (s *ListRolesService) Execute(input ListRolesInput) (*core.PaginationOutput
 	}
 
 	roles, err := s.RoleRepository.PaginateRolesBy(rolerepo.PaginateRolesParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
+		ShowDeleted:    false,
 	})
 	if err != nil {
 		return nil, err

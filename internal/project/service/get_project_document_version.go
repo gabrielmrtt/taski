@@ -22,6 +22,7 @@ type GetProjectDocumentVersionInput struct {
 	ProjectIdentity                       core.Identity
 	ProjectDocumentVersionManagerIdentity core.Identity
 	ProjectDocumentVersionIdentity        core.Identity
+	RelationsInput                        core.RelationsInput
 }
 
 func (i GetProjectDocumentVersionInput) Validate() error {
@@ -47,6 +48,7 @@ func (s *GetProjectDocumentVersionService) Execute(input GetProjectDocumentVersi
 	projectDocumentVersion, err := s.ProjectDocumentRepository.GetProjectDocumentVersionBy(projectrepo.GetProjectDocumentVersionByParams{
 		ProjectDocumentVersionManagerIdentity: &input.ProjectDocumentVersionManagerIdentity,
 		ProjectDocumentVersionIdentity:        input.ProjectDocumentVersionIdentity,
+		RelationsInput:                        input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

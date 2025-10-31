@@ -22,9 +22,10 @@ func NewListProjectDocumentsService(
 }
 
 type ListProjectDocumentsInput struct {
-	Filters    projectrepo.ProjectDocumentVersionManagerFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        projectrepo.ProjectDocumentVersionManagerFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListProjectDocumentsInput) Validate() error {
@@ -37,9 +38,10 @@ func (s *ListProjectDocumentsService) Execute(input ListProjectDocumentsInput) (
 	}
 
 	projectDocumentVersionManagers, err := s.ProjectDocumentRepository.PaginateProjectDocumentVersionManagersBy(projectrepo.PaginateProjectDocumentVersionManagersByParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

@@ -75,6 +75,7 @@ func (r *ProjectTaskCategoryBunRepository) GetProjectTaskCategoryByIdentity(para
 	}
 
 	selectQuery = selectQuery.Model(projectTaskCategory)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectTaskCategoryIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -105,6 +106,7 @@ func (r *ProjectTaskCategoryBunRepository) PaginateProjectTaskCategoryBy(params 
 	}
 
 	selectQuery = selectQuery.Model(&projectTaskCategories)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {

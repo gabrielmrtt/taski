@@ -35,9 +35,10 @@ func (s *ListOrganizationUsersService) Execute(input ListOrganizationUsersInput)
 	}
 
 	organizationUsers, err := s.OrganizationUserRepository.PaginateOrganizationUsersBy(organizationrepo.PaginateOrganizationUsersParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

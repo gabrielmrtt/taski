@@ -146,6 +146,7 @@ func (r *UserBunRepository) GetUserByIdentity(params userrepo.GetUserByIdentityP
 
 	selectQuery = selectQuery.Model(user)
 	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("users.internal_id = ?", params.UserIdentity.Internal)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -175,6 +176,7 @@ func (r *UserBunRepository) GetUserByEmail(params userrepo.GetUserByEmailParams)
 
 	selectQuery = selectQuery.Model(user)
 	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("credentials.email = ?", params.Email)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -214,6 +216,7 @@ func (r *UserBunRepository) PaginateUsersBy(params userrepo.PaginateUsersParams)
 
 	selectQuery = selectQuery.Model(&users)
 	selectQuery = selectQuery.Relation("Credentials").Relation("Data")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

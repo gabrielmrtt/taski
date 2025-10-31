@@ -19,6 +19,7 @@ func NewGetProjectService(projectRepository projectrepo.ProjectRepository) *GetP
 type GetProjectInput struct {
 	OrganizationIdentity core.Identity
 	ProjectIdentity      core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i GetProjectInput) Validate() error {
@@ -33,6 +34,7 @@ func (s *GetProjectService) Execute(input GetProjectInput) (*project.ProjectDto,
 	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
 		ProjectIdentity:      input.ProjectIdentity,
 		OrganizationIdentity: &input.OrganizationIdentity,
+		RelationsInput:       input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

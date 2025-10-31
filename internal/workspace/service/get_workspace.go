@@ -21,6 +21,7 @@ func NewGetWorkspaceService(
 type GetWorkspaceInput struct {
 	OrganizationIdentity core.Identity
 	WorkspaceIdentity    core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i GetWorkspaceInput) Validate() error {
@@ -32,7 +33,11 @@ func (s *GetWorkspaceService) Execute(input GetWorkspaceInput) (*workspace.Works
 		return nil, err
 	}
 
-	wrk, err := s.WorkspaceRepository.GetWorkspaceByIdentity(workspacerepo.GetWorkspaceByIdentityParams{WorkspaceIdentity: input.WorkspaceIdentity, OrganizationIdentity: &input.OrganizationIdentity})
+	wrk, err := s.WorkspaceRepository.GetWorkspaceByIdentity(workspacerepo.GetWorkspaceByIdentityParams{
+		WorkspaceIdentity:    input.WorkspaceIdentity,
+		OrganizationIdentity: &input.OrganizationIdentity,
+		RelationsInput:       input.RelationsInput,
+	})
 	if err != nil {
 		return nil, err
 	}

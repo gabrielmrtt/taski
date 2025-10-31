@@ -1,20 +1,23 @@
 package role
 
 import (
+	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RoleDto struct {
-	Id              string   `json:"id"`
-	Name            string   `json:"name"`
-	Description     string   `json:"description"`
-	Permissions     []string `json:"permissions"`
-	OrganizationId  *string  `json:"organizationId"`
-	IsSystemDefault bool     `json:"isSystemDefault"`
-	UserCreatorId   *string  `json:"userCreatorId"`
-	UserEditorId    *string  `json:"userEditorId"`
-	CreatedAt       string   `json:"createdAt"`
-	UpdatedAt       *string  `json:"updatedAt"`
+	Id              string        `json:"id"`
+	Name            string        `json:"name"`
+	Description     string        `json:"description"`
+	Permissions     []string      `json:"permissions"`
+	OrganizationId  *string       `json:"organizationId"`
+	IsSystemDefault bool          `json:"isSystemDefault"`
+	UserCreatorId   *string       `json:"userCreatorId"`
+	UserEditorId    *string       `json:"userEditorId"`
+	Creator         *user.UserDto `json:"creator,omitempty"`
+	Editor          *user.UserDto `json:"editor,omitempty"`
+	CreatedAt       string        `json:"createdAt"`
+	UpdatedAt       *string       `json:"updatedAt"`
 }
 
 func RoleToDto(role *Role) *RoleDto {
@@ -46,6 +49,16 @@ func RoleToDto(role *Role) *RoleDto {
 		userEditorId = &role.UserEditorIdentity.Public
 	}
 
+	var creator *user.UserDto = nil
+	if role.Creator != nil {
+		creator = user.UserToDto(role.Creator)
+	}
+
+	var editor *user.UserDto = nil
+	if role.Editor != nil {
+		editor = user.UserToDto(role.Editor)
+	}
+
 	return &RoleDto{
 		Id:              role.Identity.Public,
 		Name:            role.Name,
@@ -55,6 +68,8 @@ func RoleToDto(role *Role) *RoleDto {
 		IsSystemDefault: role.IsSystemDefault,
 		UserCreatorId:   userCreatorId,
 		UserEditorId:    userEditorId,
+		Creator:         creator,
+		Editor:          editor,
 		CreatedAt:       createdAt,
 		UpdatedAt:       updatedAt,
 	}

@@ -34,6 +34,7 @@ func (s *GetOrganizationUserService) Execute(input GetOrganizationUserInput) (*o
 	organizationUser, err := s.OrganizationUserRepository.GetOrganizationUserByIdentity(organizationrepo.GetOrganizationUserByIdentityParams{
 		OrganizationIdentity: input.OrganizationIdentity,
 		UserIdentity:         input.UserIdentity,
+		RelationsInput:       input.RelationsInput,
 	})
 
 	if err != nil {

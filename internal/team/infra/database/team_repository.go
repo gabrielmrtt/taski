@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	coredatabase "github.com/gabrielmrtt/taski/internal/core/database"
 	"github.com/gabrielmrtt/taski/internal/organization"
+	organizationdatabase "github.com/gabrielmrtt/taski/internal/organization/infra/database"
 	"github.com/gabrielmrtt/taski/internal/team"
 	teamrepo "github.com/gabrielmrtt/taski/internal/team/repository"
 	"github.com/gabrielmrtt/taski/internal/user"
@@ -29,7 +30,10 @@ type TeamTable struct {
 	CreatedAt              int64   `bun:"created_at,notnull,type:bigint"`
 	UpdatedAt              *int64  `bun:"updated_at,type:bigint"`
 
-	Members []*TeamUserTable `bun:"rel:has-many,join:internal_id=team_internal_id"`
+	Members      []*TeamUserTable                        `bun:"rel:has-many,join:internal_id=team_internal_id"`
+	Creator      *userdatabase.UserTable                 `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
+	Editor       *userdatabase.UserTable                 `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
+	Organization *organizationdatabase.OrganizationTable `bun:"rel:has-one,join:organization_internal_id=internal_id"`
 }
 
 type TeamUserTable struct {
@@ -61,6 +65,21 @@ func (t *TeamTable) ToEntity() *team.Team {
 		members = append(members, *user.ToEntity())
 	}
 
+	var creator *user.User = nil
+	if t.Creator != nil {
+		creator = t.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if t.Editor != nil {
+		editor = t.Editor.ToEntity()
+	}
+
+	var org *organization.Organization = nil
+	if t.Organization != nil {
+		org = t.Organization.ToEntity()
+	}
+
 	return &team.Team{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(t.InternalId), team.TeamIdentityPrefix),
 		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(t.OrganizationInternalId), organization.OrganizationIdentityPrefix),
@@ -69,6 +88,9 @@ func (t *TeamTable) ToEntity() *team.Team {
 		Status:               team.TeamStatuses(t.Status),
 		UserCreatorIdentity:  userCreatorIdentity,
 		UserEditorIdentity:   userEditorIdentity,
+		Creator:              creator,
+		Editor:               editor,
+		Organization:         org,
 		Timestamps:           core.Timestamps{CreatedAt: &t.CreatedAt, UpdatedAt: t.UpdatedAt},
 		Members:              members,
 	}
@@ -133,6 +155,7 @@ func (r *TeamBunRepository) GetTeamByIdentity(params teamrepo.GetTeamByIdentityP
 
 	selectQuery = selectQuery.Model(team)
 	selectQuery = selectQuery.Relation("Members.User").Relation("Members.User.Credentials").Relation("Members.User.Data")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.TeamIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -164,6 +187,7 @@ func (r *TeamBunRepository) PaginateTeamsBy(params teamrepo.PaginateTeamsParams)
 
 	selectQuery = selectQuery.Model(&teams)
 	selectQuery = selectQuery.Relation("Members.User").Relation("Members.User.Credentials").Relation("Members.User.Data")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {

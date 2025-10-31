@@ -9,6 +9,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/organization"
 	organizationdatabase "github.com/gabrielmrtt/taski/internal/organization/infra/database"
 	"github.com/gabrielmrtt/taski/internal/user"
+	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	"github.com/gabrielmrtt/taski/internal/workspace"
 	workspacerepo "github.com/gabrielmrtt/taski/internal/workspace/repository"
 	"github.com/google/uuid"
@@ -32,6 +33,8 @@ type WorkspaceTable struct {
 	DeletedAt              *int64  `bun:"deleted_at,type:bigint"`
 
 	Organization *organizationdatabase.OrganizationTable `bun:"rel:has-one,join:organization_internal_id=internal_id"`
+	Creator      *userdatabase.UserTable                 `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
+	Editor       *userdatabase.UserTable                 `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
 }
 
 func (w *WorkspaceTable) ToEntity() *workspace.Workspace {
@@ -40,6 +43,21 @@ func (w *WorkspaceTable) ToEntity() *workspace.Workspace {
 	if w.UserEditorInternalId != nil {
 		identity := core.NewIdentityFromInternal(uuid.MustParse(*w.UserEditorInternalId), user.UserIdentityPrefix)
 		userEditorIdentity = &identity
+	}
+
+	var creator *user.User = nil
+	if w.Creator != nil {
+		creator = w.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if w.Editor != nil {
+		editor = w.Editor.ToEntity()
+	}
+
+	var org *organization.Organization = nil
+	if w.Organization != nil {
+		org = w.Organization.ToEntity()
 	}
 
 	return &workspace.Workspace{
@@ -51,6 +69,9 @@ func (w *WorkspaceTable) ToEntity() *workspace.Workspace {
 		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(w.OrganizationInternalId), organization.OrganizationIdentityPrefix),
 		UserCreatorIdentity:  &userCreatorIdentity,
 		UserEditorIdentity:   userEditorIdentity,
+		Creator:              creator,
+		Editor:               editor,
+		Organization:         org,
 		Timestamps: core.Timestamps{
 			CreatedAt: &w.CreatedAt,
 			UpdatedAt: w.UpdatedAt,
@@ -124,6 +145,7 @@ func (r *WorkspaceRepository) GetWorkspaceByIdentity(params workspacerepo.GetWor
 	}
 
 	selectQuery = selectQuery.Model(workspace)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.WorkspaceIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -162,6 +184,7 @@ func (r *WorkspaceRepository) PaginateWorkspacesBy(params workspacerepo.Paginate
 	}
 
 	selectQuery = selectQuery.Model(&workspaces)
+	selectQuery = selectQuery.Relation("Creator").Relation("Editor").Relation("Organization")
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {

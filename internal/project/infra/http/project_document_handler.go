@@ -142,11 +142,17 @@ func (c *ProjectDocumentHandler) GetProjectDocumentVersion(ctx *gin.Context) {
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
 	var documentVersionManagerIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionManagerId"))
 	var documentVersionIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("documentVersionId"))
-	var input projectservice.GetProjectDocumentVersionInput = projectservice.GetProjectDocumentVersionInput{
-		ProjectIdentity:                       projectIdentity,
-		ProjectDocumentVersionManagerIdentity: documentVersionManagerIdentity,
-		ProjectDocumentVersionIdentity:        documentVersionIdentity,
+	var request projecthttprequests.GetProjectDocumentVersionRequest
+
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input := request.ToInput()
+	input.ProjectIdentity = projectIdentity
+	input.ProjectDocumentVersionManagerIdentity = documentVersionManagerIdentity
+	input.ProjectDocumentVersionIdentity = documentVersionIdentity
 
 	response, err := c.GetProjectDocumentVersionService.Execute(input)
 	if err != nil {

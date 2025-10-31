@@ -20,13 +20,15 @@ type WorkspaceFilters struct {
 type GetWorkspaceByIdentityParams struct {
 	WorkspaceIdentity    core.Identity
 	OrganizationIdentity *core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 type PaginateWorkspacesParams struct {
-	ShowDeleted bool
-	Filters     WorkspaceFilters
-	SortInput   core.SortInput
-	Pagination  core.PaginationInput
+	ShowDeleted    bool
+	Filters        WorkspaceFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreWorkspaceParams struct {

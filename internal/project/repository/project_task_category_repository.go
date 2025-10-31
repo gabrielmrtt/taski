@@ -11,15 +11,17 @@ type ProjectTaskCategoryFilters struct {
 }
 
 type PaginateProjectTaskCategoryParams struct {
-	ShowDeleted bool
-	Filters     ProjectTaskCategoryFilters
-	SortInput   core.SortInput
-	Pagination  core.PaginationInput
+	ShowDeleted    bool
+	Filters        ProjectTaskCategoryFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type GetProjectTaskCategoryByIdentityParams struct {
 	ProjectTaskCategoryIdentity *core.Identity
 	ProjectIdentity             *core.Identity
+	RelationsInput              core.RelationsInput
 }
 
 type StoreProjectTaskCategoryParams struct {

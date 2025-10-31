@@ -7,18 +7,18 @@ import (
 	"github.com/gorilla/schema"
 )
 
-type GetOrganizationUserRequest struct {
+type GetOrganizationRequest struct {
 	Relations *string `json:"relations" schema:"relations"`
 }
 
-func (r *GetOrganizationUserRequest) FromQuery(ctx *gin.Context) error {
+func (r *GetOrganizationRequest) FromQuery(ctx *gin.Context) error {
 	schemaDecoder := schema.NewDecoder()
 	schemaDecoder.IgnoreUnknownKeys(true)
 	return schemaDecoder.Decode(r, ctx.Request.URL.Query())
 }
 
-func (r *GetOrganizationUserRequest) ToInput() organizationservice.GetOrganizationUserInput {
-	return organizationservice.GetOrganizationUserInput{
+func (r *GetOrganizationRequest) ToInput() organizationservice.GetOrganizationInput {
+	return organizationservice.GetOrganizationInput{
 		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

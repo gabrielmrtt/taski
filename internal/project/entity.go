@@ -22,6 +22,8 @@ type Project struct {
 	EndAt               *int64
 	Timestamps          core.Timestamps
 	DeletedAt           *int64
+	Creator             *user.User
+	Editor              *user.User
 }
 
 type NewProjectInput struct {
@@ -440,6 +442,8 @@ type ProjectDocumentVersion struct {
 	UserEditorIdentity                    *core.Identity
 	Latest                                bool
 	Timestamps                            core.Timestamps
+	Creator                               *user.User
+	Editor                                *user.User
 }
 
 type ProjectDocument struct {

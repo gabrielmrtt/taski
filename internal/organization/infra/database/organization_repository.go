@@ -9,6 +9,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/organization"
 	organizationrepo "github.com/gabrielmrtt/taski/internal/organization/repository"
 	"github.com/gabrielmrtt/taski/internal/user"
+	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -25,6 +26,9 @@ type OrganizationTable struct {
 	CreatedAt             int64   `bun:"created_at,notnull,type:bigint"`
 	UpdatedAt             *int64  `bun:"updated_at,type:bigint"`
 	DeletedAt             *int64  `bun:"deleted_at,type:bigint"`
+
+	Creator *userdatabase.UserTable `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
+	Editor  *userdatabase.UserTable `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
 }
 
 func (o *OrganizationTable) ToEntity() *organization.Organization {
@@ -41,12 +45,24 @@ func (o *OrganizationTable) ToEntity() *organization.Organization {
 		userEditorIdentity = &identity
 	}
 
+	var creator *user.User = nil
+	if o.Creator != nil {
+		creator = o.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if o.Editor != nil {
+		editor = o.Editor.ToEntity()
+	}
+
 	return &organization.Organization{
 		Identity:            core.NewIdentityFromInternal(uuid.MustParse(o.InternalId), organization.OrganizationIdentityPrefix),
 		Name:                o.Name,
 		Status:              organization.OrganizationStatuses(o.Status),
 		UserCreatorIdentity: userCreatorIdentity,
 		UserEditorIdentity:  userEditorIdentity,
+		Creator:             creator,
+		Editor:              editor,
 		Timestamps: core.Timestamps{
 			CreatedAt: &o.CreatedAt,
 			UpdatedAt: o.UpdatedAt,

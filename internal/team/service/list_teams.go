@@ -17,9 +17,10 @@ func NewListTeamsService(teamRepository teamrepo.TeamRepository) *ListTeamsServi
 }
 
 type ListTeamsInput struct {
-	Filters    teamrepo.TeamFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        teamrepo.TeamFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListTeamsInput) Validate() error {
@@ -32,9 +33,10 @@ func (s *ListTeamsService) Execute(input ListTeamsInput) (*core.PaginationOutput
 	}
 
 	teams, err := s.TeamRepository.PaginateTeamsBy(teamrepo.PaginateTeamsParams{
-		Filters:    input.Filters,
-		SortInput:  input.SortInput,
-		Pagination: input.Pagination,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

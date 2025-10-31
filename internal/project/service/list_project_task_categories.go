@@ -19,9 +19,10 @@ func NewListProjectTaskCategoriesService(
 }
 
 type ListProjectTaskCategoriesInput struct {
-	Filters    projectrepo.ProjectTaskCategoryFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        projectrepo.ProjectTaskCategoryFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListProjectTaskCategoriesInput) Validate() error {
@@ -34,10 +35,11 @@ func (s *ListProjectTaskCategoriesService) Execute(input ListProjectTaskCategori
 	}
 
 	projectTaskCategories, err := s.ProjectTaskCategoryRepository.PaginateProjectTaskCategoryBy(projectrepo.PaginateProjectTaskCategoryParams{
-		Filters:     input.Filters,
-		SortInput:   input.SortInput,
-		Pagination:  input.Pagination,
-		ShowDeleted: false,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		ShowDeleted:    false,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

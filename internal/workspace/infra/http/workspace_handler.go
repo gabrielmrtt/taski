@@ -87,6 +87,7 @@ type GetWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Works
 // @Accept json
 // @Param organizationId path string true "Organization ID"
 // @Param workspaceId path string true "Workspace ID"
+// @Param request query workspacehttprequests.GetWorkspaceRequest true "Query parameters"
 // @Produce json
 // @Success 200 {object} GetWorkspaceResponse
 // @Failure 400 {object} corehttp.HttpErrorResponse
@@ -98,10 +99,17 @@ type GetWorkspaceResponse = corehttp.HttpSuccessResponseWithData[workspace.Works
 func (c *WorkspaceHandler) GetWorkspace(ctx *gin.Context) {
 	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	var workspaceIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("workspaceId"))
-	var input workspaceservice.GetWorkspaceInput = workspaceservice.GetWorkspaceInput{
-		OrganizationIdentity: *organizationIdentity,
-		WorkspaceIdentity:    workspaceIdentity,
+	var request workspacehttprequests.GetWorkspaceRequest
+	var input workspaceservice.GetWorkspaceInput
+
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input = request.ToInput()
+	input.OrganizationIdentity = *organizationIdentity
+	input.WorkspaceIdentity = workspaceIdentity
 
 	response, err := c.GetWorkspaceService.Execute(input)
 	if err != nil {

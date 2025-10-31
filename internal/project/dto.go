@@ -1,21 +1,26 @@
 package project
 
-import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
+import (
+	"github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
+)
 
 type ProjectDto struct {
-	Id            string  `json:"id"`
-	Name          string  `json:"name"`
-	Description   string  `json:"description"`
-	Status        string  `json:"status"`
-	Color         string  `json:"color"`
-	PriorityLevel int8    `json:"priorityLevel"`
-	StartAt       *string `json:"startAt"`
-	EndAt         *string `json:"endAt"`
-	WorkspaceId   string  `json:"workspaceId"`
-	UserCreatorId string  `json:"userCreatorId"`
-	UserEditorId  *string `json:"userEditorId"`
-	CreatedAt     string  `json:"createdAt"`
-	UpdatedAt     *string `json:"updatedAt"`
+	Id            string        `json:"id"`
+	Name          string        `json:"name"`
+	Description   string        `json:"description"`
+	Status        string        `json:"status"`
+	Color         string        `json:"color"`
+	PriorityLevel int8          `json:"priorityLevel"`
+	StartAt       *string       `json:"startAt"`
+	EndAt         *string       `json:"endAt"`
+	WorkspaceId   string        `json:"workspaceId"`
+	UserCreatorId string        `json:"userCreatorId"`
+	UserEditorId  *string       `json:"userEditorId"`
+	Creator       *user.UserDto `json:"creator,omitempty"`
+	Editor        *user.UserDto `json:"editor,omitempty"`
+	CreatedAt     string        `json:"createdAt"`
+	UpdatedAt     *string       `json:"updatedAt"`
 }
 
 func ProjectToDto(project *Project) *ProjectDto {
@@ -48,6 +53,16 @@ func ProjectToDto(project *Project) *ProjectDto {
 		updatedAt = &updatedAtString
 	}
 
+	var creator *user.UserDto = nil
+	if project.Creator != nil {
+		creator = user.UserToDto(project.Creator)
+	}
+
+	var editor *user.UserDto = nil
+	if project.Editor != nil {
+		editor = user.UserToDto(project.Editor)
+	}
+
 	return &ProjectDto{
 		Id:            project.Identity.Public,
 		Name:          project.Name,
@@ -60,6 +75,8 @@ func ProjectToDto(project *Project) *ProjectDto {
 		WorkspaceId:   project.WorkspaceIdentity.Public,
 		UserCreatorId: *userCreatorId,
 		UserEditorId:  userEditorId,
+		Creator:       creator,
+		Editor:        editor,
 		CreatedAt:     createdAt,
 		UpdatedAt:     updatedAt,
 	}
@@ -109,6 +126,8 @@ type ProjectDocumentVersionDto struct {
 	Files                           []ProjectDocumentFileDto `json:"files"`
 	UserCreatorId                   string                   `json:"userCreatorId"`
 	UserEditorId                    *string                  `json:"userEditorId"`
+	Creator                         *user.UserDto            `json:"creator,omitempty"`
+	Editor                          *user.UserDto            `json:"editor,omitempty"`
 	CreatedAt                       string                   `json:"createdAt"`
 	UpdatedAt                       *string                  `json:"updatedAt"`
 }
@@ -137,6 +156,16 @@ func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion)
 		updatedAt = &updatedAtString
 	}
 
+	var creator *user.UserDto = nil
+	if projectDocumentVersion.Creator != nil {
+		creator = user.UserToDto(projectDocumentVersion.Creator)
+	}
+
+	var editor *user.UserDto = nil
+	if projectDocumentVersion.Editor != nil {
+		editor = user.UserToDto(projectDocumentVersion.Editor)
+	}
+
 	return &ProjectDocumentVersionDto{
 		Id:                              projectDocumentVersion.Identity.Public,
 		ProjectDocumentVersionManagerId: projectDocumentVersion.ProjectDocumentVersionManagerIdentity.Public,
@@ -147,6 +176,8 @@ func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion)
 		Files:                           files,
 		UserCreatorId:                   projectDocumentVersion.UserCreatorIdentity.Public,
 		UserEditorId:                    userEditorId,
+		Creator:                         creator,
+		Editor:                          editor,
 		CreatedAt:                       datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.CreatedAt),
 		UpdatedAt:                       updatedAt,
 	}

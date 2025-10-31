@@ -2,6 +2,7 @@ package workspacehttprequests
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	"github.com/gabrielmrtt/taski/internal/workspace"
 	workspacerepo "github.com/gabrielmrtt/taski/internal/workspace/repository"
 	workspaceservice "github.com/gabrielmrtt/taski/internal/workspace/service"
@@ -17,6 +18,7 @@ type ListWorkspacesRequest struct {
 	PerPage       *int    `json:"perPage" schema:"perPage"`
 	SortBy        *string `json:"sortBy" schema:"sortBy"`
 	SortDirection *string `json:"sortDirection" schema:"sortDirection"`
+	Relations     *string `json:"relations" schema:"relations"`
 }
 
 func (r *ListWorkspacesRequest) FromQuery(ctx *gin.Context) error {
@@ -67,5 +69,6 @@ func (r *ListWorkspacesRequest) ToInput() workspaceservice.ListWorkspacesInput {
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
+		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

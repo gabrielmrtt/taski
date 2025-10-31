@@ -1,18 +1,25 @@
 package workspace
 
-import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
+import (
+	"github.com/gabrielmrtt/taski/internal/organization"
+	"github.com/gabrielmrtt/taski/internal/user"
+	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
+)
 
 type WorkspaceDto struct {
-	Id             string  `json:"id"`
-	Name           string  `json:"name"`
-	Description    string  `json:"description"`
-	Color          string  `json:"color"`
-	Status         string  `json:"status"`
-	OrganizationId string  `json:"organizationId"`
-	UserCreatorId  string  `json:"userCreatorId"`
-	UserEditorId   *string `json:"userEditorId"`
-	CreatedAt      string  `json:"createdAt"`
-	UpdatedAt      *string `json:"updatedAt"`
+	Id             string                        `json:"id"`
+	Name           string                        `json:"name"`
+	Description    string                        `json:"description"`
+	Color          string                        `json:"color"`
+	Status         string                        `json:"status"`
+	OrganizationId string                        `json:"organizationId"`
+	UserCreatorId  string                        `json:"userCreatorId"`
+	UserEditorId   *string                       `json:"userEditorId"`
+	Creator        *user.UserDto                 `json:"creator,omitempty"`
+	Editor         *user.UserDto                 `json:"editor,omitempty"`
+	Organization   *organization.OrganizationDto `json:"organization,omitempty"`
+	CreatedAt      string                        `json:"createdAt"`
+	UpdatedAt      *string                       `json:"updatedAt"`
 }
 
 func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
@@ -34,6 +41,21 @@ func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
 		userEditorId = &workspace.UserEditorIdentity.Public
 	}
 
+	var creator *user.UserDto = nil
+	if workspace.Creator != nil {
+		creator = user.UserToDto(workspace.Creator)
+	}
+
+	var editor *user.UserDto = nil
+	if workspace.Editor != nil {
+		editor = user.UserToDto(workspace.Editor)
+	}
+
+	var org *organization.OrganizationDto = nil
+	if workspace.Organization != nil {
+		org = organization.OrganizationToDto(workspace.Organization)
+	}
+
 	return &WorkspaceDto{
 		Id:             workspace.Identity.Public,
 		Name:           workspace.Name,
@@ -43,6 +65,9 @@ func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
 		OrganizationId: workspace.OrganizationIdentity.Public,
 		UserCreatorId:  *userCreatorId,
 		UserEditorId:   userEditorId,
+		Creator:        creator,
+		Editor:         editor,
+		Organization:   org,
 		CreatedAt:      createdAt,
 		UpdatedAt:      updatedAt,
 	}

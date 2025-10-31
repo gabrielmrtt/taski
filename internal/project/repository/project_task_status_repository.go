@@ -18,13 +18,15 @@ type GetProjectTaskStatusByIdentityParams struct {
 	ProjectIdentity           *core.Identity
 	IsDefault                 *bool
 	ShouldSetTaskToCompleted  *bool
+	RelationsInput            core.RelationsInput
 }
 
 type PaginateProjectTaskStatusesParams struct {
-	ShowDeleted bool
-	Filters     ProjectTaskStatusFilters
-	SortInput   core.SortInput
-	Pagination  core.PaginationInput
+	ShowDeleted    bool
+	Filters        ProjectTaskStatusFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreProjectTaskStatusParams struct {
@@ -40,8 +42,9 @@ type DeleteProjectTaskStatusParams struct {
 }
 
 type ListProjectTaskStatusesByParams struct {
-	Filters   ProjectTaskStatusFilters
-	SortInput *core.SortInput
+	Filters        ProjectTaskStatusFilters
+	SortInput      *core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 type GetLastTaskStatusOrderParams struct {

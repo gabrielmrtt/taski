@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"github.com/gabrielmrtt/taski/internal/core"
+	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
@@ -16,6 +17,9 @@ type Team struct {
 	Status               TeamStatuses
 	UserCreatorIdentity  *core.Identity
 	UserEditorIdentity   *core.Identity
+	Creator              *user.User
+	Editor               *user.User
+	Organization         *organization.Organization
 	Timestamps           core.Timestamps
 
 	Members []TeamUser

@@ -83,6 +83,7 @@ type GetTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 // @Tags Team
 // @Accept json
 // @Param teamId path string true "Team ID"
+// @Param request query teamhttprequests.GetTeamRequest true "Query parameters"
 // @Produce json
 // @Success 200 {object} GetTeamResponse
 // @Failure 400 {object} corehttp.HttpErrorResponse
@@ -94,10 +95,17 @@ type GetTeamResponse = corehttp.HttpSuccessResponseWithData[team.TeamDto]
 func (c *TeamHandler) GetTeam(ctx *gin.Context) {
 	var teamIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("teamId"))
 	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
-	var input teamservice.GetTeamInput = teamservice.GetTeamInput{
-		TeamIdentity:         teamIdentity,
-		OrganizationIdentity: *organizationIdentity,
+	var request teamhttprequests.GetTeamRequest
+	var input teamservice.GetTeamInput
+
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input = request.ToInput()
+	input.TeamIdentity = teamIdentity
+	input.OrganizationIdentity = *organizationIdentity
 
 	response, err := c.GetTeamService.Execute(input)
 	if err != nil {

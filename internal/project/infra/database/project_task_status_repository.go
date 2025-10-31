@@ -128,6 +128,7 @@ func (r *ProjectTaskStatusBunRepository) GetProjectTaskStatusByIdentity(params p
 	}
 
 	selectQuery = selectQuery.Model(projectTaskStatus)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 
 	if params.ProjectIdentity != nil {
 		selectQuery = selectQuery.Where("project_internal_id = ?", params.ProjectIdentity.Internal.String())
@@ -172,6 +173,7 @@ func (r *ProjectTaskStatusBunRepository) ListProjectTaskStatusesBy(params projec
 	}
 
 	selectQuery = selectQuery.Model(&projectTaskStatuses)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -199,6 +201,7 @@ func (r *ProjectTaskStatusBunRepository) PaginateProjectTaskStatusesBy(params pr
 	}
 
 	selectQuery = selectQuery.Model(&projectTaskStatuses)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {

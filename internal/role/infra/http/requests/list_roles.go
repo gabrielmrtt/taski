@@ -1,12 +1,10 @@
 package rolehttprequests
 
 import (
-	"strings"
-
 	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	rolerepo "github.com/gabrielmrtt/taski/internal/role/repository"
 	roleservice "github.com/gabrielmrtt/taski/internal/role/service"
-	"github.com/gabrielmrtt/taski/pkg/stringutils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
@@ -47,11 +45,6 @@ func (r *ListRolesRequest) ToInput() roleservice.ListRolesInput {
 		sortDirection = core.SortDirection(*r.SortDirection)
 	}
 
-	var relationsInput core.RelationsInput = make([]string, 0)
-	if r.Relations != nil {
-		relationsInput = strings.Split(stringutils.CamelCaseToPascalCase(*r.Relations), ",")
-	}
-
 	return roleservice.ListRolesInput{
 		Filters: rolerepo.RoleFilters{
 			Name:        nameFilter,
@@ -65,6 +58,6 @@ func (r *ListRolesRequest) ToInput() roleservice.ListRolesInput {
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: relationsInput,
+		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

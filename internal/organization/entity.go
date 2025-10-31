@@ -13,8 +13,10 @@ type Organization struct {
 	Status              OrganizationStatuses
 	UserCreatorIdentity *core.Identity
 	UserEditorIdentity  *core.Identity
+	Creator             *user.User
+	Editor              *user.User
+	DeletedAt           *int64
 	core.Timestamps
-	DeletedAt *int64
 }
 
 type NewOrganizationInput struct {

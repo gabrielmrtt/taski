@@ -83,6 +83,7 @@ type GetOrganizationResponse = corehttp.HttpSuccessResponseWithData[organization
 // @Tags Organization
 // @Accept json
 // @Param organizationId path string true "Organization ID"
+// @Param request query organizationhttprequests.GetOrganizationRequest true "Query parameters"
 // @Produce json
 // @Success 200 {object} GetOrganizationResponse
 // @Failure 400 {object} corehttp.HttpErrorResponse
@@ -93,9 +94,16 @@ type GetOrganizationResponse = corehttp.HttpSuccessResponseWithData[organization
 // @Router /organization/:organizationId [get]
 func (c *OrganizationHandler) GetOrganization(ctx *gin.Context) {
 	var organizationIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("organizationId"))
-	var input organizationservice.GetOrganizationInput = organizationservice.GetOrganizationInput{
-		OrganizationIdentity: organizationIdentity,
+	var request organizationhttprequests.GetOrganizationRequest
+	var input organizationservice.GetOrganizationInput
+
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input = request.ToInput()
+	input.OrganizationIdentity = organizationIdentity
 
 	response, err := c.GetOrganizationService.Execute(input)
 	if err != nil {

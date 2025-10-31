@@ -1,13 +1,11 @@
 package organizationhttprequests
 
 import (
-	"strings"
-
 	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	"github.com/gabrielmrtt/taski/internal/organization"
 	organizationrepo "github.com/gabrielmrtt/taski/internal/organization/repository"
 	organizationservice "github.com/gabrielmrtt/taski/internal/organization/service"
-	"github.com/gabrielmrtt/taski/pkg/stringutils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
@@ -77,11 +75,6 @@ func (r *ListOrganizationUsersRequest) ToInput() organizationservice.ListOrganiz
 		}
 	}
 
-	var relationsInput core.RelationsInput = make([]string, 0)
-	if r.Relations != nil {
-		relationsInput = strings.Split(stringutils.CamelCaseToPascalCase(*r.Relations), ",")
-	}
-
 	return organizationservice.ListOrganizationUsersInput{
 		Filters: organizationrepo.OrganizationUserFilters{
 			Name:         nameFilter,
@@ -98,6 +91,6 @@ func (r *ListOrganizationUsersRequest) ToInput() organizationservice.ListOrganiz
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: relationsInput,
+		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

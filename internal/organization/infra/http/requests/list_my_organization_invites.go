@@ -1,11 +1,9 @@
 package organizationhttprequests
 
 import (
-	"strings"
-
 	"github.com/gabrielmrtt/taski/internal/core"
+	corehttp "github.com/gabrielmrtt/taski/internal/core/http"
 	organizationservice "github.com/gabrielmrtt/taski/internal/organization/service"
-	"github.com/gabrielmrtt/taski/pkg/stringutils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/schema"
 )
@@ -30,11 +28,6 @@ func (r *ListMyOrganizationInvitesRequest) ToInput() organizationservice.ListMyO
 		sortDirection = core.SortDirection(*r.SortDirection)
 	}
 
-	var relationsInput core.RelationsInput = make([]string, 0)
-	if r.Relations != nil {
-		relationsInput = strings.Split(stringutils.CamelCaseToPascalCase(*r.Relations), ",")
-	}
-
 	return organizationservice.ListMyOrganizationInvitesInput{
 		Pagination: core.PaginationInput{
 			Page:    r.Page,
@@ -44,6 +37,6 @@ func (r *ListMyOrganizationInvitesRequest) ToInput() organizationservice.ListMyO
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: relationsInput,
+		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
 	}
 }

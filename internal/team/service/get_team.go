@@ -19,6 +19,7 @@ func NewGetTeamService(teamRepository teamrepo.TeamRepository) *GetTeamService {
 type GetTeamInput struct {
 	TeamIdentity         core.Identity
 	OrganizationIdentity core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 func (i GetTeamInput) Validate() error {
@@ -33,6 +34,7 @@ func (s *GetTeamService) Execute(input GetTeamInput) (*team.TeamDto, error) {
 	tm, err := s.TeamRepository.GetTeamByIdentity(teamrepo.GetTeamByIdentityParams{
 		TeamIdentity:         input.TeamIdentity,
 		OrganizationIdentity: &input.OrganizationIdentity,
+		RelationsInput:       input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err

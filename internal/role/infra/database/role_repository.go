@@ -11,6 +11,7 @@ import (
 	"github.com/gabrielmrtt/taski/internal/role"
 	rolerepo "github.com/gabrielmrtt/taski/internal/role/repository"
 	"github.com/gabrielmrtt/taski/internal/user"
+	userdatabase "github.com/gabrielmrtt/taski/internal/user/infra/database"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -31,7 +32,9 @@ type RoleTable struct {
 	UpdatedAt              *int64  `bun:"updated_at,type:bigint"`
 	DeletedAt              *int64  `bun:"deleted_at,type:bigint"`
 
-	RolePermissions []*RolePermissionTable `bun:"rel:has-many,join:internal_id=role_internal_id"`
+	RolePermissions []*RolePermissionTable  `bun:"rel:has-many,join:internal_id=role_internal_id"`
+	Creator         *userdatabase.UserTable `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
+	Editor          *userdatabase.UserTable `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
 }
 
 func (r *RoleTable) ToEntity() *role.Role {
@@ -55,6 +58,16 @@ func (r *RoleTable) ToEntity() *role.Role {
 		organizationIdentity = &identity
 	}
 
+	var creator *user.User = nil
+	if r.Creator != nil {
+		creator = r.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if r.Editor != nil {
+		editor = r.Editor.ToEntity()
+	}
+
 	var permissions []role.Permission = make([]role.Permission, 0)
 	for _, rolePermission := range r.RolePermissions {
 		if rolePermission.Permission != nil {
@@ -72,6 +85,8 @@ func (r *RoleTable) ToEntity() *role.Role {
 		UserCreatorIdentity:  userCreatorIdentity,
 		UserEditorIdentity:   userEditorIdentity,
 		IsSystemDefault:      r.IsSystemDefault,
+		Creator:              creator,
+		Editor:               editor,
 		Timestamps: core.Timestamps{
 			CreatedAt: &r.CreatedAt,
 			UpdatedAt: r.UpdatedAt,
@@ -154,6 +169,7 @@ func (r *RoleBunRepository) GetRoleByIdentity(params rolerepo.GetRoleByIdentityP
 
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ?", params.RoleIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
@@ -184,6 +200,7 @@ func (r *RoleBunRepository) GetRoleByIdentityAndOrganizationIdentity(params role
 
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = selectQuery.Where("internal_id = ? AND organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -211,6 +228,7 @@ func (r *RoleBunRepository) GetSystemDefaultRole(params rolerepo.GetDefaultRoleP
 
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = selectQuery.Relation("Creator").Relation("Editor")
 	selectQuery = selectQuery.Where("slug = ? AND is_system_default = TRUE", string(params.Slug))
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -250,7 +268,13 @@ func (r *RoleBunRepository) PaginateRolesBy(params rolerepo.PaginateRolesParams)
 
 	selectQuery = selectQuery.Model(&roles)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
+
+	if !params.ShowDeleted {
+		selectQuery = selectQuery.Where("deleted_at IS NULL")
+	}
+
 	countBeforePagination, err := selectQuery.Count(context.Background())
 	if err != nil {
 		return nil, err

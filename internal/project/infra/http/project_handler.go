@@ -96,10 +96,16 @@ type GetProjectResponse = corehttp.HttpSuccessResponseWithData[project.ProjectDt
 func (c *ProjectHandler) GetProject(ctx *gin.Context) {
 	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(ctx)
 	var projectIdentity core.Identity = core.NewIdentityFromPublic(ctx.Param("projectId"))
-	var input projectservice.GetProjectInput = projectservice.GetProjectInput{
-		OrganizationIdentity: *organizationIdentity,
-		ProjectIdentity:      projectIdentity,
+	var request projecthttprequests.GetProjectRequest
+
+	if err := request.FromQuery(ctx); err != nil {
+		corehttp.NewHttpErrorResponse(ctx, err)
+		return
 	}
+
+	input := request.ToInput()
+	input.OrganizationIdentity = *organizationIdentity
+	input.ProjectIdentity = projectIdentity
 
 	response, err := c.GetProjectService.Execute(input)
 	if err != nil {

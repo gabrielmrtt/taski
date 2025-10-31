@@ -12,9 +12,10 @@ type ProjectDocumentVersionManagerFilters struct {
 }
 
 type PaginateProjectDocumentVersionManagersByParams struct {
-	Filters    ProjectDocumentVersionManagerFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        ProjectDocumentVersionManagerFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type ProjectDocumentVersionFilters struct {
@@ -25,18 +26,21 @@ type ProjectDocumentVersionFilters struct {
 }
 
 type PaginateProjectDocumentVersionsByParams struct {
-	Filters    ProjectDocumentVersionFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        ProjectDocumentVersionFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type GetProjectDocumentVersionByParams struct {
 	ProjectDocumentVersionManagerIdentity *core.Identity
 	ProjectDocumentVersionIdentity        core.Identity
+	RelationsInput                        core.RelationsInput
 }
 
 type GetProjectDocumentVersionManagerByParams struct {
 	ProjectDocumentVersionManagerIdentity core.Identity
+	RelationsInput                        core.RelationsInput
 }
 
 type StoreProjectDocumentVersionManagerParams struct {
@@ -62,6 +66,7 @@ type DeleteProjectDocumentVersionManagerParams struct {
 type ListProjectDocumentVersionsByProjectDocumentVersionManagerIdentityParams struct {
 	ProjectDocumentVersionManagerIdentity core.Identity
 	SortInput                             core.SortInput
+	RelationsInput                        core.RelationsInput
 }
 
 type ProjectDocumentRepository interface {

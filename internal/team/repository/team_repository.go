@@ -16,12 +16,14 @@ type TeamFilters struct {
 type GetTeamByIdentityParams struct {
 	TeamIdentity         core.Identity
 	OrganizationIdentity *core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 type PaginateTeamsParams struct {
-	Filters    TeamFilters
-	SortInput  core.SortInput
-	Pagination core.PaginationInput
+	Filters        TeamFilters
+	SortInput      core.SortInput
+	Pagination     core.PaginationInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreTeamParams struct {

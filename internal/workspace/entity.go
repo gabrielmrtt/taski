@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
+	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
 	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
@@ -15,6 +16,9 @@ type Workspace struct {
 	OrganizationIdentity core.Identity
 	UserCreatorIdentity  *core.Identity
 	UserEditorIdentity   *core.Identity
+	Creator              *user.User
+	Editor               *user.User
+	Organization         *organization.Organization
 	Timestamps           core.Timestamps
 	DeletedAt            *int64
 }

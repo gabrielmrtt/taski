@@ -35,10 +35,11 @@ func (s *ListWorkspacesService) Execute(input ListWorkspacesInput) (*core.Pagina
 	}
 
 	workspaces, err := s.WorkspaceRepository.PaginateWorkspacesBy(workspacerepo.PaginateWorkspacesParams{
-		Filters:     input.Filters,
-		SortInput:   input.SortInput,
-		Pagination:  input.Pagination,
-		ShowDeleted: false,
+		Filters:        input.Filters,
+		SortInput:      input.SortInput,
+		Pagination:     input.Pagination,
+		ShowDeleted:    false,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
 		return nil, err
