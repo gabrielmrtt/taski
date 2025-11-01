@@ -19,6 +19,6 @@ func (r *GetProjectDocumentVersionRequest) FromQuery(ctx *gin.Context) error {
 
 func (r *GetProjectDocumentVersionRequest) ToInput() projectservice.GetProjectDocumentVersionInput {
 	return projectservice.GetProjectDocumentVersionInput{
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

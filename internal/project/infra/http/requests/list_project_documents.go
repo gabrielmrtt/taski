@@ -49,6 +49,6 @@ func (r *ListProjectDocumentsRequest) ToInput() projectservice.ListProjectDocume
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

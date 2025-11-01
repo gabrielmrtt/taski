@@ -11,13 +11,19 @@ type HttpRequest[INPUT core.ServiceInput] interface {
 	ToInput() INPUT
 }
 
-func GetRelationsInput(relations string) core.RelationsInput {
+func GetRelationsInput(relations *string) core.RelationsInput {
 	var relationsInput core.RelationsInput = make([]string, 0)
-	if relations != "" {
-		relationsInput = strings.Split(strings.TrimSpace(relations), ",")
+	if relations != nil {
+		relationsInput = strings.Split(strings.TrimSpace(*relations), ",")
 
 		for i, relation := range relationsInput {
-			relationsInput[i] = stringutils.CamelCaseToPascalCase(relation)
+			var relationPath []string = make([]string, 0)
+			parts := strings.Split(relation, ".")
+			for _, part := range parts {
+				pascalCasePart := stringutils.CamelCaseToPascalCase(part)
+				relationPath = append(relationPath, pascalCasePart)
+			}
+			relationsInput[i] = strings.Join(relationPath, ".")
 		}
 	}
 

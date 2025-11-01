@@ -49,6 +49,6 @@ func (r *ListProjectTaskStatusesRequest) ToInput() projectservice.ListProjectTas
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

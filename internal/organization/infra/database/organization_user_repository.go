@@ -280,7 +280,7 @@ func (r *OrganizationUserBunRepository) UpdateOrganizationUser(params organizati
 		LastAccessAt:           params.OrganizationUser.LastAccessAt,
 	}
 
-	_, err := tx.NewUpdate().Model(organizationUserTable).Where("user_internal_id = ? AND organization_internal_id = ?", params.OrganizationUser.User.Identity.Internal.String(), params.OrganizationUser.OrganizationIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(organizationUserTable).Where("organization_user.user_internal_id = ? AND organization_user.organization_internal_id = ?", params.OrganizationUser.User.Identity.Internal.String(), params.OrganizationUser.OrganizationIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

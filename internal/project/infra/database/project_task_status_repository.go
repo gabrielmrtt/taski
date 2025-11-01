@@ -60,23 +60,23 @@ func (r *ProjectTaskStatusBunRepository) SetTransaction(tx core.Transaction) err
 
 func (r *ProjectTaskStatusBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters projectrepo.ProjectTaskStatusFilters) *bun.SelectQuery {
 	if filters.ProjectIdentity != nil {
-		selectQuery = selectQuery.Where("project_internal_id = ?", filters.ProjectIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_task_status.project_internal_id = ?", filters.ProjectIdentity.Internal.String())
 	}
 
 	if filters.IsDefault != nil {
-		selectQuery = selectQuery.Where("is_default = ?", filters.IsDefault)
+		selectQuery = selectQuery.Where("project_task_status.is_default = ?", filters.IsDefault)
 	}
 
 	if filters.ShouldSetTaskToCompleted != nil {
-		selectQuery = selectQuery.Where("should_set_task_to_completed = ?", filters.ShouldSetTaskToCompleted)
+		selectQuery = selectQuery.Where("project_task_status.should_set_task_to_completed = ?", filters.ShouldSetTaskToCompleted)
 	}
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project_task_status.name", filters.Name)
 	}
 
 	if filters.Order != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "status_order", filters.Order)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project_task_status.status_order", filters.Order)
 	}
 
 	return selectQuery
@@ -95,10 +95,10 @@ func (r *ProjectTaskStatusBunRepository) GetLastTaskStatusOrder(params projectre
 	selectQuery = selectQuery.Model(projectTaskStatus)
 
 	if params.ProjectIdentity != nil {
-		selectQuery = selectQuery.Where("project_internal_id = ?", params.ProjectIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_task_status.project_internal_id = ?", params.ProjectIdentity.Internal.String())
 	}
 
-	selectQuery = selectQuery.Order("status_order DESC NULLS LAST")
+	selectQuery = selectQuery.Order("project_task_status.status_order DESC NULLS LAST")
 	selectQuery = selectQuery.Limit(1)
 
 	err := selectQuery.Scan(context.Background())
@@ -131,19 +131,19 @@ func (r *ProjectTaskStatusBunRepository) GetProjectTaskStatusByIdentity(params p
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 
 	if params.ProjectIdentity != nil {
-		selectQuery = selectQuery.Where("project_internal_id = ?", params.ProjectIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_task_status.project_internal_id = ?", params.ProjectIdentity.Internal.String())
 	}
 
 	if params.ProjectTaskStatusIdentity != nil {
-		selectQuery = selectQuery.Where("internal_id = ?", params.ProjectTaskStatusIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_task_status.internal_id = ?", params.ProjectTaskStatusIdentity.Internal.String())
 	}
 
 	if params.IsDefault != nil {
-		selectQuery = selectQuery.Where("is_default = ?", params.IsDefault)
+		selectQuery = selectQuery.Where("project_task_status.is_default = ?", params.IsDefault)
 	}
 
 	if params.ShouldSetTaskToCompleted != nil {
-		selectQuery = selectQuery.Where("should_set_task_to_completed = ?", params.ShouldSetTaskToCompleted)
+		selectQuery = selectQuery.Where("project_task_status.should_set_task_to_completed = ?", params.ShouldSetTaskToCompleted)
 	}
 
 	err := selectQuery.Scan(context.Background())
@@ -205,7 +205,7 @@ func (r *ProjectTaskStatusBunRepository) PaginateProjectTaskStatusesBy(params pr
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("project_task_status.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -298,7 +298,7 @@ func (r *ProjectTaskStatusBunRepository) UpdateProjectTaskStatus(params projectr
 		StatusOrder:              params.ProjectTaskStatus.Order,
 		ShouldSetTaskToCompleted: params.ProjectTaskStatus.ShouldSetTaskToCompleted,
 		IsDefault:                params.ProjectTaskStatus.IsDefault,
-	}).Where("internal_id = ?", params.ProjectTaskStatus.Identity.Internal.String()).Exec(context.Background())
+	}).Where("project_task_status.internal_id = ?", params.ProjectTaskStatus.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -331,7 +331,7 @@ func (r *ProjectTaskStatusBunRepository) DeleteProjectTaskStatus(params projectr
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&ProjectTaskStatusTable{}).Where("internal_id = ?", params.ProjectTaskStatusIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&ProjectTaskStatusTable{}).Where("project_task_status.internal_id = ?", params.ProjectTaskStatusIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

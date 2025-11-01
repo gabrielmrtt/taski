@@ -19,6 +19,6 @@ func (r *GetOrganizationUserRequest) FromQuery(ctx *gin.Context) error {
 
 func (r *GetOrganizationUserRequest) ToInput() organizationservice.GetOrganizationUserInput {
 	return organizationservice.GetOrganizationUserInput{
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

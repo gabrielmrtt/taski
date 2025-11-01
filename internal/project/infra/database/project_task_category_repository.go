@@ -54,11 +54,11 @@ func (r *ProjectTaskCategoryBunRepository) SetTransaction(tx core.Transaction) e
 
 func (r *ProjectTaskCategoryBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters projectrepo.ProjectTaskCategoryFilters) *bun.SelectQuery {
 	if filters.ProjectIdentity != nil {
-		selectQuery = selectQuery.Where("project_internal_id = ?", filters.ProjectIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_task_category.project_internal_id = ?", filters.ProjectIdentity.Internal.String())
 	}
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project_task_category.name", filters.Name)
 	}
 
 	return selectQuery
@@ -76,7 +76,7 @@ func (r *ProjectTaskCategoryBunRepository) GetProjectTaskCategoryByIdentity(para
 
 	selectQuery = selectQuery.Model(projectTaskCategory)
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectTaskCategoryIdentity.Internal.String())
+	selectQuery = selectQuery.Where("project_task_category.internal_id = ?", params.ProjectTaskCategoryIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -110,7 +110,7 @@ func (r *ProjectTaskCategoryBunRepository) PaginateProjectTaskCategoryBy(params 
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("project_task_category.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -205,7 +205,7 @@ func (r *ProjectTaskCategoryBunRepository) UpdateProjectTaskCategory(params proj
 		Name:              params.ProjectTaskCategory.Name,
 		Color:             params.ProjectTaskCategory.Color,
 		DeletedAt:         params.ProjectTaskCategory.DeletedAt,
-	}).Where("internal_id = ?", params.ProjectTaskCategory.Identity.Internal.String()).Exec(context.Background())
+	}).Where("project_task_category.internal_id = ?", params.ProjectTaskCategory.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -238,7 +238,7 @@ func (r *ProjectTaskCategoryBunRepository) DeleteProjectTaskCategory(params proj
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&ProjectTaskCategoryTable{}).Where("internal_id = ?", params.ProjectTaskCategoryIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&ProjectTaskCategoryTable{}).Where("project_task_category.internal_id = ?", params.ProjectTaskCategoryIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

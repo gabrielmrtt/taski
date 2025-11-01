@@ -60,6 +60,6 @@ func (r *ListTeamsRequest) ToInput() teamservice.ListTeamsInput {
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

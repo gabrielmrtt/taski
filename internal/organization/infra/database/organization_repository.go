@@ -91,29 +91,29 @@ func (r *OrganizationBunRepository) SetTransaction(tx core.Transaction) error {
 
 func (r *OrganizationBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters organizationrepo.OrganizationFilters) *bun.SelectQuery {
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "organization.name", filters.Name)
 	}
 
 	if filters.Status != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "status", filters.Status)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "organization.status", filters.Status)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "organization.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "organization.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DeletedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "organization.deleted_at", filters.DeletedAt)
 	}
 
 	if filters.AuthenticatedUserIdentity != nil {
 		selectQuery = selectQuery.WhereGroup(" OR ", func(query *bun.SelectQuery) *bun.SelectQuery {
-			query = query.Where("user_creator_internal_id = ?", filters.AuthenticatedUserIdentity.Internal.String())
-			query = query.WhereOr("internal_id IN (SELECT organization_internal_id FROM organization_user WHERE user_internal_id = ? AND organization_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), organization.OrganizationUserStatusActive)
+			query = query.Where("organization.user_creator_internal_id = ?", filters.AuthenticatedUserIdentity.Internal.String())
+			query = query.WhereOr("organization.internal_id IN (SELECT organization_user.organization_internal_id FROM organization_user WHERE organization_user.user_internal_id = ? AND organization_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), organization.OrganizationUserStatusActive)
 			return query
 		})
 	}
@@ -132,7 +132,7 @@ func (r *OrganizationBunRepository) GetOrganizationByIdentity(params organizatio
 	}
 
 	selectQuery = selectQuery.Model(organization)
-	selectQuery = selectQuery.Where("internal_id = ?", params.OrganizationIdentity.Internal.String())
+	selectQuery = selectQuery.Where("organization.internal_id = ?", params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -173,7 +173,7 @@ func (r *OrganizationBunRepository) PaginateOrganizationsBy(params organizationr
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("organization.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -351,7 +351,7 @@ func (r *OrganizationBunRepository) UpdateOrganization(params organizationrepo.U
 		DeletedAt:             params.Organization.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(organizationTable).Where("internal_id = ?", params.Organization.Identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(organizationTable).Where("organization.internal_id = ?", params.Organization.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -384,7 +384,7 @@ func (r *OrganizationBunRepository) DeleteOrganization(params organizationrepo.D
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&OrganizationTable{}).Where("internal_id = ?", params.OrganizationIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&OrganizationTable{}).Where("organization.internal_id = ?", params.OrganizationIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

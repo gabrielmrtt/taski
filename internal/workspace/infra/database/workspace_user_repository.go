@@ -51,14 +51,14 @@ func (r *WorkspaceUserBunRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *WorkspaceUserBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters workspacerepo.WorkspaceUserFilters) *bun.SelectQuery {
-	selectQuery = selectQuery.Where("workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
+	selectQuery = selectQuery.Where("workspace_user.workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
 
 	if filters.UserIdentity != nil {
-		selectQuery = selectQuery.Where("user_internal_id = ?", filters.UserIdentity.Internal.String())
+		selectQuery = selectQuery.Where("workspace_user.user_internal_id = ?", filters.UserIdentity.Internal.String())
 	}
 
 	if filters.Status != nil {
-		selectQuery = selectQuery.Where("status = ?", filters.Status)
+		selectQuery = selectQuery.Where("workspace_user.status = ?", filters.Status)
 	}
 
 	return selectQuery
@@ -76,7 +76,8 @@ func (r *WorkspaceUserBunRepository) GetWorkspaceUserByIdentity(params workspace
 
 	selectQuery = selectQuery.Model(workspaceUser)
 	selectQuery = selectQuery.Relation("User")
-	selectQuery = selectQuery.Where("workspace_internal_id = ? and user_internal_id = ?", params.WorkspaceIdentity.Internal.String(), params.UserIdentity.Internal.String())
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("workspace_user.workspace_internal_id = ? and workspace_user.user_internal_id = ?", params.WorkspaceIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -106,7 +107,8 @@ func (r *WorkspaceUserBunRepository) GetWorkspaceUsersByUserIdentity(params work
 
 	selectQuery = selectQuery.Model(&workspaceUsers)
 	selectQuery = selectQuery.Relation("User")
-	selectQuery = selectQuery.Where("user_internal_id = ?", params.UserIdentity.Internal.String())
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("workspace_user.user_internal_id = ?", params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {

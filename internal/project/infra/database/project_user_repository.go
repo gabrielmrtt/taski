@@ -51,14 +51,14 @@ func (r *ProjectUserBunRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *ProjectUserBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters projectrepo.ProjectUserFilters) *bun.SelectQuery {
-	selectQuery = selectQuery.Where("project_internal_id = ?", filters.ProjectIdentity.Internal.String())
+	selectQuery = selectQuery.Where("project_user.project_internal_id = ?", filters.ProjectIdentity.Internal.String())
 
 	if filters.UserIdentity != nil {
-		selectQuery = selectQuery.Where("user_internal_id = ?", filters.UserIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project_user.user_internal_id = ?", filters.UserIdentity.Internal.String())
 	}
 
 	if filters.Status != nil {
-		selectQuery = selectQuery.Where("status = ?", filters.Status)
+		selectQuery = selectQuery.Where("project_user.status = ?", filters.Status)
 	}
 
 	return selectQuery
@@ -77,7 +77,7 @@ func (r *ProjectUserBunRepository) GetProjectUserByIdentity(params projectrepo.G
 	selectQuery = selectQuery.Model(projectUser)
 	selectQuery = selectQuery.Relation("User")
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("project_internal_id = ? and user_internal_id = ?", params.ProjectIdentity.Internal.String(), params.UserIdentity.Internal.String())
+	selectQuery = selectQuery.Where("project_user.project_internal_id = ? and project_user.user_internal_id = ?", params.ProjectIdentity.Internal.String(), params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -107,7 +107,7 @@ func (r *ProjectUserBunRepository) GetProjectUsersByUserIdentity(params projectr
 
 	selectQuery = selectQuery.Model(&projectUsers)
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("user_internal_id = ?", params.UserIdentity.Internal.String())
+	selectQuery = selectQuery.Where("project_user.user_internal_id = ?", params.UserIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -179,7 +179,7 @@ func (r *ProjectUserBunRepository) UpdateProjectUser(params projectrepo.UpdatePr
 		ProjectInternalId: params.ProjectUser.ProjectIdentity.Internal.String(),
 		UserInternalId:    params.ProjectUser.User.Identity.Internal.String(),
 		Status:            string(params.ProjectUser.Status),
-	}).Where("project_internal_id = ? and user_internal_id = ?", params.ProjectUser.ProjectIdentity.Internal.String(), params.ProjectUser.User.Identity.Internal.String()).Exec(context.Background())
+	}).Where("project_user.project_internal_id = ? and project_user.user_internal_id = ?", params.ProjectUser.ProjectIdentity.Internal.String(), params.ProjectUser.User.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -212,7 +212,7 @@ func (r *ProjectUserBunRepository) DeleteProjectUser(params projectrepo.DeletePr
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&ProjectUserTable{}).Where("project_internal_id = ? and user_internal_id = ?", params.ProjectIdentity.Internal.String(), params.UserIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&ProjectUserTable{}).Where("project_user.project_internal_id = ? and project_user.user_internal_id = ?", params.ProjectIdentity.Internal.String(), params.UserIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -245,7 +245,7 @@ func (r *ProjectUserBunRepository) DeleteAllByUserIdentity(params projectrepo.De
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&ProjectUserTable{}).Where("user_internal_id = ?", params.UserIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&ProjectUserTable{}).Where("project_user.user_internal_id = ?", params.UserIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

@@ -19,6 +19,6 @@ func (r *GetProjectRequest) FromQuery(ctx *gin.Context) error {
 
 func (r *GetProjectRequest) ToInput() projectservice.GetProjectInput {
 	return projectservice.GetProjectInput{
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

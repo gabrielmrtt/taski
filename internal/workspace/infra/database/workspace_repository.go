@@ -100,35 +100,35 @@ func (r *WorkspaceRepository) SetTransaction(tx core.Transaction) error {
 
 func (r *WorkspaceRepository) applyFilters(selectQuery *bun.SelectQuery, filters workspacerepo.WorkspaceFilters) *bun.SelectQuery {
 	if filters.OrganizationIdentity != nil {
-		selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+		selectQuery = selectQuery.Where("workspace.organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
 	}
 
 	if filters.AuthenticatedUserIdentity != nil {
-		selectQuery = selectQuery.Where("workspace.internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND workspace_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
+		selectQuery = selectQuery.Where("workspace.internal_id IN (SELECT workspace_user.workspace_internal_id FROM workspace_user WHERE workspace_user.user_internal_id = ? AND workspace_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
 	}
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.name", filters.Name)
 	}
 
 	if filters.Description != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "description", filters.Description)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.description", filters.Description)
 	}
 
 	if filters.Status != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "status", filters.Status)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.status", filters.Status)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DeletedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "workspace.deleted_at", filters.DeletedAt)
 	}
 
 	return selectQuery
@@ -146,7 +146,7 @@ func (r *WorkspaceRepository) GetWorkspaceByIdentity(params workspacerepo.GetWor
 
 	selectQuery = selectQuery.Model(workspace)
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("internal_id = ?", params.WorkspaceIdentity.Internal.String())
+	selectQuery = selectQuery.Where("workspace.internal_id = ?", params.WorkspaceIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -184,11 +184,11 @@ func (r *WorkspaceRepository) PaginateWorkspacesBy(params workspacerepo.Paginate
 	}
 
 	selectQuery = selectQuery.Model(&workspaces)
-	selectQuery = selectQuery.Relation("Creator").Relation("Editor").Relation("Organization")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("workspace.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -315,7 +315,7 @@ func (r *WorkspaceRepository) UpdateWorkspace(params workspacerepo.UpdateWorkspa
 		DeletedAt:              params.Workspace.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(workspaceTable).Where("internal_id = ?", params.Workspace.Identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(workspaceTable).Where("workspace.internal_id = ?", params.Workspace.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -348,7 +348,7 @@ func (r *WorkspaceRepository) DeleteWorkspace(params workspacerepo.DeleteWorkspa
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&WorkspaceTable{}).Where("internal_id = ?", params.WorkspaceIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&WorkspaceTable{}).Where("workspace.internal_id = ?", params.WorkspaceIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

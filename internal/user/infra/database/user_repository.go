@@ -108,7 +108,7 @@ func (r *UserBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters u
 	}
 
 	if filters.Status != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "status", filters.Status)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "users.status", filters.Status)
 	}
 
 	if filters.Name != nil {
@@ -116,7 +116,7 @@ func (r *UserBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters u
 	}
 
 	if filters.DisplayName != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "data.display_name", filters.DisplayName)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "user_data.display_name", filters.DisplayName)
 	}
 
 	if filters.CreatedAt != nil {

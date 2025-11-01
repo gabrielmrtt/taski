@@ -37,6 +37,6 @@ func (r *ListMyOrganizationInvitesRequest) ToInput() organizationservice.ListMyO
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

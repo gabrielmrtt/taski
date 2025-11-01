@@ -8,7 +8,7 @@ import (
 )
 
 type GetMeRequest struct {
-	Relations string `json:"relations" schema:"relations"`
+	Relations *string `json:"relations" schema:"relations"`
 }
 
 func (r *GetMeRequest) FromQuery(ctx *gin.Context) error {

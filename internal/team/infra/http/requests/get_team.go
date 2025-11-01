@@ -19,6 +19,6 @@ func (r *GetTeamRequest) FromQuery(ctx *gin.Context) error {
 
 func (r *GetTeamRequest) ToInput() teamservice.GetTeamInput {
 	return teamservice.GetTeamInput{
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

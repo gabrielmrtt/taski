@@ -58,6 +58,6 @@ func (r *ListRolesRequest) ToInput() roleservice.ListRolesInput {
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

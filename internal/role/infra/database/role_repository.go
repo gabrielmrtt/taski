@@ -132,26 +132,26 @@ func (r *RoleBunRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *RoleBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters rolerepo.RoleFilters) *bun.SelectQuery {
-	selectQuery = selectQuery.Where("organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
+	selectQuery = selectQuery.Where("roles.organization_internal_id = ?", filters.OrganizationIdentity.Internal.String())
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "roles.name", filters.Name)
 	}
 
 	if filters.Description != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "description", filters.Description)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "roles.description", filters.Description)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "roles.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "roles.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DeletedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "roles.deleted_at", filters.DeletedAt)
 	}
 
 	return selectQuery
@@ -170,7 +170,7 @@ func (r *RoleBunRepository) GetRoleByIdentity(params rolerepo.GetRoleByIdentityP
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("internal_id = ?", params.RoleIdentity.Internal.String())
+	selectQuery = selectQuery.Where("roles.internal_id = ?", params.RoleIdentity.Internal.String())
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
@@ -201,7 +201,7 @@ func (r *RoleBunRepository) GetRoleByIdentityAndOrganizationIdentity(params role
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("internal_id = ? AND organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
+	selectQuery = selectQuery.Where("roles.internal_id = ? AND roles.organization_internal_id = ?", params.RoleIdentity.Internal.String(), params.OrganizationIdentity.Internal.String())
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -228,8 +228,7 @@ func (r *RoleBunRepository) GetSystemDefaultRole(params rolerepo.GetDefaultRoleP
 
 	selectQuery = selectQuery.Model(role)
 	selectQuery = selectQuery.Relation("RolePermissions.Permission")
-	selectQuery = selectQuery.Relation("Creator").Relation("Editor")
-	selectQuery = selectQuery.Where("slug = ? AND is_system_default = TRUE", string(params.Slug))
+	selectQuery = selectQuery.Where("roles.slug = ? AND roles.is_system_default = TRUE", string(params.Slug))
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -272,7 +271,7 @@ func (r *RoleBunRepository) PaginateRolesBy(params rolerepo.PaginateRolesParams)
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("roles.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -434,7 +433,7 @@ func (r *RoleBunRepository) UpdateRole(params rolerepo.UpdateRoleParams) error {
 		DeletedAt:              params.Role.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(roleTable).Where("internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(roleTable).Where("roles.internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -442,7 +441,7 @@ func (r *RoleBunRepository) UpdateRole(params rolerepo.UpdateRoleParams) error {
 	}
 
 	if params.Role.Permissions != nil {
-		_, err := tx.NewDelete().Model(&RolePermissionTable{}).Where("role_internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
+		_, err := tx.NewDelete().Model(&RolePermissionTable{}).Where("roles.role_internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
 		if err != nil {
 			return err
 		}
@@ -486,7 +485,7 @@ func (r *RoleBunRepository) DeleteRole(params rolerepo.DeleteRoleParams) error {
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&RoleTable{}).Where("internal_id = ?", params.RoleIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&RoleTable{}).Where("roles.internal_id = ?", params.RoleIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -532,7 +531,7 @@ func (r *RoleBunRepository) ChangeRoleUsersToDefault(params rolerepo.ChangeRoleU
 		return errors.New("default role not found")
 	}
 
-	_, err = tx.NewRaw("UPDATE organization_user SET role_internal_id = ? WHERE role_internal_id = ?", defaultRole.Identity.Internal.String(), params.RoleIdentity.Internal.String()).Exec(context.Background())
+	_, err = tx.NewRaw("UPDATE organization_user SET organization_user.role_internal_id = ? WHERE organization_user.role_internal_id = ?", defaultRole.Identity.Internal.String(), params.RoleIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		return err
 	}

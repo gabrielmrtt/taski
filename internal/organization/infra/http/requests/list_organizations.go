@@ -64,6 +64,6 @@ func (r *ListOrganizationsRequest) ToInput() organizationservice.ListOrganizatio
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

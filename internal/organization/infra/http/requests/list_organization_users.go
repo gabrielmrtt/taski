@@ -91,6 +91,6 @@ func (r *ListOrganizationUsersRequest) ToInput() organizationservice.ListOrganiz
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

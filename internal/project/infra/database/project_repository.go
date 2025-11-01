@@ -49,6 +49,16 @@ func (p *ProjectTable) ToEntity() *project.Project {
 		userEditorIdentity = &identity
 	}
 
+	var creator *user.User = nil
+	if p.Creator != nil {
+		creator = p.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if p.Editor != nil {
+		editor = p.Editor.ToEntity()
+	}
+
 	return &project.Project{
 		Identity:            core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project.ProjectIdentityPrefix),
 		WorkspaceIdentity:   core.NewIdentityFromInternal(uuid.MustParse(p.WorkspaceInternalId), workspace.WorkspaceIdentityPrefix),
@@ -66,6 +76,8 @@ func (p *ProjectTable) ToEntity() *project.Project {
 			UpdatedAt: p.UpdatedAt,
 		},
 		DeletedAt: p.DeletedAt,
+		Creator:   creator,
+		Editor:    editor,
 	}
 }
 
@@ -89,46 +101,46 @@ func (r *ProjectBunRepository) SetTransaction(tx core.Transaction) error {
 
 func (r *ProjectBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters projectrepo.ProjectFilters) *bun.SelectQuery {
 	if filters.WorkspaceIdentity != nil {
-		selectQuery = selectQuery.Where("workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project.workspace_internal_id = ?", filters.WorkspaceIdentity.Internal.String())
 		if filters.AuthenticatedUserIdentity != nil {
-			selectQuery = selectQuery.Where("workspace_internal_id IN (SELECT workspace_internal_id FROM workspace_user WHERE user_internal_id = ? AND status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
+			selectQuery = selectQuery.Where("project.workspace_internal_id IN (SELECT workspace_user.workspace_internal_id FROM workspace_user WHERE workspace_user.user_internal_id = ? AND workspace_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), workspace.WorkspaceUserStatusActive)
 		}
 	}
 
 	if filters.AuthenticatedUserIdentity != nil {
-		selectQuery = selectQuery.Where("internal_id IN (SELECT project_internal_id FROM project_user WHERE user_internal_id = ? AND status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), project.ProjectUserStatusActive)
+		selectQuery = selectQuery.Where("project.internal_id IN (SELECT project_user.project_internal_id FROM project_user WHERE project_user.user_internal_id = ? AND project_user.status = ?)", filters.AuthenticatedUserIdentity.Internal.String(), project.ProjectUserStatusActive)
 	}
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.name", filters.Name)
 	}
 
 	if filters.Description != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "description", filters.Description)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.description", filters.Description)
 	}
 
 	if filters.Color != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "color", filters.Color)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.color", filters.Color)
 	}
 
 	if filters.PriorityLevel != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "priority_level", filters.PriorityLevel)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.priority_level", filters.PriorityLevel)
 	}
 
 	if filters.Status != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "status", filters.Status)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.status", filters.Status)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DeletedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "deleted_at", filters.DeletedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "project.deleted_at", filters.DeletedAt)
 	}
 
 	return selectQuery
@@ -146,13 +158,13 @@ func (r *ProjectBunRepository) GetProjectByIdentity(params projectrepo.GetProjec
 
 	selectQuery = selectQuery.Model(project)
 	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
-	selectQuery = selectQuery.Where("internal_id = ?", params.ProjectIdentity.Internal.String())
+	selectQuery = selectQuery.Where("project.internal_id = ?", params.ProjectIdentity.Internal.String())
 	if params.WorkspaceIdentity != nil {
-		selectQuery = selectQuery.Where("workspace_internal_id = ?", params.WorkspaceIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project.workspace_internal_id = ?", params.WorkspaceIdentity.Internal.String())
 	}
 
 	if params.OrganizationIdentity != nil {
-		selectQuery = selectQuery.Where("workspace_internal_id IN (SELECT internal_id FROM workspace WHERE workspace.organization_internal_id = ?)", params.OrganizationIdentity.Internal.String())
+		selectQuery = selectQuery.Where("project.workspace_internal_id IN (SELECT workspace.internal_id FROM workspace WHERE workspace.organization_internal_id = ?)", params.OrganizationIdentity.Internal.String())
 	}
 
 	err := selectQuery.Scan(context.Background())
@@ -196,7 +208,7 @@ func (r *ProjectBunRepository) PaginateProjectsBy(params projectrepo.PaginatePro
 	selectQuery = r.applyFilters(selectQuery, params.Filters)
 
 	if !params.ShowDeleted {
-		selectQuery = selectQuery.Where("deleted_at IS NULL")
+		selectQuery = selectQuery.Where("project.deleted_at IS NULL")
 	}
 
 	countBeforePagination, err := selectQuery.Count(context.Background())
@@ -329,7 +341,7 @@ func (r *ProjectBunRepository) UpdateProject(params projectrepo.UpdateProjectPar
 		DeletedAt:             params.Project.DeletedAt,
 	}
 
-	_, err := tx.NewUpdate().Model(projectTable).Where("internal_id = ?", params.Project.Identity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(projectTable).Where("project.internal_id = ?", params.Project.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -362,7 +374,7 @@ func (r *ProjectBunRepository) DeleteProject(params projectrepo.DeleteProjectPar
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&ProjectTable{}).Where("internal_id = ?", params.ProjectIdentity.Internal.String()).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&ProjectTable{}).Where("project.internal_id = ?", params.ProjectIdentity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

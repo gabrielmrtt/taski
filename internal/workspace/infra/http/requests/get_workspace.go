@@ -19,6 +19,6 @@ func (r *GetWorkspaceRequest) FromQuery(ctx *gin.Context) error {
 
 func (r *GetWorkspaceRequest) ToInput() workspaceservice.GetWorkspaceInput {
 	return workspaceservice.GetWorkspaceInput{
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

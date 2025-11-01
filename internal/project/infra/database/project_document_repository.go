@@ -57,8 +57,8 @@ type ProjectDocumentVersionTable struct {
 
 	ProjectDocumentVersionManager *ProjectDocumentVersionManagerTable `bun:"rel:has-one,join:project_document_version_manager_internal_id=internal_id"`
 	ProjectDocumentFiles          []*ProjectDocumentFileTable         `bun:"rel:has-many,join:internal_id=project_document_version_internal_id"`
-	UserCreator                   *userdatabase.UserTable             `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
-	UserEditor                    *userdatabase.UserTable             `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
+	Creator                       *userdatabase.UserTable             `bun:"rel:has-one,join:user_creator_internal_id=internal_id"`
+	Editor                        *userdatabase.UserTable             `bun:"rel:has-one,join:user_editor_internal_id=internal_id"`
 }
 
 type ProjectDocumentFileTable struct {
@@ -93,6 +93,16 @@ func (p *ProjectDocumentVersionTable) ToEntity() *project.ProjectDocumentVersion
 		files[i] = *file.ToEntity()
 	}
 
+	var creator *user.User = nil
+	if p.Creator != nil {
+		creator = p.Creator.ToEntity()
+	}
+
+	var editor *user.User = nil
+	if p.Editor != nil {
+		editor = p.Editor.ToEntity()
+	}
+
 	return &project.ProjectDocumentVersion{
 		Identity:                              core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project.ProjectDocumentVersionIdentityPrefix),
 		ProjectDocumentVersionManagerIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.ProjectDocumentVersionManagerInternalId), project.ProjectDocumentVersionManagerIdentityPrefix),
@@ -110,6 +120,8 @@ func (p *ProjectDocumentVersionTable) ToEntity() *project.ProjectDocumentVersion
 			CreatedAt: &p.CreatedAt,
 			UpdatedAt: p.UpdatedAt,
 		},
+		Creator: creator,
+		Editor:  editor,
 	}
 }
 

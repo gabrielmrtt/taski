@@ -69,6 +69,6 @@ func (r *ListWorkspacesRequest) ToInput() workspaceservice.ListWorkspacesInput {
 			By:        r.SortBy,
 			Direction: &sortDirection,
 		},
-		RelationsInput: corehttp.GetRelationsInput(*r.Relations),
+		RelationsInput: corehttp.GetRelationsInput(r.Relations),
 	}
 }

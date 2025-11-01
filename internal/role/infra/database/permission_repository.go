@@ -50,11 +50,11 @@ func (r *PermissionBunRepository) SetTransaction(tx core.Transaction) error {
 
 func (r *PermissionBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters rolerepo.PermissionFilters) *bun.SelectQuery {
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "permissions.name", filters.Name)
 	}
 
 	if filters.Slug != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "slug", filters.Slug)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "permissions.slug", filters.Slug)
 	}
 
 	return selectQuery
@@ -70,7 +70,7 @@ func (r *PermissionBunRepository) GetPermissionBySlug(params rolerepo.GetPermiss
 		selectQuery = r.db.NewSelect()
 	}
 
-	selectQuery = selectQuery.Model(permission).Where("slug = ?", params.Slug)
+	selectQuery = selectQuery.Model(permission).Where("permissions.slug = ?", params.Slug)
 
 	err := selectQuery.Scan(context.Background())
 
@@ -221,7 +221,7 @@ func (r *PermissionBunRepository) UpdatePermission(params rolerepo.UpdatePermiss
 		Description: params.Permission.Description,
 	}
 
-	_, err := tx.NewUpdate().Model(permissionTable).Where("slug = ?", params.Permission.Slug).Exec(context.Background())
+	_, err := tx.NewUpdate().Model(permissionTable).Where("permissions.slug = ?", params.Permission.Slug).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -256,7 +256,7 @@ func (r *PermissionBunRepository) DeletePermission(params rolerepo.DeletePermiss
 		}
 	}
 
-	_, err := tx.NewDelete().Model(&PermissionTable{}).Where("slug = ?", params.PermissionSlug).Exec(context.Background())
+	_, err := tx.NewDelete().Model(&PermissionTable{}).Where("permissions.slug = ?", params.PermissionSlug).Exec(context.Background())
 	if err != nil {
 		return err
 	}
