@@ -3,7 +3,6 @@ package organization
 import (
 	"github.com/gabrielmrtt/taski/internal/role"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type OrganizationDto struct {
@@ -19,11 +18,9 @@ type OrganizationDto struct {
 }
 
 func OrganizationToDto(organization *Organization) *OrganizationDto {
-	createdAt := datetimeutils.EpochToRFC3339(*organization.Timestamps.CreatedAt)
-
 	var updatedAt *string = nil
 	if organization.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*organization.Timestamps.UpdatedAt)
+		updatedAtString := organization.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 
@@ -55,7 +52,7 @@ func OrganizationToDto(organization *Organization) *OrganizationDto {
 		UserEditorId:  userEditorId,
 		Creator:       creator,
 		Editor:        editor,
-		CreatedAt:     createdAt,
+		CreatedAt:     organization.Timestamps.CreatedAt.ToRFC3339(),
 		UpdatedAt:     updatedAt,
 	}
 }
@@ -65,13 +62,21 @@ type OrganizationUserDto struct {
 	Role           *role.RoleDto `json:"role,omitempty"`
 	User           *user.UserDto `json:"user,omitempty"`
 	Status         string        `json:"status"`
+	LastAccessAt   *string       `json:"lastAccessAt"`
 }
 
 func OrganizationUserToDto(organizationUser *OrganizationUser) *OrganizationUserDto {
+	var lastAccessAt *string = nil
+	if organizationUser.LastAccessAt != nil {
+		lastAccessAtString := organizationUser.LastAccessAt.ToRFC3339()
+		lastAccessAt = &lastAccessAtString
+	}
+
 	return &OrganizationUserDto{
 		OrganizationId: organizationUser.OrganizationIdentity.Public,
 		Role:           role.RoleToDto(&organizationUser.Role),
 		User:           user.UserToDto(&organizationUser.User),
 		Status:         string(organizationUser.Status),
+		LastAccessAt:   lastAccessAt,
 	}
 }

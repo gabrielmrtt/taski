@@ -41,12 +41,17 @@ func (o *OrganizationUserTable) ToEntity() *organization.OrganizationUser {
 		role = o.Role.ToEntity()
 	}
 
+	var lastAccessAt *core.DateTime = nil
+	if o.LastAccessAt != nil {
+		lastAccessAt = &core.DateTime{Value: *o.LastAccessAt}
+	}
+
 	return &organization.OrganizationUser{
 		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(o.OrganizationInternalId), organization.OrganizationIdentityPrefix),
 		User:                 *user,
 		Role:                 *role,
 		Status:               organization.OrganizationUserStatuses(o.Status),
-		LastAccessAt:         o.LastAccessAt,
+		LastAccessAt:         lastAccessAt,
 	}
 }
 
@@ -229,12 +234,18 @@ func (r *OrganizationUserBunRepository) StoreOrganizationUser(params organizatio
 		}
 	}
 
+	var lastAccessAt *int64 = nil
+	if params.OrganizationUser.LastAccessAt != nil {
+		lastAccessAtEpoch := params.OrganizationUser.LastAccessAt.ToEpoch()
+		lastAccessAt = &lastAccessAtEpoch
+	}
+
 	organizationUserTable := &OrganizationUserTable{
 		OrganizationInternalId: params.OrganizationUser.OrganizationIdentity.Internal.String(),
 		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
 		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
 		Status:                 string(params.OrganizationUser.Status),
-		LastAccessAt:           params.OrganizationUser.LastAccessAt,
+		LastAccessAt:           lastAccessAt,
 	}
 
 	_, err := tx.NewInsert().Model(organizationUserTable).Exec(context.Background())
@@ -272,12 +283,18 @@ func (r *OrganizationUserBunRepository) UpdateOrganizationUser(params organizati
 		}
 	}
 
+	var lastAccessAt *int64 = nil
+	if params.OrganizationUser.LastAccessAt != nil {
+		lastAccessAtEpoch := params.OrganizationUser.LastAccessAt.ToEpoch()
+		lastAccessAt = &lastAccessAtEpoch
+	}
+
 	organizationUserTable := &OrganizationUserTable{
 		OrganizationInternalId: params.OrganizationUser.OrganizationIdentity.Internal.String(),
 		UserInternalId:         params.OrganizationUser.User.Identity.Internal.String(),
 		RoleInternalId:         params.OrganizationUser.Role.Identity.Internal.String(),
 		Status:                 string(params.OrganizationUser.Status),
-		LastAccessAt:           params.OrganizationUser.LastAccessAt,
+		LastAccessAt:           lastAccessAt,
 	}
 
 	_, err := tx.NewUpdate().Model(organizationUserTable).Where("organization_user.user_internal_id = ? AND organization_user.organization_internal_id = ?", params.OrganizationUser.User.Identity.Internal.String(), params.OrganizationUser.OrganizationIdentity.Internal.String()).Exec(context.Background())

@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 	"github.com/gabrielmrtt/taski/pkg/encodingutils"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -88,8 +89,8 @@ func (i Identity) IsEmpty() bool {
 }
 
 type Timestamps struct {
-	CreatedAt *int64 `json:"createdAt"`
-	UpdatedAt *int64 `json:"updatedAt"`
+	CreatedAt *DateTime `json:"createdAt"`
+	UpdatedAt *DateTime `json:"updatedAt"`
 }
 
 type Name struct {
@@ -224,4 +225,66 @@ func (c Color) Validate() error {
 	}
 
 	return nil
+}
+
+type DateTime struct {
+	Value int64
+}
+
+func NewDateTime() DateTime {
+	return DateTime{Value: datetimeutils.EpochNow()}
+}
+
+func NewDateTimeFromEpoch(value int64) (DateTime, error) {
+	if value < 0 {
+		return DateTime{}, NewInvalidInputError("invalid date timestamp", []InvalidInputErrorField{
+			{
+				Field: "datetime",
+				Error: "datetime cannot be negative",
+			},
+		})
+	}
+
+	return DateTime{Value: value}, nil
+}
+
+func NewDateTimeFromRFC3339(value string) (DateTime, error) {
+	if !datetimeutils.IsValidRFC3339(value) {
+		return DateTime{}, NewInvalidInputError("invalid date timestamp", []InvalidInputErrorField{
+			{
+				Field: "datetime",
+				Error: "datetime is not a valid RFC 3339 date",
+			},
+		})
+	}
+
+	return DateTime{Value: datetimeutils.RFC3339ToEpoch(value)}, nil
+}
+
+func (d DateTime) ToEpoch() int64 {
+	return d.Value
+}
+
+func (d DateTime) ToRFC3339() string {
+	return datetimeutils.EpochToRFC3339(d.Value)
+}
+
+func (d DateTime) Equals(_d DateTime) bool {
+	return d.Value == _d.Value
+}
+
+func (d DateTime) IsBefore(_d DateTime) bool {
+	return d.Value < _d.Value
+}
+
+func (d DateTime) IsAfter(_d DateTime) bool {
+	return d.Value > _d.Value
+}
+
+func (d DateTime) IsBeforeOrEqual(_d DateTime) bool {
+	return d.Value <= _d.Value
+}
+
+func (d DateTime) IsAfterOrEqual(_d DateTime) bool {
+	return d.Value >= _d.Value
 }

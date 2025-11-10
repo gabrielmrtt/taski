@@ -2,7 +2,6 @@ package project
 
 import (
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type ProjectDto struct {
@@ -26,13 +25,13 @@ type ProjectDto struct {
 func ProjectToDto(project *Project) *ProjectDto {
 	var startAt *string = nil
 	if project.StartAt != nil {
-		startAtString := datetimeutils.EpochToRFC3339(*project.StartAt)
+		startAtString := project.StartAt.ToRFC3339()
 		startAt = &startAtString
 	}
 
 	var endAt *string = nil
 	if project.EndAt != nil {
-		endAtString := datetimeutils.EpochToRFC3339(*project.EndAt)
+		endAtString := project.EndAt.ToRFC3339()
 		endAt = &endAtString
 	}
 
@@ -46,10 +45,10 @@ func ProjectToDto(project *Project) *ProjectDto {
 		userEditorId = &project.UserEditorIdentity.Public
 	}
 
-	createdAt := datetimeutils.EpochToRFC3339(*project.Timestamps.CreatedAt)
+	createdAt := project.Timestamps.CreatedAt.ToRFC3339()
 	var updatedAt *string = nil
 	if project.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*project.Timestamps.UpdatedAt)
+		updatedAtString := project.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 
@@ -152,7 +151,7 @@ func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion)
 
 	var updatedAt *string = nil
 	if projectDocumentVersion.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.UpdatedAt)
+		updatedAtString := projectDocumentVersion.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 
@@ -178,7 +177,7 @@ func ProjectDocumentVersionToDto(projectDocumentVersion *ProjectDocumentVersion)
 		UserEditorId:                    userEditorId,
 		Creator:                         creator,
 		Editor:                          editor,
-		CreatedAt:                       datetimeutils.EpochToRFC3339(*projectDocumentVersion.Timestamps.CreatedAt),
+		CreatedAt:                       projectDocumentVersion.Timestamps.CreatedAt.ToRFC3339(),
 		UpdatedAt:                       updatedAt,
 	}
 }

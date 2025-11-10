@@ -4,7 +4,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/role"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type Organization struct {
@@ -15,7 +14,7 @@ type Organization struct {
 	UserEditorIdentity  *core.Identity
 	Creator             *user.User
 	Editor              *user.User
-	DeletedAt           *int64
+	DeletedAt           *core.DateTime
 	core.Timestamps
 }
 
@@ -25,7 +24,7 @@ type NewOrganizationInput struct {
 }
 
 func NewOrganization(input NewOrganizationInput) (*Organization, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	return &Organization{
 		Identity:            core.NewIdentity(OrganizationIdentityPrefix),
@@ -49,13 +48,13 @@ func (o *Organization) ChangeName(name string, userEditorIdentity *core.Identity
 
 	o.Name = nameValueObject.Value
 	o.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	o.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (o *Organization) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	o.DeletedAt = &now
 }
 
@@ -76,7 +75,7 @@ type OrganizationUser struct {
 	User                 user.User
 	Role                 role.Role
 	Status               OrganizationUserStatuses
-	LastAccessAt         *int64
+	LastAccessAt         *core.DateTime
 }
 
 type NewOrganizationUserInput struct {
@@ -87,7 +86,7 @@ type NewOrganizationUserInput struct {
 }
 
 func NewOrganizationUser(input NewOrganizationUserInput) (*OrganizationUser, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	return &OrganizationUser{
 		OrganizationIdentity: input.OrganizationIdentity,
@@ -124,7 +123,7 @@ func (o *OrganizationUser) Invite() {
 
 func (o *OrganizationUser) AcceptInvitation() {
 	o.Status = OrganizationUserStatusActive
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	o.LastAccessAt = &now
 }
 
@@ -141,6 +140,6 @@ func (o *OrganizationUser) CanExecuteAction(permissionSlug role.PermissionSlugs)
 }
 
 func (o *OrganizationUser) Access() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	o.LastAccessAt = &now
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type Team struct {
@@ -33,7 +32,7 @@ type NewTeamInput struct {
 }
 
 func NewTeam(input NewTeamInput) (*Team, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	if _, err := core.NewName(input.Name); err != nil {
 		return nil, err
@@ -62,7 +61,7 @@ func (t *Team) ChangeName(name string, userEditorIdentity *core.Identity) error 
 
 	t.Name = name
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -74,20 +73,20 @@ func (t *Team) ChangeDescription(description string, userEditorIdentity *core.Id
 
 	t.Description = description
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (t *Team) Activate() {
 	t.Status = TeamStatusActive
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
 func (t *Team) Inactivate() {
 	t.Status = TeamStatusInactive
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
@@ -111,7 +110,7 @@ func (t *Team) AddUser(user user.User) {
 	}
 
 	t.Members = append(t.Members, teamUser)
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
@@ -119,12 +118,12 @@ func (t *Team) RemoveUser(user user.User) {
 	t.Members = slices.DeleteFunc(t.Members, func(tu TeamUser) bool {
 		return tu.User.Identity == user.Identity
 	})
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
 func (t *Team) RemoveAllUsers() {
 	t.Members = []TeamUser{}
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }

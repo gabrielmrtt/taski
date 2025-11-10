@@ -43,8 +43,8 @@ type CreateProjectInput struct {
 	Description          string
 	Color                string
 	PriorityLevel        project.ProjectPriorityLevels
-	StartAt              *int64
-	EndAt                *int64
+	StartAt              *core.DateTime
+	EndAt                *core.DateTime
 }
 
 func (i CreateProjectInput) Validate() error {

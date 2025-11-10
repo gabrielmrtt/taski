@@ -45,10 +45,15 @@ type SubTaskTable struct {
 }
 
 func (s *SubTaskTable) ToEntity() *task.SubTask {
+	var completedAt *core.DateTime = nil
+	if s.CompletedAt != nil {
+		completedAt = &core.DateTime{Value: *s.CompletedAt}
+	}
+
 	return &task.SubTask{
 		Identity:    core.NewIdentityFromInternal(uuid.MustParse(s.InternalId), task.SubTaskIdentityPrefix),
 		Name:        s.Name,
-		CompletedAt: s.CompletedAt,
+		CompletedAt: completedAt,
 	}
 }
 
@@ -137,6 +142,31 @@ func (t *TaskTable) ToEntity() *task.Task {
 		childrenTasks = append(childrenTasks, childTask.ToEntity())
 	}
 
+	var dueDate *core.DateTime = nil
+	if t.DueDate != nil {
+		dueDate = &core.DateTime{Value: *t.DueDate}
+	}
+
+	var completedAt *core.DateTime = nil
+	if t.CompletedAt != nil {
+		completedAt = &core.DateTime{Value: *t.CompletedAt}
+	}
+
+	var createdAt *core.DateTime = nil
+	if t.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: t.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if t.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *t.UpdatedAt}
+	}
+
+	var deletedAt *core.DateTime = nil
+	if t.DeletedAt != nil {
+		deletedAt = &core.DateTime{Value: *t.DeletedAt}
+	}
+
 	return &task.Task{
 		Identity:                core.NewIdentityFromInternal(uuid.MustParse(t.InternalId), task.TaskIdentityPrefix),
 		ProjectIdentity:         core.NewIdentityFromInternal(uuid.MustParse(t.ProjectInternalId), project.ProjectIdentityPrefix),
@@ -148,8 +178,8 @@ func (t *TaskTable) ToEntity() *task.Task {
 		Description:             t.Description,
 		EstimatedMinutes:        &t.EstimatedMinutes,
 		PriorityLevel:           task.TaskPriorityLevels(t.PriorityLevel),
-		DueDate:                 t.DueDate,
-		CompletedAt:             t.CompletedAt,
+		DueDate:                 dueDate,
+		CompletedAt:             completedAt,
 		SubTasks:                subTasks,
 		ChildrenTasks:           childrenTasks,
 		Users:                   users,
@@ -157,10 +187,10 @@ func (t *TaskTable) ToEntity() *task.Task {
 		UserCreatorIdentity:     userCreatorIdentity,
 		UserEditorIdentity:      userEditorIdentity,
 		Timestamps: core.Timestamps{
-			CreatedAt: &t.CreatedAt,
-			UpdatedAt: t.UpdatedAt,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
-		DeletedAt: t.DeletedAt,
+		DeletedAt: deletedAt,
 	}
 }
 
@@ -183,48 +213,70 @@ func (r *TaskBunRepository) SetTransaction(tx core.Transaction) error {
 }
 
 func (r *TaskBunRepository) applyFilters(selectQuery *bun.SelectQuery, filters taskrepo.TaskFilters) *bun.SelectQuery {
+	if filters.OrganizationIdentity != nil {
+		args := []interface{}{filters.OrganizationIdentity.Internal.String()}
+
+		projectQueryString := `
+			SELECT project.internal_id FROM project 
+			WHERE project.workspace_internal_id IN (
+				SELECT workspace.internal_id FROM workspace 
+				WHERE workspace.organization_internal_id = ?
+			)
+		`
+
+		if filters.AuthenticatedUserIdentity != nil {
+			projectQueryString = projectQueryString + ` AND project.internal_id IN (
+				SELECT project_user.project_internal_id FROM project_user
+				WHERE project_user.user_internal_id = ? AND project_user.status = ?
+			)`
+			args = append(args, filters.AuthenticatedUserIdentity.Internal.String(), project.ProjectUserStatusActive)
+		}
+
+		selectQuery = selectQuery.Where("task.project_internal_id IN ("+projectQueryString+")", args...)
+	}
+
 	if filters.ProjectIdentity != nil {
-		selectQuery = selectQuery.Where("project_internal_id = ?", filters.ProjectIdentity.Internal.String())
+		selectQuery = selectQuery.Where("task.project_internal_id = ?", filters.ProjectIdentity.Internal.String())
 	}
 
 	if filters.TaskStatusIdentity != nil {
-		selectQuery = selectQuery.Where("project_task_status_internal_id = ?", filters.TaskStatusIdentity.Internal.String())
+		selectQuery = selectQuery.Where("task.project_task_status_internal_id = ?", filters.TaskStatusIdentity.Internal.String())
 	}
 
 	if filters.TaskCategoryIdentity != nil {
-		selectQuery = selectQuery.Where("project_task_category_internal_id = ?", filters.TaskCategoryIdentity.Internal.String())
+		selectQuery = selectQuery.Where("task.project_task_category_internal_id = ?", filters.TaskCategoryIdentity.Internal.String())
 	}
 
 	if filters.ParentTaskIdentity != nil {
-		selectQuery = selectQuery.Where("parent_task_internal_id = ?", filters.ParentTaskIdentity.Internal.String())
+		selectQuery = selectQuery.Where("task.parent_task_internal_id = ?", filters.ParentTaskIdentity.Internal.String())
 	}
 
 	if filters.Name != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "name", filters.Name)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.name", filters.Name)
 	}
 
 	if filters.CompletedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "completed_at", filters.CompletedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.completed_at", filters.CompletedAt)
 	}
 
 	if filters.CreatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "created_at", filters.CreatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.created_at", filters.CreatedAt)
 	}
 
 	if filters.UpdatedAt != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "updated_at", filters.UpdatedAt)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.updated_at", filters.UpdatedAt)
 	}
 
 	if filters.DueDate != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "due_date", filters.DueDate)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.due_date", filters.DueDate)
 	}
 
 	if filters.Type != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "type", filters.Type)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.type", filters.Type)
 	}
 
 	if filters.Priority != nil {
-		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "priority_level", filters.Priority)
+		selectQuery = coredatabase.ApplyComparableFilter(selectQuery, "task.priority_level", filters.Priority)
 	}
 
 	return selectQuery
@@ -239,8 +291,25 @@ func (r *TaskBunRepository) GetTaskByIdentity(params taskrepo.GetTaskByIdentityP
 	}
 
 	selectQuery = selectQuery.Model(task)
-	selectQuery = selectQuery.Relation("ProjectTaskStatus").Relation("ProjectTaskCategory").Relation("ChildrenTasks").Relation("Users").Relation("SubTasks")
-	selectQuery = selectQuery.Where("internal_id = ?", params.TaskIdentity.Internal.String())
+	selectQuery = selectQuery.Relation("ProjectTaskStatus").Relation("ProjectTaskCategory").Relation("SubTasks")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("task.internal_id = ?", params.TaskIdentity.Internal.String())
+
+	if params.OrganizationIdentity != nil {
+		selectQuery = selectQuery.Where(`
+			task.project_internal_id IN (
+				SELECT project.internal_id FROM project 
+				WHERE project.workspace_internal_id IN (
+					SELECT workspace.internal_id FROM workspace 
+					WHERE workspace.organization_internal_id = ?
+				)
+			)`, params.OrganizationIdentity.Internal.String())
+	}
+
+	if params.ProjectIdentity != nil {
+		selectQuery = selectQuery.Where("task.project_internal_id = ?", params.ProjectIdentity.Internal.String())
+	}
+
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -255,4 +324,431 @@ func (r *TaskBunRepository) GetTaskByIdentity(params taskrepo.GetTaskByIdentityP
 	}
 
 	return task.ToEntity(), nil
+}
+
+func (r *TaskBunRepository) PaginateTasksBy(params taskrepo.PaginateTasksParams) (*core.PaginationOutput[task.Task], error) {
+	var tasks []*TaskTable = make([]*TaskTable, 0)
+	var selectQuery *bun.SelectQuery
+	var perPage int = 10
+	var page int = 1
+
+	if params.Pagination.PerPage != nil {
+		perPage = *params.Pagination.PerPage
+	}
+
+	if params.Pagination.Page != nil {
+		page = *params.Pagination.Page
+	}
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&tasks)
+	selectQuery = selectQuery.Relation("ProjectTaskStatus").Relation("ProjectTaskCategory").Relation("SubTasks")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = r.applyFilters(selectQuery, params.Filters)
+	countBeforePagination, err := selectQuery.Count(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	selectQuery = coredatabase.ApplySort(selectQuery, params.SortInput)
+	selectQuery = coredatabase.ApplyPagination(selectQuery, params.Pagination)
+	err = selectQuery.Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+	}
+
+	var taskEntities []task.Task = make([]task.Task, 0)
+	for _, task := range tasks {
+		taskEntities = append(taskEntities, *task.ToEntity())
+	}
+
+	return &core.PaginationOutput[task.Task]{
+		Data:    taskEntities,
+		Page:    page,
+		HasMore: core.HasMorePages(page, countBeforePagination, perPage),
+		Total:   countBeforePagination,
+	}, nil
+}
+
+func (r *TaskBunRepository) GetTasksByParentTaskIdentity(params taskrepo.GetTasksByParentTaskIdentityParams) ([]*task.Task, error) {
+	var tasks []*TaskTable = make([]*TaskTable, 0)
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(&tasks)
+	selectQuery = selectQuery.Relation("ProjectTaskStatus").Relation("ProjectTaskCategory").Relation("SubTasks")
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("task.parent_task_internal_id = ?", params.ParentTaskIdentity.Internal.String())
+	err := selectQuery.Scan(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	var taskEntities []*task.Task = make([]*task.Task, 0)
+	for _, task := range tasks {
+		taskEntities = append(taskEntities, task.ToEntity())
+	}
+
+	return taskEntities, nil
+}
+
+func (r *TaskBunRepository) AddSubTask(params taskrepo.AddSubTaskParams) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	var completedAt *int64 = nil
+	if params.SubTask.CompletedAt != nil {
+		completedAt = &params.SubTask.CompletedAt.Value
+	}
+
+	var subTaskTable *SubTaskTable = &SubTaskTable{
+		InternalId:     params.SubTask.Identity.Internal.String(),
+		PublicId:       params.SubTask.Identity.Public,
+		Name:           params.SubTask.Name,
+		CompletedAt:    completedAt,
+		TaskInternalId: params.Task.Identity.Internal.String(),
+	}
+
+	_, err := tx.NewInsert().Model(subTaskTable).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *TaskBunRepository) UpdateSubTask(params taskrepo.UpdateSubTaskParams) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	var completedAt *int64 = nil
+	if params.SubTask.CompletedAt != nil {
+		completedAt = &params.SubTask.CompletedAt.Value
+	}
+
+	_, err := tx.NewUpdate().Model(&SubTaskTable{
+		InternalId:  params.SubTask.Identity.Internal.String(),
+		PublicId:    params.SubTask.Identity.Public,
+		Name:        params.SubTask.Name,
+		CompletedAt: completedAt,
+	}).Where("sub_task.internal_id = ?", params.SubTask.Identity.Internal.String()).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *TaskBunRepository) RemoveSubTask(params taskrepo.RemoveSubTaskParams) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err := tx.NewDelete().Model(&SubTaskTable{}).Where("sub_task.internal_id = ?", params.SubTask.Identity.Internal.String()).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *TaskBunRepository) StoreTask(params taskrepo.StoreTaskParams) (*task.Task, error) {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var parentTaskInternalId *string = nil
+	if params.Task.ParentTaskIdentity != nil {
+		internalId := params.Task.ParentTaskIdentity.Internal.String()
+		parentTaskInternalId = &internalId
+	}
+
+	var userEditorInternalId *string = nil
+	if params.Task.UserEditorIdentity != nil {
+		internalId := params.Task.UserEditorIdentity.Internal.String()
+		userEditorInternalId = &internalId
+	}
+
+	var dueDate *int64 = nil
+	if params.Task.DueDate != nil {
+		dueDate = &params.Task.DueDate.Value
+	}
+
+	var completedAt *int64 = nil
+	if params.Task.CompletedAt != nil {
+		completedAt = &params.Task.CompletedAt.Value
+	}
+
+	var createdAt *int64 = nil
+	if params.Task.Timestamps.CreatedAt != nil {
+		createdAt = &params.Task.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Task.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Task.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Task.DeletedAt != nil {
+		deletedAt = &params.Task.DeletedAt.Value
+	}
+
+	_, err := tx.NewInsert().Model(&TaskTable{
+		InternalId:                    params.Task.Identity.Internal.String(),
+		PublicId:                      params.Task.Identity.Public,
+		Name:                          params.Task.Name,
+		Description:                   params.Task.Description,
+		EstimatedMinutes:              *params.Task.EstimatedMinutes,
+		PriorityLevel:                 int8(params.Task.PriorityLevel),
+		DueDate:                       dueDate,
+		CompletedAt:                   completedAt,
+		Type:                          string(params.Task.Type),
+		ProjectTaskStatusInternalId:   params.Task.Status.Identity.Internal.String(),
+		ProjectTaskCategoryInternalId: params.Task.Category.Identity.Internal.String(),
+		ParentTaskInternalId:          parentTaskInternalId,
+		ProjectInternalId:             params.Task.ProjectIdentity.Internal.String(),
+		UserCreatorInternalId:         params.Task.UserCreatorIdentity.Internal.String(),
+		UserEditorInternalId:          userEditorInternalId,
+		CreatedAt:                     *createdAt,
+		UpdatedAt:                     updatedAt,
+		DeletedAt:                     deletedAt,
+	}).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	for _, subTask := range params.Task.SubTasks {
+		err = r.AddSubTask(taskrepo.AddSubTaskParams{
+			Task:    params.Task,
+			SubTask: subTask,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return params.Task, nil
+}
+
+func (r *TaskBunRepository) UpdateTask(params taskrepo.UpdateTaskParams) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	var parentTaskInternalId *string = nil
+	if params.Task.ParentTaskIdentity != nil {
+		internalId := params.Task.ParentTaskIdentity.Internal.String()
+		parentTaskInternalId = &internalId
+	}
+
+	var userEditorInternalId *string = nil
+	if params.Task.UserEditorIdentity != nil {
+		internalId := params.Task.UserEditorIdentity.Internal.String()
+		userEditorInternalId = &internalId
+	}
+
+	var dueDate *int64 = nil
+	if params.Task.DueDate != nil {
+		dueDate = &params.Task.DueDate.Value
+	}
+
+	var completedAt *int64 = nil
+	if params.Task.CompletedAt != nil {
+		completedAt = &params.Task.CompletedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Task.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Task.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Task.DeletedAt != nil {
+		deletedAt = &params.Task.DeletedAt.Value
+	}
+
+	taskTable := &TaskTable{
+		InternalId:                    params.Task.Identity.Internal.String(),
+		PublicId:                      params.Task.Identity.Public,
+		Name:                          params.Task.Name,
+		Description:                   params.Task.Description,
+		EstimatedMinutes:              *params.Task.EstimatedMinutes,
+		PriorityLevel:                 int8(params.Task.PriorityLevel),
+		DueDate:                       dueDate,
+		CompletedAt:                   completedAt,
+		Type:                          string(params.Task.Type),
+		ProjectTaskStatusInternalId:   params.Task.Status.Identity.Internal.String(),
+		ProjectTaskCategoryInternalId: params.Task.Category.Identity.Internal.String(),
+		ParentTaskInternalId:          parentTaskInternalId,
+		ProjectInternalId:             params.Task.ProjectIdentity.Internal.String(),
+		UserCreatorInternalId:         params.Task.UserCreatorIdentity.Internal.String(),
+		UserEditorInternalId:          userEditorInternalId,
+		UpdatedAt:                     updatedAt,
+		DeletedAt:                     deletedAt,
+	}
+
+	_, err := tx.NewUpdate().Model(taskTable).Where("task.internal_id = ?", params.Task.Identity.Internal.String()).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *TaskBunRepository) DeleteTask(params taskrepo.DeleteTaskParams) error {
+	var tx bun.Tx
+	var shouldCommit bool = false
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		tx = *r.tx.Tx
+	} else {
+		var err error
+		tx, err = r.db.BeginTx(context.Background(), nil)
+		shouldCommit = true
+
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err := tx.NewDelete().Model(&TaskTable{}).Where("task.internal_id = ?", params.TaskIdentity.Internal.String()).Exec(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		return err
+	}
+
+	if shouldCommit {
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

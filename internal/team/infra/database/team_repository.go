@@ -80,6 +80,16 @@ func (t *TeamTable) ToEntity() *team.Team {
 		org = t.Organization.ToEntity()
 	}
 
+	var createdAt *core.DateTime = nil
+	if t.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: t.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if t.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *t.UpdatedAt}
+	}
+
 	return &team.Team{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(t.InternalId), team.TeamIdentityPrefix),
 		OrganizationIdentity: core.NewIdentityFromInternal(uuid.MustParse(t.OrganizationInternalId), organization.OrganizationIdentityPrefix),
@@ -91,7 +101,7 @@ func (t *TeamTable) ToEntity() *team.Team {
 		Creator:              creator,
 		Editor:               editor,
 		Organization:         org,
-		Timestamps:           core.Timestamps{CreatedAt: &t.CreatedAt, UpdatedAt: t.UpdatedAt},
+		Timestamps:           core.Timestamps{CreatedAt: createdAt, UpdatedAt: updatedAt},
 		Members:              members,
 	}
 }
@@ -243,6 +253,16 @@ func (r *TeamBunRepository) StoreTeam(params teamrepo.StoreTeamParams) (*team.Te
 		userCreatorInternalId = &identity
 	}
 
+	var createdAt *int64 = nil
+	if params.Team.Timestamps.CreatedAt != nil {
+		createdAt = &params.Team.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Team.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Team.Timestamps.UpdatedAt.Value
+	}
+
 	teamTable := &TeamTable{
 		InternalId:             params.Team.Identity.Internal.String(),
 		PublicId:               params.Team.Identity.Public,
@@ -251,8 +271,8 @@ func (r *TeamBunRepository) StoreTeam(params teamrepo.StoreTeamParams) (*team.Te
 		Status:                 string(params.Team.Status),
 		OrganizationInternalId: params.Team.OrganizationIdentity.Internal.String(),
 		UserCreatorInternalId:  *userCreatorInternalId,
-		CreatedAt:              *params.Team.Timestamps.CreatedAt,
-		UpdatedAt:              params.Team.Timestamps.UpdatedAt,
+		CreatedAt:              *createdAt,
+		UpdatedAt:              updatedAt,
 	}
 
 	_, err := tx.NewInsert().Model(teamTable).Exec(context.Background())
@@ -304,6 +324,11 @@ func (r *TeamBunRepository) UpdateTeam(params teamrepo.UpdateTeamParams) error {
 		userEditorInternalId = &identity
 	}
 
+	var updatedAt *int64 = nil
+	if params.Team.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Team.Timestamps.UpdatedAt.Value
+	}
+
 	teamTable := &TeamTable{
 		InternalId:             params.Team.Identity.Internal.String(),
 		PublicId:               params.Team.Identity.Public,
@@ -313,7 +338,7 @@ func (r *TeamBunRepository) UpdateTeam(params teamrepo.UpdateTeamParams) error {
 		OrganizationInternalId: params.Team.OrganizationIdentity.Internal.String(),
 		UserCreatorInternalId:  params.Team.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:   userEditorInternalId,
-		UpdatedAt:              params.Team.Timestamps.UpdatedAt,
+		UpdatedAt:              updatedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(teamTable).Where("internal_id = ?", params.Team.Identity.Internal.String()).Exec(context.Background())

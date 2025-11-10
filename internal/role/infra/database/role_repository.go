@@ -75,6 +75,21 @@ func (r *RoleTable) ToEntity() *role.Role {
 		}
 	}
 
+	var createdAt *core.DateTime = nil
+	if r.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: r.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if r.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *r.UpdatedAt}
+	}
+
+	var deletedAt *core.DateTime = nil
+	if r.DeletedAt != nil {
+		deletedAt = &core.DateTime{Value: *r.DeletedAt}
+	}
+
 	return &role.Role{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(r.InternalId), role.RoleIdentityPrefix),
 		Name:                 r.Name,
@@ -88,10 +103,10 @@ func (r *RoleTable) ToEntity() *role.Role {
 		Creator:              creator,
 		Editor:               editor,
 		Timestamps: core.Timestamps{
-			CreatedAt: &r.CreatedAt,
-			UpdatedAt: r.UpdatedAt,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
-		DeletedAt: r.DeletedAt,
+		DeletedAt: deletedAt,
 	}
 }
 
@@ -342,6 +357,21 @@ func (r *RoleBunRepository) StoreRole(params rolerepo.StoreRoleParams) (*role.Ro
 		userEditorInternalId = &identity
 	}
 
+	var createdAt *int64 = nil
+	if params.Role.Timestamps.CreatedAt != nil {
+		createdAt = &params.Role.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Role.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Role.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Role.DeletedAt != nil {
+		deletedAt = &params.Role.DeletedAt.Value
+	}
+
 	roleTable := &RoleTable{
 		InternalId:             params.Role.Identity.Internal.String(),
 		PublicId:               params.Role.Identity.Public,
@@ -352,9 +382,9 @@ func (r *RoleBunRepository) StoreRole(params rolerepo.StoreRoleParams) (*role.Ro
 		UserCreatorInternalId:  userCreatorInternalId,
 		UserEditorInternalId:   userEditorInternalId,
 		IsSystemDefault:        params.Role.IsSystemDefault,
-		CreatedAt:              *params.Role.Timestamps.CreatedAt,
-		UpdatedAt:              params.Role.Timestamps.UpdatedAt,
-		DeletedAt:              params.Role.DeletedAt,
+		CreatedAt:              *createdAt,
+		UpdatedAt:              updatedAt,
+		DeletedAt:              deletedAt,
 	}
 
 	_, err := tx.NewInsert().Model(roleTable).Exec(context.Background())
@@ -418,6 +448,21 @@ func (r *RoleBunRepository) UpdateRole(params rolerepo.UpdateRoleParams) error {
 		userEditorInternalId = &identity
 	}
 
+	var createdAt *int64 = nil
+	if params.Role.Timestamps.CreatedAt != nil {
+		createdAt = &params.Role.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Role.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Role.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Role.DeletedAt != nil {
+		deletedAt = &params.Role.DeletedAt.Value
+	}
+
 	roleTable := &RoleTable{
 		InternalId:             params.Role.Identity.Internal.String(),
 		PublicId:               params.Role.Identity.Public,
@@ -428,9 +473,9 @@ func (r *RoleBunRepository) UpdateRole(params rolerepo.UpdateRoleParams) error {
 		UserCreatorInternalId:  userCreatorInternalId,
 		UserEditorInternalId:   userEditorInternalId,
 		IsSystemDefault:        params.Role.IsSystemDefault,
-		CreatedAt:              *params.Role.Timestamps.CreatedAt,
-		UpdatedAt:              params.Role.Timestamps.UpdatedAt,
-		DeletedAt:              params.Role.DeletedAt,
+		CreatedAt:              *createdAt,
+		UpdatedAt:              updatedAt,
+		DeletedAt:              deletedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(roleTable).Where("roles.internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
@@ -441,7 +486,7 @@ func (r *RoleBunRepository) UpdateRole(params rolerepo.UpdateRoleParams) error {
 	}
 
 	if params.Role.Permissions != nil {
-		_, err := tx.NewDelete().Model(&RolePermissionTable{}).Where("roles.role_internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
+		_, err := tx.NewDelete().Model(&RolePermissionTable{}).Where("role_permission.role_internal_id = ?", params.Role.Identity.Internal.String()).Exec(context.Background())
 		if err != nil {
 			return err
 		}

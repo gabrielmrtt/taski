@@ -31,8 +31,8 @@ type UpdateProjectInput struct {
 	Color                *string
 	Status               *project.ProjectStatuses
 	PriorityLevel        *project.ProjectPriorityLevels
-	StartAt              *int64
-	EndAt                *int64
+	StartAt              *core.DateTime
+	EndAt                *core.DateTime
 }
 
 func (i UpdateProjectInput) Validate() error {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type Permission struct {
@@ -41,7 +40,7 @@ type Role struct {
 	UserEditorIdentity   *core.Identity
 	IsSystemDefault      bool
 	core.Timestamps
-	DeletedAt *int64
+	DeletedAt *core.DateTime
 
 	Creator *user.User
 	Editor  *user.User
@@ -57,7 +56,7 @@ type NewRoleInput struct {
 }
 
 func NewRole(input NewRoleInput) (*Role, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	return &Role{
 		Identity:             core.NewIdentity(RoleIdentityPrefix),
@@ -82,7 +81,7 @@ func (r *Role) ChangeName(name string, userEditorIdentity *core.Identity) error 
 
 	r.Name = name
 	r.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -94,7 +93,7 @@ func (r *Role) ChangeDescription(description string, userEditorIdentity *core.Id
 
 	r.Description = description
 	r.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -112,14 +111,14 @@ func (r *Role) HasPermission(permissionSlug PermissionSlugs) bool {
 func (r *Role) ClearPermissions(userEditorIdentity *core.Identity) {
 	r.Permissions = []Permission{}
 	r.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.Timestamps.UpdatedAt = &now
 }
 
 func (r *Role) AddPermission(permission Permission, userEditorIdentity *core.Identity) {
 	r.Permissions = append(r.Permissions, permission)
 	r.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.Timestamps.UpdatedAt = &now
 }
 
@@ -128,12 +127,12 @@ func (r *Role) RemovePermission(permission Permission, userEditorIdentity *core.
 		return p.Slug == permission.Slug
 	})
 	r.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.Timestamps.UpdatedAt = &now
 }
 
 func (r *Role) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	r.DeletedAt = &now
 }
 

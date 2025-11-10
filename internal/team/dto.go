@@ -3,7 +3,6 @@ package team
 import (
 	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type TeamDto struct {
@@ -22,10 +21,10 @@ type TeamDto struct {
 }
 
 func TeamToDto(team *Team) *TeamDto {
-	createdAt := datetimeutils.EpochToRFC3339(*team.Timestamps.CreatedAt)
+	createdAt := team.Timestamps.CreatedAt.ToRFC3339()
 	var updatedAt *string = nil
 	if team.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*team.Timestamps.UpdatedAt)
+		updatedAtString := team.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 

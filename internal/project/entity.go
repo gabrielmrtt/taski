@@ -5,7 +5,6 @@ import (
 
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type Project struct {
@@ -18,10 +17,10 @@ type Project struct {
 	PriorityLevel       ProjectPriorityLevels
 	UserCreatorIdentity *core.Identity
 	UserEditorIdentity  *core.Identity
-	StartAt             *int64
-	EndAt               *int64
+	StartAt             *core.DateTime
+	EndAt               *core.DateTime
 	Timestamps          core.Timestamps
-	DeletedAt           *int64
+	DeletedAt           *core.DateTime
 	Creator             *user.User
 	Editor              *user.User
 }
@@ -32,13 +31,13 @@ type NewProjectInput struct {
 	Color               string
 	WorkspaceIdentity   core.Identity
 	PriorityLevel       ProjectPriorityLevels
-	StartAt             *int64
-	EndAt               *int64
+	StartAt             *core.DateTime
+	EndAt               *core.DateTime
 	UserCreatorIdentity *core.Identity
 }
 
 func NewProject(input NewProjectInput) (*Project, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	if _, err := core.NewName(input.Name); err != nil {
 		return nil, err
@@ -53,16 +52,16 @@ func NewProject(input NewProjectInput) (*Project, error) {
 	}
 
 	if input.StartAt != nil {
-		if *input.StartAt < now {
-			return nil, core.NewInternalError("start at cannot be in the past")
+		if input.StartAt.IsBefore(now) {
+			return nil, core.NewConflictError("start at cannot be in the past")
 		}
 	} else {
 		input.StartAt = &now
 	}
 
 	if input.EndAt != nil {
-		if *input.EndAt < now {
-			return nil, core.NewInternalError("end at cannot be in the past")
+		if input.EndAt.IsBefore(now) {
+			return nil, core.NewConflictError("end at cannot be in the past")
 		}
 	} else {
 		input.EndAt = &now
@@ -95,7 +94,7 @@ func (p *Project) ChangeName(name string, userEditorIdentity *core.Identity) err
 
 	p.Name = name
 	p.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -107,7 +106,7 @@ func (p *Project) ChangeDescription(description string, userEditorIdentity *core
 
 	p.Description = description
 	p.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -119,7 +118,7 @@ func (p *Project) ChangeColor(color string, userEditorIdentity *core.Identity) e
 
 	p.Color = color
 	p.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -131,20 +130,22 @@ func (p *Project) ChangeStatus(status ProjectStatuses, userEditorIdentity *core.
 
 	p.Status = status
 	p.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.Timestamps.UpdatedAt = &now
 	return nil
 }
 
-func (p *Project) ChangeStartAt(startAt int64, userEditorIdentity *core.Identity) error {
-	now := datetimeutils.EpochNow()
+func (p *Project) ChangeStartAt(startAt core.DateTime, userEditorIdentity *core.Identity) error {
+	now := core.NewDateTime()
 
-	if startAt < now {
-		return core.NewInternalError("start at cannot be in the past")
+	if startAt.IsBefore(now) {
+		return core.NewConflictError("start at cannot be in the past")
 	}
 
-	if startAt > *p.EndAt {
-		return core.NewInternalError("start at cannot be after end at")
+	if p.EndAt != nil {
+		if startAt.IsAfter(*p.EndAt) {
+			return core.NewConflictError("start at cannot be after end at")
+		}
 	}
 
 	p.StartAt = &startAt
@@ -153,15 +154,17 @@ func (p *Project) ChangeStartAt(startAt int64, userEditorIdentity *core.Identity
 	return nil
 }
 
-func (p *Project) ChangeEndAt(endAt int64, userEditorIdentity *core.Identity) error {
-	now := datetimeutils.EpochNow()
+func (p *Project) ChangeEndAt(endAt core.DateTime, userEditorIdentity *core.Identity) error {
+	now := core.NewDateTime()
 
-	if endAt < now {
-		return core.NewInternalError("end at cannot be in the past")
+	if endAt.IsBefore(now) {
+		return core.NewConflictError("end at cannot be in the past")
 	}
 
-	if endAt < *p.StartAt {
-		return core.NewInternalError("end at cannot be before start at")
+	if p.StartAt != nil {
+		if endAt.IsBefore(*p.StartAt) {
+			return core.NewConflictError("end at cannot be before start at")
+		}
 	}
 
 	p.EndAt = &endAt
@@ -177,13 +180,13 @@ func (p *Project) ChangePriorityLevel(priorityLevel ProjectPriorityLevels, userE
 
 	p.PriorityLevel = priorityLevel
 	p.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (p *Project) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	p.DeletedAt = &now
 }
 
@@ -212,15 +215,15 @@ func (p *Project) IsDeleted() bool {
 }
 
 func (p *Project) HasEnded() bool {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
-	return p.EndAt != nil && *p.EndAt < now
+	return p.EndAt != nil && p.EndAt.ToEpoch() < now.ToEpoch()
 }
 
 func (p *Project) HasStarted() bool {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
-	return p.StartAt != nil && *p.StartAt <= now
+	return p.StartAt != nil && p.StartAt.ToEpoch() <= now.ToEpoch()
 }
 
 type ProjectUser struct {
@@ -283,7 +286,7 @@ type ProjectTaskStatus struct {
 	Order                    *int8
 	ShouldSetTaskToCompleted bool
 	IsDefault                bool
-	DeletedAt                *int64
+	DeletedAt                *core.DateTime
 }
 
 type NewProjectTaskStatusInput struct {
@@ -360,7 +363,7 @@ func (s *ProjectTaskStatus) SetIsDefault(v bool) error {
 }
 
 func (s *ProjectTaskStatus) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	s.DeletedAt = &now
 }
 
@@ -373,7 +376,7 @@ type ProjectTaskCategory struct {
 	ProjectIdentity core.Identity
 	Name            string
 	Color           string
-	DeletedAt       *int64
+	DeletedAt       *core.DateTime
 }
 
 type NewProjectTaskCategoryInput struct {
@@ -419,7 +422,7 @@ func (c *ProjectTaskCategory) ChangeColor(color string) error {
 }
 
 func (c *ProjectTaskCategory) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	c.DeletedAt = &now
 }
 
@@ -477,7 +480,7 @@ func NewProjectDocument(input NewProjectDocumentInput) (*ProjectDocumentVersion,
 		return nil, err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	projectDocument := &ProjectDocument{
 		Identity: core.NewIdentityWithoutPublic(),
@@ -509,7 +512,7 @@ func (v *ProjectDocumentVersion) ChangeTitle(title string, userEditorIdentity *c
 
 	v.Document.Title = title
 	v.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	v.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -521,20 +524,20 @@ func (v *ProjectDocumentVersion) ChangeContent(content string, userEditorIdentit
 
 	v.Document.Content = content
 	v.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	v.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (v *ProjectDocumentVersion) ClearAllFiles() {
 	v.Document.Files = []ProjectDocumentFile{}
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	v.Timestamps.UpdatedAt = &now
 }
 
 func (v *ProjectDocumentVersion) AddFile(file ProjectDocumentFile) {
 	v.Document.Files = append(v.Document.Files, file)
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	v.Timestamps.UpdatedAt = &now
 }
 
@@ -542,7 +545,7 @@ func (v *ProjectDocumentVersion) RemoveFile(file ProjectDocumentFile) {
 	v.Document.Files = slices.DeleteFunc(v.Document.Files, func(f ProjectDocumentFile) bool {
 		return f.Identity == file.Identity
 	})
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	v.Timestamps.UpdatedAt = &now
 }
 
@@ -551,7 +554,7 @@ func (v *ProjectDocumentVersion) IsLatest() bool {
 }
 
 func (v *ProjectDocumentVersion) NewVersion(version string) *ProjectDocumentVersion {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	v.Latest = false
 	return &ProjectDocumentVersion{

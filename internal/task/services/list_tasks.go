@@ -2,34 +2,27 @@ package taskservice
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
-	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	"github.com/gabrielmrtt/taski/internal/task"
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
 )
 
 type ListTasksService struct {
-	TaskRepository        taskrepo.TaskRepository
-	ProjectRepository     projectrepo.ProjectRepository
-	TransactionRepository core.TransactionRepository
+	TaskRepository taskrepo.TaskRepository
 }
 
 func NewListTasksService(
 	taskRepository taskrepo.TaskRepository,
-	projectRepository projectrepo.ProjectRepository,
-	transactionRepository core.TransactionRepository,
 ) *ListTasksService {
 	return &ListTasksService{
-		TaskRepository:        taskRepository,
-		ProjectRepository:     projectRepository,
-		TransactionRepository: transactionRepository,
+		TaskRepository: taskRepository,
 	}
 }
 
 type ListTasksInput struct {
-	ProjectIdentity core.Identity
-	Filters         taskrepo.TaskFilters
-	Pagination      core.PaginationInput
-	SortInput       core.SortInput
+	Filters        taskrepo.TaskFilters
+	Pagination     core.PaginationInput
+	SortInput      core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 func (i ListTasksInput) Validate() error { return nil }
@@ -39,34 +32,13 @@ func (s *ListTasksService) Execute(input ListTasksInput) (*core.PaginationOutput
 		return nil, err
 	}
 
-	tx, err := s.TransactionRepository.BeginTransaction()
-	if err != nil {
-		return nil, err
-	}
-
-	s.TaskRepository.SetTransaction(tx)
-	s.ProjectRepository.SetTransaction(tx)
-
-	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
-		ProjectIdentity: input.ProjectIdentity,
-	})
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if prj == nil {
-		tx.Rollback()
-		return nil, core.NewNotFoundError("project not found")
-	}
-
 	tasks, err := s.TaskRepository.PaginateTasksBy(taskrepo.PaginateTasksParams{
-		Filters:    input.Filters,
-		Pagination: input.Pagination,
-		SortInput:  input.SortInput,
+		Filters:        input.Filters,
+		Pagination:     input.Pagination,
+		SortInput:      input.SortInput,
+		RelationsInput: input.RelationsInput,
 	})
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 

@@ -6,7 +6,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/project"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type TaskUser struct {
@@ -16,7 +15,7 @@ type TaskUser struct {
 type SubTask struct {
 	Identity    core.Identity
 	Name        string
-	CompletedAt *int64
+	CompletedAt *core.DateTime
 }
 
 type NewSubTaskInput struct {
@@ -45,7 +44,7 @@ func (s *SubTask) ChangeName(name string) error {
 }
 
 func (s *SubTask) Complete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	s.CompletedAt = &now
 }
 
@@ -64,8 +63,8 @@ type Task struct {
 	Description             string
 	EstimatedMinutes        *int16
 	PriorityLevel           TaskPriorityLevels
-	DueDate                 *int64
-	CompletedAt             *int64
+	DueDate                 *core.DateTime
+	CompletedAt             *core.DateTime
 	SubTasks                []*SubTask
 	ChildrenTasks           []*Task
 	Users                   []*TaskUser
@@ -73,7 +72,7 @@ type Task struct {
 	UserCreatorIdentity     *core.Identity
 	UserEditorIdentity      *core.Identity
 	Timestamps              core.Timestamps
-	DeletedAt               *int64
+	DeletedAt               *core.DateTime
 }
 
 type NewTaskInput struct {
@@ -85,7 +84,7 @@ type NewTaskInput struct {
 	Description         string
 	EstimatedMinutes    *int16
 	PriorityLevel       TaskPriorityLevels
-	DueDate             *int64
+	DueDate             *core.DateTime
 	SubTasks            []*SubTask
 	Users               []*TaskUser
 	ChildrenTasks       []*Task
@@ -93,7 +92,7 @@ type NewTaskInput struct {
 }
 
 func NewTask(input NewTaskInput) (*Task, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	if _, err := core.NewName(input.Name); err != nil {
 		return nil, err
@@ -151,7 +150,7 @@ func (t *Task) ChangeName(name string, userEditorIdentity *core.Identity) error 
 
 	t.Name = name
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -163,7 +162,7 @@ func (t *Task) ChangeDescription(description string, userEditorIdentity *core.Id
 
 	t.Description = description
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -175,7 +174,7 @@ func (t *Task) ChangeEstimatedMinutes(estimatedMinutes int16, userEditorIdentity
 
 	t.EstimatedMinutes = &estimatedMinutes
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -183,15 +182,15 @@ func (t *Task) ChangeEstimatedMinutes(estimatedMinutes int16, userEditorIdentity
 func (t *Task) ChangePriorityLevel(priorityLevel TaskPriorityLevels, userEditorIdentity *core.Identity) error {
 	t.PriorityLevel = priorityLevel
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
 
-func (t *Task) ChangeDueDate(dueDate int64, userEditorIdentity *core.Identity) error {
-	now := datetimeutils.EpochNow()
+func (t *Task) ChangeDueDate(dueDate core.DateTime, userEditorIdentity *core.Identity) error {
+	now := core.NewDateTime()
 
-	if dueDate < now {
+	if dueDate.IsBefore(now) {
 		return core.NewInternalError("due date cannot be in the past")
 	}
 
@@ -204,7 +203,7 @@ func (t *Task) ChangeDueDate(dueDate int64, userEditorIdentity *core.Identity) e
 func (t *Task) ChangeStatus(status *project.ProjectTaskStatus, userEditorIdentity *core.Identity) error {
 	t.Status = status
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -212,18 +211,18 @@ func (t *Task) ChangeStatus(status *project.ProjectTaskStatus, userEditorIdentit
 func (t *Task) ChangeCategory(category *project.ProjectTaskCategory, userEditorIdentity *core.Identity) error {
 	t.Category = category
 	t.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (t *Task) Complete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.CompletedAt = &now
 }
 
 func (t *Task) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.DeletedAt = &now
 }
 
@@ -236,12 +235,13 @@ func (t *Task) IsDeleted() bool {
 }
 
 func (t *Task) IsOverdue() bool {
-	return t.DueDate != nil && *t.DueDate < datetimeutils.EpochNow() && !t.IsCompleted()
+	now := core.NewDateTime()
+	return t.DueDate != nil && t.DueDate.IsBefore(now) && !t.IsCompleted()
 }
 
 func (t *Task) AddUser(user *TaskUser) {
 	t.Users = append(t.Users, user)
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
@@ -249,19 +249,19 @@ func (t *Task) RemoveUser(user *TaskUser) {
 	t.Users = slices.DeleteFunc(t.Users, func(u *TaskUser) bool {
 		return u.User.Identity == user.User.Identity
 	})
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
 func (t *Task) ClearUsers() {
 	t.Users = []*TaskUser{}
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
 func (t *Task) AddSubTask(subTask *SubTask) {
 	t.SubTasks = append(t.SubTasks, subTask)
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
@@ -269,14 +269,14 @@ func (t *Task) RemoveSubTask(subTask *SubTask) {
 	t.SubTasks = slices.DeleteFunc(t.SubTasks, func(s *SubTask) bool {
 		return s.Identity == subTask.Identity
 	})
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
 func (t *Task) AddChildTask(childTask *Task) {
 	t.ChildrenTasks = append(t.ChildrenTasks, childTask)
 	childTask.ParentTaskIdentity = &t.Identity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	childTask.Timestamps.UpdatedAt = &now
 
@@ -298,7 +298,7 @@ func (t *Task) RemoveChildTask(childTask *Task) {
 		return t.Identity.Equals(childTask.Identity)
 	})
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	childTask.Timestamps.UpdatedAt = &now
 
@@ -335,7 +335,7 @@ func NewTaskComment(input NewTaskCommentInput) (*TaskComment, error) {
 		return nil, err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	return &TaskComment{
 		Identity:     core.NewIdentity(TaskCommentIdentityPrefix),
@@ -356,14 +356,14 @@ func (t *TaskComment) ChangeContent(content string) error {
 	}
 
 	t.Content = content
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (t *TaskComment) AddFile(file TaskCommentFile) {
 	t.Files = append(t.Files, file)
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }
 
@@ -371,6 +371,12 @@ func (t *TaskComment) RemoveFile(file TaskCommentFile) {
 	t.Files = slices.DeleteFunc(t.Files, func(f TaskCommentFile) bool {
 		return f.Identity == file.Identity
 	})
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
+	t.Timestamps.UpdatedAt = &now
+}
+
+func (t *TaskComment) ClearAllFiles() {
+	t.Files = []TaskCommentFile{}
+	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
 }

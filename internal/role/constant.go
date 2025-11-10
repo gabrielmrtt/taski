@@ -28,6 +28,10 @@ const (
 	TeamsCreate              PermissionSlugs = "teams:create"
 	TeamsUpdate              PermissionSlugs = "teams:update"
 	TeamsDelete              PermissionSlugs = "teams:delete"
+	TasksView                PermissionSlugs = "tasks:view"
+	TasksCreate              PermissionSlugs = "tasks:create"
+	TasksUpdate              PermissionSlugs = "tasks:update"
+	TasksDelete              PermissionSlugs = "tasks:delete"
 )
 
 type PermissionSlugsArrayItem struct {
@@ -60,6 +64,10 @@ var PermissionSlugsArray = []PermissionSlugsArrayItem{
 	{Name: "Teams Create", Slug: TeamsCreate, Description: "Allow users to create teams"},
 	{Name: "Teams Update", Slug: TeamsUpdate, Description: "Allow users to update teams"},
 	{Name: "Teams Delete", Slug: TeamsDelete, Description: "Allow users to delete teams"},
+	{Name: "Tasks View", Slug: TasksView, Description: "Allow users to view tasks"},
+	{Name: "Tasks Create", Slug: TasksCreate, Description: "Allow users to create tasks"},
+	{Name: "Tasks Update", Slug: TasksUpdate, Description: "Allow users to update tasks"},
+	{Name: "Tasks Delete", Slug: TasksDelete, Description: "Allow users to delete tasks"},
 }
 
 type DefaultRoleSlugs string
@@ -89,6 +97,10 @@ var DefaultRoleSlugsArray = []DefaultRoleSlugsArrayItem{
 			ProjectsUpdate,
 			ProjectsDelete,
 			WorkspacesView,
+			TasksView,
+			TasksCreate,
+			TasksUpdate,
+			TasksDelete,
 		},
 	},
 	{
@@ -119,6 +131,10 @@ var DefaultRoleSlugsArray = []DefaultRoleSlugsArrayItem{
 			TeamsCreate,
 			TeamsUpdate,
 			TeamsDelete,
+			TasksView,
+			TasksCreate,
+			TasksUpdate,
+			TasksDelete,
 		},
 	},
 }

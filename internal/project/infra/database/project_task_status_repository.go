@@ -103,6 +103,10 @@ func (r *ProjectTaskStatusBunRepository) GetLastTaskStatusOrder(params projectre
 
 	err := selectQuery.Scan(context.Background())
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+
 		return 0, err
 	}
 

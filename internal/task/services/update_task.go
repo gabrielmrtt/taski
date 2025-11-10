@@ -5,12 +5,10 @@ import (
 	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	"github.com/gabrielmrtt/taski/internal/task"
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type UpdateTaskService struct {
 	TaskRepository                taskrepo.TaskRepository
-	ProjectRepository             projectrepo.ProjectRepository
 	ProjectTaskStatusRepository   projectrepo.ProjectTaskStatusRepository
 	ProjectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository
 	ProjectUserRepository         projectrepo.ProjectUserRepository
@@ -19,7 +17,6 @@ type UpdateTaskService struct {
 
 func NewUpdateTaskService(
 	taskRepository taskrepo.TaskRepository,
-	projectRepository projectrepo.ProjectRepository,
 	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
 	projectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
@@ -27,7 +24,6 @@ func NewUpdateTaskService(
 ) *UpdateTaskService {
 	return &UpdateTaskService{
 		TaskRepository:                taskRepository,
-		ProjectRepository:             projectRepository,
 		ProjectTaskStatusRepository:   projectTaskStatusRepository,
 		ProjectTaskCategoryRepository: projectTaskCategoryRepository,
 		ProjectUserRepository:         projectUserRepository,
@@ -36,19 +32,19 @@ func NewUpdateTaskService(
 }
 
 type UpdateTaskInput struct {
-	ProjectIdentity    core.Identity
-	TaskIdentity       core.Identity
-	StatusIdentity     *core.Identity
-	CategoryIdentity   *core.Identity
-	ParentTaskIdentity *core.Identity
-	Name               *string
-	Description        *string
-	EstimatedMinutes   *int16
-	PriorityLevel      *task.TaskPriorityLevels
-	DueDate            *int64
-	Users              []*core.Identity
-	ChildrenTasks      []*core.Identity
-	UserEditorIdentity core.Identity
+	OrganizationIdentity *core.Identity
+	TaskIdentity         core.Identity
+	StatusIdentity       *core.Identity
+	CategoryIdentity     *core.Identity
+	ParentTaskIdentity   *core.Identity
+	Name                 *string
+	Description          *string
+	EstimatedMinutes     *int16
+	PriorityLevel        *task.TaskPriorityLevels
+	DueDate              *core.DateTime
+	Users                []*core.Identity
+	ChildrenTasks        []*core.Identity
+	UserEditorIdentity   core.Identity
 }
 
 func (i UpdateTaskInput) Validate() error {
@@ -84,7 +80,7 @@ func (i UpdateTaskInput) Validate() error {
 	}
 
 	if i.DueDate != nil {
-		if *i.DueDate < datetimeutils.EpochNow() {
+		if i.DueDate.IsBefore(core.NewDateTime()) {
 			fields = append(fields, core.InvalidInputErrorField{
 				Field: "due date",
 				Error: "due date cannot be in the past",
@@ -110,26 +106,12 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 	}
 
 	s.TaskRepository.SetTransaction(tx)
-	s.ProjectRepository.SetTransaction(tx)
 	s.ProjectTaskStatusRepository.SetTransaction(tx)
 	s.ProjectTaskCategoryRepository.SetTransaction(tx)
 
-	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
-		ProjectIdentity: input.ProjectIdentity,
-	})
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	if prj == nil {
-		tx.Rollback()
-		return core.NewNotFoundError("project not found")
-	}
-
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
-		TaskIdentity:    input.TaskIdentity,
-		ProjectIdentity: &input.ProjectIdentity,
+		TaskIdentity:         input.TaskIdentity,
+		OrganizationIdentity: input.OrganizationIdentity,
 	})
 	if err != nil {
 		tx.Rollback()
@@ -141,15 +123,10 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 		return core.NewNotFoundError("task not found")
 	}
 
-	if tsk.ProjectIdentity != input.ProjectIdentity {
-		tx.Rollback()
-		return core.NewNotFoundError("task not found in project")
-	}
-
 	if input.StatusIdentity != nil {
 		status, err := s.ProjectTaskStatusRepository.GetProjectTaskStatusByIdentity(projectrepo.GetProjectTaskStatusByIdentityParams{
 			ProjectTaskStatusIdentity: input.StatusIdentity,
-			ProjectIdentity:           &input.ProjectIdentity,
+			ProjectIdentity:           &tsk.ProjectIdentity,
 		})
 		if err != nil {
 			tx.Rollback()
@@ -171,7 +148,7 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 	if input.CategoryIdentity != nil {
 		category, err := s.ProjectTaskCategoryRepository.GetProjectTaskCategoryByIdentity(projectrepo.GetProjectTaskCategoryByIdentityParams{
 			ProjectTaskCategoryIdentity: input.CategoryIdentity,
-			ProjectIdentity:             &input.ProjectIdentity,
+			ProjectIdentity:             &tsk.ProjectIdentity,
 		})
 		if err != nil {
 			tx.Rollback()
@@ -234,7 +211,7 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 		tsk.ClearUsers()
 		for _, userIdentity := range input.Users {
 			user, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
-				ProjectIdentity: input.ProjectIdentity,
+				ProjectIdentity: tsk.ProjectIdentity,
 				UserIdentity:    *userIdentity,
 			})
 			if err != nil {
@@ -269,7 +246,7 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 		for _, childTaskIdentity := range input.ChildrenTasks {
 			childTask, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 				TaskIdentity:    *childTaskIdentity,
-				ProjectIdentity: &input.ProjectIdentity,
+				ProjectIdentity: &tsk.ProjectIdentity,
 			})
 			if err != nil {
 				tx.Rollback()

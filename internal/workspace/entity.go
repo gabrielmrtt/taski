@@ -4,7 +4,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type Workspace struct {
@@ -20,7 +19,7 @@ type Workspace struct {
 	Editor               *user.User
 	Organization         *organization.Organization
 	Timestamps           core.Timestamps
-	DeletedAt            *int64
+	DeletedAt            *core.DateTime
 }
 
 type NewWorkspaceInput struct {
@@ -32,7 +31,7 @@ type NewWorkspaceInput struct {
 }
 
 func NewWorkspace(input NewWorkspaceInput) (*Workspace, error) {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	if _, err := core.NewName(input.Name); err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ func (w *Workspace) ChangeName(name string, userEditorIdentity *core.Identity) e
 
 	w.Name = name
 	w.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	w.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -79,7 +78,7 @@ func (w *Workspace) ChangeDescription(description string, userEditorIdentity *co
 
 	w.Description = description
 	w.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	w.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -91,7 +90,7 @@ func (w *Workspace) ChangeColor(color string, userEditorIdentity *core.Identity)
 
 	w.Color = color
 	w.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	w.Timestamps.UpdatedAt = &now
 	return nil
 }
@@ -103,13 +102,13 @@ func (w *Workspace) ChangeStatus(status WorkspaceStatuses, userEditorIdentity *c
 
 	w.Status = status
 	w.UserEditorIdentity = userEditorIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	w.Timestamps.UpdatedAt = &now
 	return nil
 }
 
 func (w *Workspace) Delete() {
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 	w.DeletedAt = &now
 }
 

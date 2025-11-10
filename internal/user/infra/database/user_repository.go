@@ -55,12 +55,22 @@ func (u *UserTable) ToEntity() *user.User {
 		}
 	}
 
+	var createdAt *core.DateTime = nil
+	if u.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: u.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if u.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *u.UpdatedAt}
+	}
+
 	return &user.User{
 		Identity:    core.NewIdentityFromInternal(uuid.MustParse(u.InternalId), user.UserIdentityPrefix),
 		Status:      user.UserStatuses(u.Status),
 		Credentials: userCredentials,
 		Data:        userData,
-		Timestamps:  core.Timestamps{CreatedAt: &u.CreatedAt, UpdatedAt: u.UpdatedAt},
+		Timestamps:  core.Timestamps{CreatedAt: createdAt, UpdatedAt: updatedAt},
 		DeletedAt:   u.DeletedAt,
 	}
 }
@@ -268,12 +278,22 @@ func (r *UserBunRepository) StoreUser(params userrepo.StoreUserParams) (*user.Us
 		}
 	}
 
+	var createdAt *int64 = nil
+	if params.User.Timestamps.CreatedAt != nil {
+		createdAt = &params.User.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.User.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.User.Timestamps.UpdatedAt.Value
+	}
+
 	userTable := &UserTable{
 		InternalId: params.User.Identity.Internal.String(),
 		PublicId:   params.User.Identity.Public,
 		Status:     string(params.User.Status),
-		CreatedAt:  *params.User.Timestamps.CreatedAt,
-		UpdatedAt:  params.User.Timestamps.UpdatedAt,
+		CreatedAt:  *createdAt,
+		UpdatedAt:  updatedAt,
 		DeletedAt:  params.User.DeletedAt,
 	}
 
@@ -339,12 +359,22 @@ func (r *UserBunRepository) UpdateUser(params userrepo.UpdateUserParams) error {
 		}
 	}
 
+	var createdAt *int64 = nil
+	if params.User.Timestamps.CreatedAt != nil {
+		createdAt = &params.User.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.User.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.User.Timestamps.UpdatedAt.Value
+	}
+
 	userTable := &UserTable{
 		InternalId: params.User.Identity.Internal.String(),
 		PublicId:   params.User.Identity.Public,
 		Status:     string(params.User.Status),
-		CreatedAt:  *params.User.Timestamps.CreatedAt,
-		UpdatedAt:  params.User.Timestamps.UpdatedAt,
+		CreatedAt:  *createdAt,
+		UpdatedAt:  updatedAt,
 		DeletedAt:  params.User.DeletedAt,
 	}
 

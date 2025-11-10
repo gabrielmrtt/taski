@@ -32,6 +32,7 @@ type ComparableFilter[T any] struct {
 	Like               *T
 	In                 *[]T
 	Negate             *bool
+	NotNull            *bool
 }
 
 type ServiceInput interface {

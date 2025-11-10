@@ -60,6 +60,21 @@ func (w *WorkspaceTable) ToEntity() *workspace.Workspace {
 		org = w.Organization.ToEntity()
 	}
 
+	var createdAt *core.DateTime = nil
+	if w.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: w.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if w.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *w.UpdatedAt}
+	}
+
+	var deletedAt *core.DateTime = nil
+	if w.DeletedAt != nil {
+		deletedAt = &core.DateTime{Value: *w.DeletedAt}
+	}
+
 	return &workspace.Workspace{
 		Identity:             core.NewIdentityFromInternal(uuid.MustParse(w.InternalId), workspace.WorkspaceIdentityPrefix),
 		Name:                 w.Name,
@@ -73,10 +88,10 @@ func (w *WorkspaceTable) ToEntity() *workspace.Workspace {
 		Editor:               editor,
 		Organization:         org,
 		Timestamps: core.Timestamps{
-			CreatedAt: &w.CreatedAt,
-			UpdatedAt: w.UpdatedAt,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
-		DeletedAt: w.DeletedAt,
+		DeletedAt: deletedAt,
 	}
 }
 
@@ -245,6 +260,21 @@ func (r *WorkspaceRepository) StoreWorkspace(params workspacerepo.StoreWorkspace
 		userEditorInternalId = &identity
 	}
 
+	var createdAt *int64 = nil
+	if params.Workspace.Timestamps.CreatedAt != nil {
+		createdAt = &params.Workspace.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Workspace.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Workspace.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Workspace.DeletedAt != nil {
+		deletedAt = &params.Workspace.DeletedAt.Value
+	}
+
 	workspaceTable := &WorkspaceTable{
 		InternalId:             params.Workspace.Identity.Internal.String(),
 		PublicId:               params.Workspace.Identity.Public,
@@ -255,9 +285,9 @@ func (r *WorkspaceRepository) StoreWorkspace(params workspacerepo.StoreWorkspace
 		OrganizationInternalId: params.Workspace.OrganizationIdentity.Internal.String(),
 		UserCreatorInternalId:  params.Workspace.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:   userEditorInternalId,
-		CreatedAt:              *params.Workspace.Timestamps.CreatedAt,
-		UpdatedAt:              params.Workspace.Timestamps.UpdatedAt,
-		DeletedAt:              params.Workspace.DeletedAt,
+		CreatedAt:              *createdAt,
+		UpdatedAt:              updatedAt,
+		DeletedAt:              deletedAt,
 	}
 
 	_, err := tx.NewInsert().Model(workspaceTable).Exec(context.Background())
@@ -301,6 +331,16 @@ func (r *WorkspaceRepository) UpdateWorkspace(params workspacerepo.UpdateWorkspa
 		userEditorInternalId = &identity
 	}
 
+	var updatedAt *int64 = nil
+	if params.Workspace.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Workspace.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Workspace.DeletedAt != nil {
+		deletedAt = &params.Workspace.DeletedAt.Value
+	}
+
 	workspaceTable := &WorkspaceTable{
 		InternalId:             params.Workspace.Identity.Internal.String(),
 		PublicId:               params.Workspace.Identity.Public,
@@ -311,8 +351,8 @@ func (r *WorkspaceRepository) UpdateWorkspace(params workspacerepo.UpdateWorkspa
 		OrganizationInternalId: params.Workspace.OrganizationIdentity.Internal.String(),
 		UserCreatorInternalId:  params.Workspace.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:   userEditorInternalId,
-		UpdatedAt:              params.Workspace.Timestamps.UpdatedAt,
-		DeletedAt:              params.Workspace.DeletedAt,
+		UpdatedAt:              updatedAt,
+		DeletedAt:              deletedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(workspaceTable).Where("workspace.internal_id = ?", params.Workspace.Identity.Internal.String()).Exec(context.Background())

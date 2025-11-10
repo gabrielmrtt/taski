@@ -68,7 +68,7 @@ func NewUser(input NewUserInput) (*User, error) {
 
 	identity := core.NewIdentity(UserIdentityPrefix)
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	timestamps := core.Timestamps{
 		CreatedAt: &now,
@@ -116,7 +116,7 @@ func (u *User) ChangeCredentialsName(name string) error {
 	}
 
 	u.Credentials.Name = nameValueObject.Value
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 	return nil
@@ -132,7 +132,7 @@ func (u *User) ChangeCredentialsEmail(email string) error {
 		return err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Credentials.Email = emailValueObject.Value
 	u.Timestamps.UpdatedAt = &now
@@ -155,7 +155,7 @@ func (u *User) ChangeCredentialsPassword(password string) error {
 		return err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Credentials.Password = hashedPassword
 	u.Timestamps.UpdatedAt = &now
@@ -173,7 +173,7 @@ func (u *User) ChangeCredentialsPhoneNumber(phoneNumber string) error {
 		return err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Credentials.PhoneNumber = &phoneNumberValueObject.Value
 	u.Timestamps.UpdatedAt = &now
@@ -192,7 +192,7 @@ func (u *User) ChangeUserDataDisplayName(displayName string) error {
 	}
 
 	u.Data.DisplayName = displayNameValueObject.Value
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 
@@ -210,7 +210,7 @@ func (u *User) ChangeUserDataAbout(about string) error {
 	}
 
 	u.Data.About = &aboutValueObject.Value
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 
@@ -223,7 +223,7 @@ func (u *User) ChangeUserDataProfilePicture(profilePictureIdentity *core.Identit
 	}
 
 	u.Data.ProfilePictureIdentity = profilePictureIdentity
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 
@@ -232,14 +232,14 @@ func (u *User) ChangeUserDataProfilePicture(profilePictureIdentity *core.Identit
 
 func (u *User) Activate() {
 	u.Status = UserStatusActive
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 }
 
 func (u *User) Deactivate() {
 	u.Status = UserStatusInactive
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	u.Timestamps.UpdatedAt = &now
 }

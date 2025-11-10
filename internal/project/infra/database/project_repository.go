@@ -59,6 +59,31 @@ func (p *ProjectTable) ToEntity() *project.Project {
 		editor = p.Editor.ToEntity()
 	}
 
+	var startAt *core.DateTime = nil
+	if p.StartAt != nil {
+		startAt = &core.DateTime{Value: *p.StartAt}
+	}
+
+	var endAt *core.DateTime = nil
+	if p.EndAt != nil {
+		endAt = &core.DateTime{Value: *p.EndAt}
+	}
+
+	var createdAt *core.DateTime = nil
+	if p.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: p.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if p.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *p.UpdatedAt}
+	}
+
+	var deletedAt *core.DateTime = nil
+	if p.DeletedAt != nil {
+		deletedAt = &core.DateTime{Value: *p.DeletedAt}
+	}
+
 	return &project.Project{
 		Identity:            core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project.ProjectIdentityPrefix),
 		WorkspaceIdentity:   core.NewIdentityFromInternal(uuid.MustParse(p.WorkspaceInternalId), workspace.WorkspaceIdentityPrefix),
@@ -69,13 +94,13 @@ func (p *ProjectTable) ToEntity() *project.Project {
 		PriorityLevel:       project.ProjectPriorityLevels(p.PriorityLevel),
 		UserCreatorIdentity: &userCreatorIdentity,
 		UserEditorIdentity:  userEditorIdentity,
-		StartAt:             p.StartAt,
-		EndAt:               p.EndAt,
+		StartAt:             startAt,
+		EndAt:               endAt,
 		Timestamps: core.Timestamps{
-			CreatedAt: &p.CreatedAt,
-			UpdatedAt: p.UpdatedAt,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
-		DeletedAt: p.DeletedAt,
+		DeletedAt: deletedAt,
 		Creator:   creator,
 		Editor:    editor,
 	}
@@ -267,6 +292,31 @@ func (r *ProjectBunRepository) StoreProject(params projectrepo.StoreProjectParam
 		userEditorInternalId = &identity
 	}
 
+	var startAt *int64 = nil
+	if params.Project.StartAt != nil {
+		startAt = &params.Project.StartAt.Value
+	}
+
+	var endAt *int64 = nil
+	if params.Project.EndAt != nil {
+		endAt = &params.Project.EndAt.Value
+	}
+
+	var createdAt *int64 = nil
+	if params.Project.Timestamps.CreatedAt != nil {
+		createdAt = &params.Project.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Project.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Project.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Project.DeletedAt != nil {
+		deletedAt = &params.Project.DeletedAt.Value
+	}
+
 	_, err := tx.NewInsert().Model(&ProjectTable{
 		InternalId:            params.Project.Identity.Internal.String(),
 		PublicId:              params.Project.Identity.Public,
@@ -275,14 +325,14 @@ func (r *ProjectBunRepository) StoreProject(params projectrepo.StoreProjectParam
 		Status:                string(params.Project.Status),
 		Color:                 params.Project.Color,
 		PriorityLevel:         int(params.Project.PriorityLevel),
-		StartAt:               params.Project.StartAt,
-		EndAt:                 params.Project.EndAt,
+		StartAt:               startAt,
+		EndAt:                 endAt,
 		WorkspaceInternalId:   params.Project.WorkspaceIdentity.Internal.String(),
 		UserCreatorInternalId: params.Project.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:  userEditorInternalId,
-		CreatedAt:             *params.Project.Timestamps.CreatedAt,
-		UpdatedAt:             params.Project.Timestamps.UpdatedAt,
-		DeletedAt:             params.Project.DeletedAt,
+		CreatedAt:             *createdAt,
+		UpdatedAt:             updatedAt,
+		DeletedAt:             deletedAt,
 	}).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -324,6 +374,26 @@ func (r *ProjectBunRepository) UpdateProject(params projectrepo.UpdateProjectPar
 		userEditorInternalId = &identity
 	}
 
+	var startAt *int64 = nil
+	if params.Project.StartAt != nil {
+		startAt = &params.Project.StartAt.Value
+	}
+
+	var endAt *int64 = nil
+	if params.Project.EndAt != nil {
+		endAt = &params.Project.EndAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.Project.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.Project.Timestamps.UpdatedAt.Value
+	}
+
+	var deletedAt *int64 = nil
+	if params.Project.DeletedAt != nil {
+		deletedAt = &params.Project.DeletedAt.Value
+	}
+
 	projectTable := &ProjectTable{
 		InternalId:            params.Project.Identity.Internal.String(),
 		PublicId:              params.Project.Identity.Public,
@@ -332,13 +402,13 @@ func (r *ProjectBunRepository) UpdateProject(params projectrepo.UpdateProjectPar
 		Status:                string(params.Project.Status),
 		Color:                 params.Project.Color,
 		PriorityLevel:         int(params.Project.PriorityLevel),
-		StartAt:               params.Project.StartAt,
-		EndAt:                 params.Project.EndAt,
+		StartAt:               startAt,
+		EndAt:                 endAt,
 		WorkspaceInternalId:   params.Project.WorkspaceIdentity.Internal.String(),
 		UserCreatorInternalId: params.Project.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:  userEditorInternalId,
-		UpdatedAt:             params.Project.Timestamps.UpdatedAt,
-		DeletedAt:             params.Project.DeletedAt,
+		UpdatedAt:             updatedAt,
+		DeletedAt:             deletedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(projectTable).Where("project.internal_id = ?", params.Project.Identity.Internal.String()).Exec(context.Background())

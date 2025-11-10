@@ -83,10 +83,12 @@ func (s *CreateProjectTaskStatusService) Execute(input CreateProjectTaskStatusIn
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
 	if prj == nil {
+		tx.Rollback()
 		return nil, core.NewNotFoundError("project not found")
 	}
 
@@ -97,6 +99,7 @@ func (s *CreateProjectTaskStatusService) Execute(input CreateProjectTaskStatusIn
 			ProjectIdentity: &prj.Identity,
 		})
 		if err != nil {
+			tx.Rollback()
 			return nil, err
 		}
 

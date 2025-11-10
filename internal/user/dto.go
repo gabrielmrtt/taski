@@ -1,9 +1,5 @@
 package user
 
-import (
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
-)
-
 type UserDto struct {
 	Id          string              `json:"id"`
 	Status      string              `json:"status"`
@@ -51,10 +47,10 @@ func UserToDto(user *User) *UserDto {
 		}
 	}
 
-	var createdAt string = datetimeutils.EpochToRFC3339(*user.Timestamps.CreatedAt)
+	var createdAt string = user.Timestamps.CreatedAt.ToRFC3339()
 	var updatedAt *string = nil
 	if user.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*user.Timestamps.UpdatedAt)
+		updatedAtString := user.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 

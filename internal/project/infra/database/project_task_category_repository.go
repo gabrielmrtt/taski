@@ -200,11 +200,16 @@ func (r *ProjectTaskCategoryBunRepository) UpdateProjectTaskCategory(params proj
 		}
 	}
 
+	var deletedAt *int64 = nil
+	if params.ProjectTaskCategory.DeletedAt != nil {
+		deletedAt = &params.ProjectTaskCategory.DeletedAt.Value
+	}
+
 	_, err := tx.NewUpdate().Model(&ProjectTaskCategoryTable{
 		ProjectInternalId: params.ProjectTaskCategory.ProjectIdentity.Internal.String(),
 		Name:              params.ProjectTaskCategory.Name,
 		Color:             params.ProjectTaskCategory.Color,
-		DeletedAt:         params.ProjectTaskCategory.DeletedAt,
+		DeletedAt:         deletedAt,
 	}).Where("project_task_category.internal_id = ?", params.ProjectTaskCategory.Identity.Internal.String()).Exec(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {

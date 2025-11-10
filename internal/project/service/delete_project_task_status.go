@@ -51,10 +51,12 @@ func (s *DeleteProjectTaskStatusService) Execute(input DeleteProjectTaskStatusIn
 		OrganizationIdentity: &input.OrganizationIdentity,
 	})
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	if prj == nil {
+		tx.Rollback()
 		return core.NewNotFoundError("project not found")
 	}
 
@@ -63,10 +65,12 @@ func (s *DeleteProjectTaskStatusService) Execute(input DeleteProjectTaskStatusIn
 		ProjectIdentity:           &prj.Identity,
 	})
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	if projectTaskStatus == nil || projectTaskStatus.IsDeleted() {
+		tx.Rollback()
 		return core.NewNotFoundError("project task status not found")
 	}
 
@@ -76,11 +80,13 @@ func (s *DeleteProjectTaskStatusService) Execute(input DeleteProjectTaskStatusIn
 		ProjectTaskStatus: projectTaskStatus,
 	})
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 

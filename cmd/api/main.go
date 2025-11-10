@@ -10,6 +10,7 @@ import (
 	projectinfra "github.com/gabrielmrtt/taski/internal/project/infra"
 	roleinfra "github.com/gabrielmrtt/taski/internal/role/infra"
 	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
+	taskinfra "github.com/gabrielmrtt/taski/internal/task/infra"
 	teaminfra "github.com/gabrielmrtt/taski/internal/team/infra"
 	userinfra "github.com/gabrielmrtt/taski/internal/user/infra"
 	workspaceinfra "github.com/gabrielmrtt/taski/internal/workspace/infra"
@@ -59,6 +60,10 @@ func bootstrapApplication() {
 			DbConnection: dbConnection,
 		})
 		teaminfra.BootstrapInfra(teaminfra.BootstrapInfraOptions{
+			RouterGroup:  g,
+			DbConnection: dbConnection,
+		})
+		taskinfra.BootstrapInfra(taskinfra.BootstrapInfraOptions{
 			RouterGroup:  g,
 			DbConnection: dbConnection,
 		})

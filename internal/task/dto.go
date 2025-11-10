@@ -1,6 +1,8 @@
 package task
 
-import "github.com/gabrielmrtt/taski/pkg/datetimeutils"
+import (
+	"github.com/gabrielmrtt/taski/internal/user"
+)
 
 type SubTaskDto struct {
 	Id          string `json:"id"`
@@ -11,7 +13,7 @@ type SubTaskDto struct {
 func SubTaskToDto(subTask *SubTask) *SubTaskDto {
 	var completedAt *string = nil
 	if subTask.CompletedAt != nil {
-		completedAtString := datetimeutils.EpochToRFC3339(*subTask.CompletedAt)
+		completedAtString := subTask.CompletedAt.ToRFC3339()
 		completedAt = &completedAtString
 	}
 
@@ -52,19 +54,19 @@ type TaskDto struct {
 func TaskToDto(task *Task) *TaskDto {
 	var dueDate *string = nil
 	if task.DueDate != nil {
-		dueDateString := datetimeutils.EpochToRFC3339(*task.DueDate)
+		dueDateString := task.DueDate.ToRFC3339()
 		dueDate = &dueDateString
 	}
 
 	var completedAt *string = nil
 	if task.CompletedAt != nil {
-		completedAtString := datetimeutils.EpochToRFC3339(*task.CompletedAt)
+		completedAtString := task.CompletedAt.ToRFC3339()
 		completedAt = &completedAtString
 	}
 
 	var updatedAt *string = nil
 	if task.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*task.Timestamps.UpdatedAt)
+		updatedAtString := task.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 
@@ -106,7 +108,49 @@ func TaskToDto(task *Task) *TaskDto {
 		Users:            usersDto,
 		UserCreatorId:    *userCreatorId,
 		UserEditorId:     userEditorId,
-		CreatedAt:        datetimeutils.EpochToRFC3339(*task.Timestamps.CreatedAt),
+		CreatedAt:        task.Timestamps.CreatedAt.ToRFC3339(),
 		UpdatedAt:        updatedAt,
+	}
+}
+
+type TaskCommentFileDto struct {
+	FileId string `json:"fileId"`
+}
+
+type TaskCommentDto struct {
+	Id        string               `json:"id"`
+	Content   string               `json:"content"`
+	Files     []TaskCommentFileDto `json:"files"`
+	Author    *user.UserDto        `json:"author"`
+	CreatedAt string               `json:"createdAt"`
+	UpdatedAt *string              `json:"updatedAt"`
+}
+
+func TaskCommentToDto(taskComment *TaskComment) *TaskCommentDto {
+	var updatedAt *string = nil
+	if taskComment.Timestamps.UpdatedAt != nil {
+		updatedAtString := taskComment.Timestamps.UpdatedAt.ToRFC3339()
+		updatedAt = &updatedAtString
+	}
+
+	var taskCommentFilesDto []TaskCommentFileDto = make([]TaskCommentFileDto, len(taskComment.Files))
+	for i, file := range taskComment.Files {
+		taskCommentFilesDto[i] = TaskCommentFileDto{
+			FileId: file.FileIdentity.Public,
+		}
+	}
+
+	var author *user.UserDto = nil
+	if taskComment.Author != nil {
+		author = user.UserToDto(taskComment.Author)
+	}
+
+	return &TaskCommentDto{
+		Id:        taskComment.Identity.Public,
+		Content:   taskComment.Content,
+		Files:     taskCommentFilesDto,
+		Author:    author,
+		CreatedAt: taskComment.Timestamps.CreatedAt.ToRFC3339(),
+		UpdatedAt: updatedAt,
 	}
 }

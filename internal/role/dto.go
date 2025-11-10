@@ -2,7 +2,6 @@ package role
 
 import (
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RoleDto struct {
@@ -26,10 +25,10 @@ func RoleToDto(role *Role) *RoleDto {
 		permissions = append(permissions, string(permission.Slug))
 	}
 
-	createdAt := datetimeutils.EpochToRFC3339(*role.Timestamps.CreatedAt)
+	createdAt := role.Timestamps.CreatedAt.ToRFC3339()
 	var updatedAt *string = nil
 	if role.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*role.Timestamps.UpdatedAt)
+		updatedAtString := role.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 

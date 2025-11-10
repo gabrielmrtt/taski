@@ -13,8 +13,8 @@ type UpdateProjectRequest struct {
 	Color         *string `json:"color"`
 	Status        *string `json:"status"`
 	PriorityLevel *int8   `json:"priorityLevel"`
-	StartAt       *int64  `json:"startAt"`
-	EndAt         *int64  `json:"endAt"`
+	StartAt       *string `json:"startAt"`
+	EndAt         *string `json:"endAt"`
 }
 
 func (r *UpdateProjectRequest) ToInput() projectservice.UpdateProjectInput {
@@ -36,6 +36,24 @@ func (r *UpdateProjectRequest) ToInput() projectservice.UpdateProjectInput {
 		workspaceIdentity = &identity
 	}
 
+	var startAt *core.DateTime = nil
+	if r.StartAt != nil {
+		d, err := core.NewDateTimeFromRFC3339(*r.StartAt)
+		if err != nil {
+			return projectservice.UpdateProjectInput{}
+		}
+		startAt = &d
+	}
+
+	var endAt *core.DateTime = nil
+	if r.EndAt != nil {
+		d, err := core.NewDateTimeFromRFC3339(*r.EndAt)
+		if err != nil {
+			return projectservice.UpdateProjectInput{}
+		}
+		endAt = &d
+	}
+
 	return projectservice.UpdateProjectInput{
 		WorkspaceIdentity: workspaceIdentity,
 		Name:              r.Name,
@@ -43,7 +61,7 @@ func (r *UpdateProjectRequest) ToInput() projectservice.UpdateProjectInput {
 		Color:             r.Color,
 		Status:            status,
 		PriorityLevel:     priorityLevel,
-		StartAt:           r.StartAt,
-		EndAt:             r.EndAt,
+		StartAt:           startAt,
+		EndAt:             endAt,
 	}
 }

@@ -55,6 +55,16 @@ func (o *OrganizationTable) ToEntity() *organization.Organization {
 		editor = o.Editor.ToEntity()
 	}
 
+	var updatedAt *core.DateTime = nil
+	if o.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *o.UpdatedAt}
+	}
+
+	var deletedAt *core.DateTime = nil
+	if o.DeletedAt != nil {
+		deletedAt = &core.DateTime{Value: *o.DeletedAt}
+	}
+
 	return &organization.Organization{
 		Identity:            core.NewIdentityFromInternal(uuid.MustParse(o.InternalId), organization.OrganizationIdentityPrefix),
 		Name:                o.Name,
@@ -64,10 +74,10 @@ func (o *OrganizationTable) ToEntity() *organization.Organization {
 		Creator:             creator,
 		Editor:              editor,
 		Timestamps: core.Timestamps{
-			CreatedAt: &o.CreatedAt,
-			UpdatedAt: o.UpdatedAt,
+			CreatedAt: &core.DateTime{Value: o.CreatedAt},
+			UpdatedAt: updatedAt,
 		},
-		DeletedAt: o.DeletedAt,
+		DeletedAt: deletedAt,
 	}
 }
 
@@ -284,6 +294,18 @@ func (r *OrganizationBunRepository) StoreOrganization(params organizationrepo.St
 		userEditorInternalId = &identity
 	}
 
+	var updatedAt *int64 = nil
+	if params.Organization.Timestamps.UpdatedAt != nil {
+		updatedAtEpoch := params.Organization.Timestamps.UpdatedAt.ToEpoch()
+		updatedAt = &updatedAtEpoch
+	}
+
+	var deletedAt *int64 = nil
+	if params.Organization.DeletedAt != nil {
+		deletedAtEpoch := params.Organization.DeletedAt.ToEpoch()
+		deletedAt = &deletedAtEpoch
+	}
+
 	organizationTable := &OrganizationTable{
 		InternalId:            params.Organization.Identity.Internal.String(),
 		PublicId:              params.Organization.Identity.Public,
@@ -291,9 +313,9 @@ func (r *OrganizationBunRepository) StoreOrganization(params organizationrepo.St
 		Status:                string(params.Organization.Status),
 		UserCreatorInternalId: userCreatorInternalId,
 		UserEditorInternalId:  userEditorInternalId,
-		CreatedAt:             *params.Organization.Timestamps.CreatedAt,
-		UpdatedAt:             params.Organization.Timestamps.UpdatedAt,
-		DeletedAt:             params.Organization.DeletedAt,
+		CreatedAt:             params.Organization.Timestamps.CreatedAt.ToEpoch(),
+		UpdatedAt:             updatedAt,
+		DeletedAt:             deletedAt,
 	}
 
 	_, err := tx.NewInsert().Model(organizationTable).Exec(context.Background())
@@ -339,6 +361,18 @@ func (r *OrganizationBunRepository) UpdateOrganization(params organizationrepo.U
 		userEditorInternalId = &identity
 	}
 
+	var updatedAt *int64 = nil
+	if params.Organization.Timestamps.UpdatedAt != nil {
+		updatedAtEpoch := params.Organization.Timestamps.UpdatedAt.ToEpoch()
+		updatedAt = &updatedAtEpoch
+	}
+
+	var deletedAt *int64 = nil
+	if params.Organization.DeletedAt != nil {
+		deletedAtEpoch := params.Organization.DeletedAt.ToEpoch()
+		deletedAt = &deletedAtEpoch
+	}
+
 	organizationTable := &OrganizationTable{
 		InternalId:            params.Organization.Identity.Internal.String(),
 		PublicId:              params.Organization.Identity.Public,
@@ -346,9 +380,9 @@ func (r *OrganizationBunRepository) UpdateOrganization(params organizationrepo.U
 		Status:                string(params.Organization.Status),
 		UserCreatorInternalId: userCreatorInternalId,
 		UserEditorInternalId:  userEditorInternalId,
-		CreatedAt:             *params.Organization.Timestamps.CreatedAt,
-		UpdatedAt:             params.Organization.Timestamps.UpdatedAt,
-		DeletedAt:             params.Organization.DeletedAt,
+		CreatedAt:             params.Organization.Timestamps.CreatedAt.ToEpoch(),
+		UpdatedAt:             updatedAt,
+		DeletedAt:             deletedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(organizationTable).Where("organization.internal_id = ?", params.Organization.Identity.Internal.String()).Exec(context.Background())

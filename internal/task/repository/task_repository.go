@@ -6,33 +6,38 @@ import (
 )
 
 type TaskFilters struct {
-	ProjectIdentity      *core.Identity
-	TaskStatusIdentity   *core.Identity
-	TaskCategoryIdentity *core.Identity
-	ParentTaskIdentity   *core.Identity
-	Name                 *core.ComparableFilter[string]
-	CompletedAt          *core.ComparableFilter[int64]
-	CreatedAt            *core.ComparableFilter[int64]
-	UpdatedAt            *core.ComparableFilter[int64]
-	DueDate              *core.ComparableFilter[int64]
-	Type                 *core.ComparableFilter[task.TaskType]
-	Priority             *core.ComparableFilter[task.TaskPriorityLevels]
+	OrganizationIdentity      *core.Identity
+	AuthenticatedUserIdentity *core.Identity
+	ProjectIdentity           *core.Identity
+	TaskStatusIdentity        *core.Identity
+	TaskCategoryIdentity      *core.Identity
+	ParentTaskIdentity        *core.Identity
+	Name                      *core.ComparableFilter[string]
+	CompletedAt               *core.ComparableFilter[int64]
+	CreatedAt                 *core.ComparableFilter[int64]
+	UpdatedAt                 *core.ComparableFilter[int64]
+	DueDate                   *core.ComparableFilter[int64]
+	Type                      *core.ComparableFilter[task.TaskType]
+	Priority                  *core.ComparableFilter[task.TaskPriorityLevels]
 }
 
 type GetTaskByIdentityParams struct {
-	TaskIdentity    core.Identity
-	ProjectIdentity *core.Identity
+	TaskIdentity         core.Identity
+	OrganizationIdentity *core.Identity
+	ProjectIdentity      *core.Identity
+	RelationsInput       core.RelationsInput
 }
 
 type GetTasksByParentTaskIdentityParams struct {
 	ParentTaskIdentity core.Identity
-	ProjectIdentity    *core.Identity
+	RelationsInput     core.RelationsInput
 }
 
 type PaginateTasksParams struct {
-	Filters    TaskFilters
-	Pagination core.PaginationInput
-	SortInput  core.SortInput
+	Filters        TaskFilters
+	Pagination     core.PaginationInput
+	SortInput      core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreTaskParams struct {

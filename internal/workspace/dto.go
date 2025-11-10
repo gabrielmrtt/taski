@@ -3,7 +3,6 @@ package workspace
 import (
 	"github.com/gabrielmrtt/taski/internal/organization"
 	"github.com/gabrielmrtt/taski/internal/user"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type WorkspaceDto struct {
@@ -23,11 +22,11 @@ type WorkspaceDto struct {
 }
 
 func WorkspaceToDto(workspace *Workspace) *WorkspaceDto {
-	createdAt := datetimeutils.EpochToRFC3339(*workspace.Timestamps.CreatedAt)
+	createdAt := workspace.Timestamps.CreatedAt.ToRFC3339()
 
 	var updatedAt *string = nil
 	if workspace.Timestamps.UpdatedAt != nil {
-		updatedAtString := datetimeutils.EpochToRFC3339(*workspace.Timestamps.UpdatedAt)
+		updatedAtString := workspace.Timestamps.UpdatedAt.ToRFC3339()
 		updatedAt = &updatedAtString
 	}
 

@@ -6,7 +6,6 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/role"
 	rolerepo "github.com/gabrielmrtt/taski/internal/role/repository"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type RolesSeeder struct {
@@ -38,7 +37,7 @@ func (s *RolesSeeder) Run() error {
 		return err
 	}
 
-	now := datetimeutils.EpochNow()
+	now := core.NewDateTime()
 
 	var roles []role.Role = make([]role.Role, 0)
 	for _, defaultRole := range role.DefaultRoleSlugsArray {

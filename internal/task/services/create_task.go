@@ -8,7 +8,6 @@ import (
 	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	"github.com/gabrielmrtt/taski/internal/task"
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
-	"github.com/gabrielmrtt/taski/pkg/datetimeutils"
 )
 
 type CreateTaskService struct {
@@ -60,19 +59,20 @@ func (i CreateSubTaskInput) Validate() error {
 }
 
 type CreateTaskInput struct {
-	ProjectIdentity     core.Identity
-	StatusIdentity      core.Identity
-	CategoryIdentity    *core.Identity
-	ParentTaskIdentity  *core.Identity
-	Name                string
-	Description         string
-	EstimatedMinutes    *int16
-	PriorityLevel       task.TaskPriorityLevels
-	DueDate             *int64
-	SubTasks            []*CreateSubTaskInput
-	Users               []*core.Identity
-	ChildrenTasks       []*core.Identity
-	UserCreatorIdentity core.Identity
+	OrganizationIdentity *core.Identity
+	ProjectIdentity      core.Identity
+	StatusIdentity       core.Identity
+	CategoryIdentity     *core.Identity
+	ParentTaskIdentity   *core.Identity
+	Name                 string
+	Description          string
+	EstimatedMinutes     *int16
+	PriorityLevel        task.TaskPriorityLevels
+	DueDate              *core.DateTime
+	SubTasks             []*CreateSubTaskInput
+	Users                []*core.Identity
+	ChildrenTasks        []*core.Identity
+	UserCreatorIdentity  core.Identity
 }
 
 func (i CreateTaskInput) Validate() error {
@@ -102,7 +102,7 @@ func (i CreateTaskInput) Validate() error {
 	}
 
 	if i.DueDate != nil {
-		if *i.DueDate < datetimeutils.EpochNow() {
+		if i.DueDate.IsBefore(core.NewDateTime()) {
 			fields = append(fields, core.InvalidInputErrorField{
 				Field: "due date",
 				Error: "due date cannot be in the past",
@@ -155,7 +155,8 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 	s.ProjectTaskCategoryRepository.SetTransaction(tx)
 
 	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
-		ProjectIdentity: input.ProjectIdentity,
+		ProjectIdentity:      input.ProjectIdentity,
+		OrganizationIdentity: input.OrganizationIdentity,
 	})
 	if err != nil {
 		tx.Rollback()

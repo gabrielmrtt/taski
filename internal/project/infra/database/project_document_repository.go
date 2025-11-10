@@ -103,6 +103,16 @@ func (p *ProjectDocumentVersionTable) ToEntity() *project.ProjectDocumentVersion
 		editor = p.Editor.ToEntity()
 	}
 
+	var createdAt *core.DateTime = nil
+	if p.CreatedAt != 0 {
+		createdAt = &core.DateTime{Value: p.CreatedAt}
+	}
+
+	var updatedAt *core.DateTime = nil
+	if p.UpdatedAt != nil {
+		updatedAt = &core.DateTime{Value: *p.UpdatedAt}
+	}
+
 	return &project.ProjectDocumentVersion{
 		Identity:                              core.NewIdentityFromInternal(uuid.MustParse(p.InternalId), project.ProjectDocumentVersionIdentityPrefix),
 		ProjectDocumentVersionManagerIdentity: core.NewIdentityFromInternal(uuid.MustParse(p.ProjectDocumentVersionManagerInternalId), project.ProjectDocumentVersionManagerIdentityPrefix),
@@ -117,8 +127,8 @@ func (p *ProjectDocumentVersionTable) ToEntity() *project.ProjectDocumentVersion
 		UserEditorIdentity:  userEditorIdentity,
 		Latest:              p.Latest,
 		Timestamps: core.Timestamps{
-			CreatedAt: &p.CreatedAt,
-			UpdatedAt: p.UpdatedAt,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
 		Creator: creator,
 		Editor:  editor,
@@ -452,6 +462,16 @@ func (r *ProjectDocumentBunRepository) StoreProjectDocumentVersion(params projec
 		userEditorInternalId = &identity
 	}
 
+	var createdAt *int64 = nil
+	if params.ProjectDocumentVersion.Timestamps.CreatedAt != nil {
+		createdAt = &params.ProjectDocumentVersion.Timestamps.CreatedAt.Value
+	}
+
+	var updatedAt *int64 = nil
+	if params.ProjectDocumentVersion.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.ProjectDocumentVersion.Timestamps.UpdatedAt.Value
+	}
+
 	projectDocumentVersionTable := &ProjectDocumentVersionTable{
 		InternalId:                              params.ProjectDocumentVersion.Identity.Internal.String(),
 		PublicId:                                params.ProjectDocumentVersion.Identity.Public,
@@ -462,8 +482,8 @@ func (r *ProjectDocumentBunRepository) StoreProjectDocumentVersion(params projec
 		UserCreatorInternalId:                   params.ProjectDocumentVersion.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:                    userEditorInternalId,
 		Latest:                                  params.ProjectDocumentVersion.Latest,
-		CreatedAt:                               *params.ProjectDocumentVersion.Timestamps.CreatedAt,
-		UpdatedAt:                               params.ProjectDocumentVersion.Timestamps.UpdatedAt,
+		CreatedAt:                               *createdAt,
+		UpdatedAt:                               updatedAt,
 	}
 
 	_, err := tx.NewInsert().Model(projectDocumentVersionTable).Exec(context.Background())
@@ -516,6 +536,11 @@ func (r *ProjectDocumentBunRepository) UpdateProjectDocumentVersion(params proje
 		userEditorInternalId = &identity
 	}
 
+	var updatedAt *int64 = nil
+	if params.ProjectDocumentVersion.Timestamps.UpdatedAt != nil {
+		updatedAt = &params.ProjectDocumentVersion.Timestamps.UpdatedAt.Value
+	}
+
 	projectDocumentVersionTable := &ProjectDocumentVersionTable{
 		InternalId:                              params.ProjectDocumentVersion.Identity.Internal.String(),
 		PublicId:                                params.ProjectDocumentVersion.Identity.Public,
@@ -524,7 +549,7 @@ func (r *ProjectDocumentBunRepository) UpdateProjectDocumentVersion(params proje
 		Title:                                   params.ProjectDocumentVersion.Document.Title,
 		Content:                                 params.ProjectDocumentVersion.Document.Content,
 		UserEditorInternalId:                    userEditorInternalId,
-		UpdatedAt:                               params.ProjectDocumentVersion.Timestamps.UpdatedAt,
+		UpdatedAt:                               updatedAt,
 	}
 
 	_, err := tx.NewUpdate().Model(projectDocumentVersionTable).Where("internal_id = ?", params.ProjectDocumentVersion.Identity.Internal.String()).Exec(context.Background())

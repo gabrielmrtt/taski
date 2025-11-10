@@ -15,12 +15,14 @@ type TaskCommentFilters struct {
 type GetTaskCommentByIdentityParams struct {
 	TaskCommentIdentity core.Identity
 	TaskIdentity        *core.Identity
+	RelationsInput      core.RelationsInput
 }
 
 type PaginateTaskCommentsParams struct {
-	Filters    TaskCommentFilters
-	Pagination core.PaginationInput
-	SortInput  core.SortInput
+	Filters        TaskCommentFilters
+	Pagination     core.PaginationInput
+	SortInput      core.SortInput
+	RelationsInput core.RelationsInput
 }
 
 type StoreTaskCommentParams struct {
