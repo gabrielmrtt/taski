@@ -121,6 +121,40 @@ func (r *ProjectTaskStatusBunRepository) GetLastTaskStatusOrder(params projectre
 	return *projectTaskStatus.StatusOrder, nil
 }
 
+func (r *ProjectTaskStatusBunRepository) GetTaskStatusByOrder(params projectrepo.GetTaskStatusByOrderParams) (*project.ProjectTaskStatus, error) {
+	var projectTaskStatus *ProjectTaskStatusTable = new(ProjectTaskStatusTable)
+	var selectQuery *bun.SelectQuery
+
+	if r.tx != nil && !r.tx.IsClosed() {
+		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
+	}
+
+	selectQuery = selectQuery.Model(projectTaskStatus)
+	selectQuery = coredatabase.ApplyRelations(selectQuery, params.RelationsInput)
+	selectQuery = selectQuery.Where("project_task_status.status_order = ?", params.Order)
+
+	if params.ProjectIdentity != nil {
+		selectQuery = selectQuery.Where("project_task_status.project_internal_id = ?", params.ProjectIdentity.Internal.String())
+	}
+
+	err := selectQuery.Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	if projectTaskStatus.InternalId == "" {
+		return nil, nil
+	}
+
+	return projectTaskStatus.ToEntity(), nil
+}
+
 func (r *ProjectTaskStatusBunRepository) GetProjectTaskStatusByIdentity(params projectrepo.GetProjectTaskStatusByIdentityParams) (*project.ProjectTaskStatus, error) {
 	var projectTaskStatus *ProjectTaskStatusTable = new(ProjectTaskStatusTable)
 	var selectQuery *bun.SelectQuery

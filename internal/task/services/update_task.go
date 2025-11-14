@@ -9,7 +9,6 @@ import (
 
 type UpdateTaskService struct {
 	TaskRepository                taskrepo.TaskRepository
-	ProjectTaskStatusRepository   projectrepo.ProjectTaskStatusRepository
 	ProjectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository
 	ProjectUserRepository         projectrepo.ProjectUserRepository
 	TransactionRepository         core.TransactionRepository
@@ -17,14 +16,12 @@ type UpdateTaskService struct {
 
 func NewUpdateTaskService(
 	taskRepository taskrepo.TaskRepository,
-	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
 	projectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *UpdateTaskService {
 	return &UpdateTaskService{
 		TaskRepository:                taskRepository,
-		ProjectTaskStatusRepository:   projectTaskStatusRepository,
 		ProjectTaskCategoryRepository: projectTaskCategoryRepository,
 		ProjectUserRepository:         projectUserRepository,
 		TransactionRepository:         transactionRepository,
@@ -106,7 +103,6 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 	}
 
 	s.TaskRepository.SetTransaction(tx)
-	s.ProjectTaskStatusRepository.SetTransaction(tx)
 	s.ProjectTaskCategoryRepository.SetTransaction(tx)
 
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
@@ -121,28 +117,6 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 	if tsk == nil {
 		tx.Rollback()
 		return core.NewNotFoundError("task not found")
-	}
-
-	if input.StatusIdentity != nil {
-		status, err := s.ProjectTaskStatusRepository.GetProjectTaskStatusByIdentity(projectrepo.GetProjectTaskStatusByIdentityParams{
-			ProjectTaskStatusIdentity: input.StatusIdentity,
-			ProjectIdentity:           &tsk.ProjectIdentity,
-		})
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-
-		if status == nil {
-			tx.Rollback()
-			return core.NewNotFoundError("project task status not found")
-		}
-
-		err = tsk.ChangeStatus(status, &input.UserEditorIdentity)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
 	}
 
 	if input.CategoryIdentity != nil {

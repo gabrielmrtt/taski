@@ -215,15 +215,11 @@ func (p *Project) IsDeleted() bool {
 }
 
 func (p *Project) HasEnded() bool {
-	now := core.NewDateTime()
-
-	return p.EndAt != nil && p.EndAt.ToEpoch() < now.ToEpoch()
+	return p.EndAt != nil && p.EndAt.IsBefore(core.NewDateTime())
 }
 
 func (p *Project) HasStarted() bool {
-	now := core.NewDateTime()
-
-	return p.StartAt != nil && p.StartAt.ToEpoch() <= now.ToEpoch()
+	return p.StartAt != nil && p.StartAt.IsBeforeOrEqual(core.NewDateTime())
 }
 
 type ProjectUser struct {

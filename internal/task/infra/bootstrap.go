@@ -31,18 +31,19 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	listTasksService := taskservice.NewListTasksService(taskRepository)
 	getTaskService := taskservice.NewGetTaskService(taskRepository)
 	createTaskService := taskservice.NewCreateTaskService(taskRepository, projectRepository, projectUserRepository, projectTaskStatusRepository, projectTaskCategoryRepository, transactionRepository)
-	updateTaskService := taskservice.NewUpdateTaskService(taskRepository, projectTaskStatusRepository, projectTaskCategoryRepository, projectUserRepository, transactionRepository)
+	updateTaskService := taskservice.NewUpdateTaskService(taskRepository, projectTaskCategoryRepository, projectUserRepository, transactionRepository)
 	deleteTaskService := taskservice.NewDeleteTaskService(taskRepository, transactionRepository)
 	addSubTaskService := taskservice.NewAddSubTaskService(taskRepository, transactionRepository)
 	updateSubTaskService := taskservice.NewUpdateSubTaskService(taskRepository, transactionRepository)
 	removeSubTaskService := taskservice.NewRemoveSubTaskService(taskRepository, transactionRepository)
+	changeTaskStatusService := taskservice.NewChangeTaskStatusService(taskRepository, projectTaskStatusRepository, transactionRepository)
 
 	listTaskCommentsService := taskservice.NewListTaskCommentsService(taskCommentRepository, taskRepository)
 	createTaskCommentService := taskservice.NewCreateTaskCommentService(taskRepository, taskCommentRepository, uploadedFileRepository, storageRepository, projectUserRepository, transactionRepository)
 	updateTaskCommentService := taskservice.NewUpdateTaskCommentService(taskCommentRepository, taskRepository, uploadedFileRepository, storageRepository, transactionRepository)
 	deleteTaskCommentService := taskservice.NewDeleteTaskCommentService(taskCommentRepository, taskRepository, uploadedFileRepository, storageRepository, transactionRepository)
 
-	taskHandler := taskhttp.NewTaskHandler(listTasksService, getTaskService, createTaskService, updateTaskService, deleteTaskService, addSubTaskService, updateSubTaskService, removeSubTaskService)
+	taskHandler := taskhttp.NewTaskHandler(listTasksService, getTaskService, createTaskService, updateTaskService, deleteTaskService, addSubTaskService, updateSubTaskService, removeSubTaskService, changeTaskStatusService)
 	taskCommentHandler := taskhttp.NewTaskCommentHandler(listTaskCommentsService, createTaskCommentService, updateTaskCommentService, deleteTaskCommentService)
 
 	taskHandler.ConfigureRoutes(corehttp.ConfigureRoutesOptions{

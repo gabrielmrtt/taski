@@ -7,7 +7,6 @@ import (
 )
 
 type UpdateTaskRequest struct {
-	StatusId         *string   `json:"statusId"`
 	CategoryId       *string   `json:"categoryId"`
 	ParentTaskId     *string   `json:"parentTaskId"`
 	Name             *string   `json:"name"`
@@ -21,10 +20,6 @@ type UpdateTaskRequest struct {
 
 func (r *UpdateTaskRequest) ToInput() taskservice.UpdateTaskInput {
 	var statusIdentity *core.Identity = nil
-	if r.StatusId != nil {
-		identity := core.NewIdentity(*r.StatusId)
-		statusIdentity = &identity
-	}
 
 	var categoryIdentity *core.Identity = nil
 	if r.CategoryId != nil {

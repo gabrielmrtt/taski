@@ -231,10 +231,16 @@ type DateTime struct {
 	Value int64
 }
 
+/*
+NewDateTime creates a new DateTime object with the current epoch time.
+*/
 func NewDateTime() DateTime {
 	return DateTime{Value: datetimeutils.EpochNow()}
 }
 
+/*
+NewDateTimeFromEpoch creates a new DateTime object from an epoch time.
+*/
 func NewDateTimeFromEpoch(value int64) (DateTime, error) {
 	if value < 0 {
 		return DateTime{}, NewInvalidInputError("invalid date timestamp", []InvalidInputErrorField{
@@ -248,6 +254,9 @@ func NewDateTimeFromEpoch(value int64) (DateTime, error) {
 	return DateTime{Value: value}, nil
 }
 
+/*
+NewDateTimeFromRFC3339 creates a new DateTime object from an RFC 3339 string.
+*/
 func NewDateTimeFromRFC3339(value string) (DateTime, error) {
 	if !datetimeutils.IsValidRFC3339(value) {
 		return DateTime{}, NewInvalidInputError("invalid date timestamp", []InvalidInputErrorField{
@@ -261,30 +270,51 @@ func NewDateTimeFromRFC3339(value string) (DateTime, error) {
 	return DateTime{Value: datetimeutils.RFC3339ToEpoch(value)}, nil
 }
 
+/*
+ToEpoch converts the DateTime object to an epoch time.
+*/
 func (d DateTime) ToEpoch() int64 {
 	return d.Value
 }
 
+/*
+ToRFC3339 converts the DateTime object to an RFC 3339 string.
+*/
 func (d DateTime) ToRFC3339() string {
 	return datetimeutils.EpochToRFC3339(d.Value)
 }
 
+/*
+Equals checks if two DateTime objects are equal.
+*/
 func (d DateTime) Equals(_d DateTime) bool {
 	return d.Value == _d.Value
 }
 
+/*
+IsBefore checks if the DateTime object is before another DateTime object.
+*/
 func (d DateTime) IsBefore(_d DateTime) bool {
 	return d.Value < _d.Value
 }
 
+/*
+IsAfter checks if the DateTime object is after another DateTime object.
+*/
 func (d DateTime) IsAfter(_d DateTime) bool {
 	return d.Value > _d.Value
 }
 
+/*
+IsBeforeOrEqual checks if the DateTime object is before or equal to another DateTime object.
+*/
 func (d DateTime) IsBeforeOrEqual(_d DateTime) bool {
 	return d.Value <= _d.Value
 }
 
+/*
+IsAfterOrEqual checks if the DateTime object is after or equal to another DateTime object.
+*/
 func (d DateTime) IsAfterOrEqual(_d DateTime) bool {
 	return d.Value >= _d.Value
 }

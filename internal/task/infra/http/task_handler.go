@@ -14,14 +14,15 @@ import (
 )
 
 type TaskHandler struct {
-	ListTasksService     *taskservice.ListTasksService
-	GetTaskService       *taskservice.GetTaskService
-	CreateTaskService    *taskservice.CreateTaskService
-	UpdateTaskService    *taskservice.UpdateTaskService
-	DeleteTaskService    *taskservice.DeleteTaskService
-	AddSubTaskService    *taskservice.AddSubTaskService
-	UpdateSubTaskService *taskservice.UpdateSubTaskService
-	RemoveSubTaskService *taskservice.RemoveSubTaskService
+	ListTasksService        *taskservice.ListTasksService
+	GetTaskService          *taskservice.GetTaskService
+	CreateTaskService       *taskservice.CreateTaskService
+	UpdateTaskService       *taskservice.UpdateTaskService
+	DeleteTaskService       *taskservice.DeleteTaskService
+	AddSubTaskService       *taskservice.AddSubTaskService
+	UpdateSubTaskService    *taskservice.UpdateSubTaskService
+	RemoveSubTaskService    *taskservice.RemoveSubTaskService
+	ChangeTaskStatusService *taskservice.ChangeTaskStatusService
 }
 
 func NewTaskHandler(
@@ -33,16 +34,18 @@ func NewTaskHandler(
 	addSubTaskService *taskservice.AddSubTaskService,
 	updateSubTaskService *taskservice.UpdateSubTaskService,
 	removeSubTaskService *taskservice.RemoveSubTaskService,
+	changeTaskStatusService *taskservice.ChangeTaskStatusService,
 ) *TaskHandler {
 	return &TaskHandler{
-		ListTasksService:     listTasksService,
-		GetTaskService:       getTaskService,
-		CreateTaskService:    createTaskService,
-		UpdateTaskService:    updateTaskService,
-		DeleteTaskService:    deleteTaskService,
-		AddSubTaskService:    addSubTaskService,
-		UpdateSubTaskService: updateSubTaskService,
-		RemoveSubTaskService: removeSubTaskService,
+		ListTasksService:        listTasksService,
+		GetTaskService:          getTaskService,
+		CreateTaskService:       createTaskService,
+		UpdateTaskService:       updateTaskService,
+		DeleteTaskService:       deleteTaskService,
+		AddSubTaskService:       addSubTaskService,
+		UpdateSubTaskService:    updateSubTaskService,
+		RemoveSubTaskService:    removeSubTaskService,
+		ChangeTaskStatusService: changeTaskStatusService,
 	}
 }
 
@@ -358,6 +361,44 @@ func (h *TaskHandler) RemoveSubTask(c *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(c, http.StatusOK)
 }
 
+type ChangeTaskStatusResponse = corehttp.EmptyHttpSuccessResponse
+
+// ChangeTaskStatus godoc
+// @Summary Change the status of a task
+// @Description Changes the status of an accessible task.
+// @Tags Task
+// @Accept json
+// @Param taskId path string true "Task ID"
+// @Param request body taskhttprequests.ChangeTaskStatusRequest true "Request body"
+// @Produce json
+// @Success 200 {object} ChangeTaskStatusResponse
+// @Failure 400 {object} corehttp.HttpErrorResponse
+// @Failure 401 {object} corehttp.HttpErrorResponse
+// @Failure 403 {object} corehttp.HttpErrorResponse
+// @Failure 404 {object} corehttp.HttpErrorResponse
+// @Failure 500 {object} corehttp.HttpErrorResponse
+// @Router /task/:taskId/status [put]
+func (h *TaskHandler) ChangeTaskStatus(c *gin.Context) {
+	var request taskhttprequests.ChangeTaskStatusRequest
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(c)
+	var taskIdentity core.Identity = core.NewIdentityFromPublic(c.Param("taskId"))
+	var input taskservice.ChangeTaskStatusInput
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		corehttp.NewHttpErrorResponse(c, err)
+		return
+	}
+
+	input = request.ToInput()
+	input.OrganizationIdentity = organizationIdentity
+	input.TaskIdentity = taskIdentity
+
+	err := h.ChangeTaskStatusService.Execute(input)
+	if err != nil {
+		corehttp.NewHttpErrorResponse(c, err)
+		return
+	}
+}
 func (h *TaskHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
 	middlewareOptions := corehttp.MiddlewareOptions{
 		DbConnection: options.DbConnection,
@@ -371,6 +412,7 @@ func (h *TaskHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *
 		g.POST("", organizationhttpmiddlewares.UserMustHavePermission("tasks:create", middlewareOptions), h.CreateTask)
 		g.PUT("/:taskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.UpdateTask)
 		g.DELETE("/:taskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:delete", middlewareOptions), h.DeleteTask)
+		g.PATCH("/:taskId/status", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.ChangeTaskStatus)
 		g.POST("/:taskId/sub-task", organizationhttpmiddlewares.UserMustHavePermission("tasks:create", middlewareOptions), h.AddSubTask)
 		g.PUT("/:taskId/sub-task/:subTaskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.UpdateSubTask)
 		g.DELETE("/:taskId/sub-task/:subTaskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.RemoveSubTask)

@@ -309,6 +309,17 @@ func (t *Task) RemoveChildTask(childTask *Task) {
 	childTask.ParentTaskIdentity = nil
 }
 
+func (t *Task) RegisterAction(actionType TaskActionType, user *user.User) TaskAction {
+	now := core.NewDateTime()
+	return TaskAction{
+		Identity:     core.NewIdentity(TaskActionIdentityPrefix),
+		TaskIdentity: t.Identity,
+		Type:         actionType,
+		User:         user,
+		CreatedAT:    now,
+	}
+}
+
 type TaskCommentFile struct {
 	Identity     core.Identity
 	FileIdentity core.Identity
@@ -379,4 +390,12 @@ func (t *TaskComment) ClearAllFiles() {
 	t.Files = []TaskCommentFile{}
 	now := core.NewDateTime()
 	t.Timestamps.UpdatedAt = &now
+}
+
+type TaskAction struct {
+	Identity     core.Identity
+	TaskIdentity core.Identity
+	Type         TaskActionType
+	User         *user.User
+	CreatedAT    core.DateTime
 }

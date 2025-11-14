@@ -51,10 +51,17 @@ type GetLastTaskStatusOrderParams struct {
 	ProjectIdentity *core.Identity
 }
 
+type GetTaskStatusByOrderParams struct {
+	ProjectIdentity *core.Identity
+	Order           int8
+	RelationsInput  core.RelationsInput
+}
+
 type ProjectTaskStatusRepository interface {
 	SetTransaction(tx core.Transaction) error
 
 	GetLastTaskStatusOrder(params GetLastTaskStatusOrderParams) (int8, error)
+	GetTaskStatusByOrder(params GetTaskStatusByOrderParams) (*project.ProjectTaskStatus, error)
 
 	GetProjectTaskStatusByIdentity(params GetProjectTaskStatusByIdentityParams) (*project.ProjectTaskStatus, error)
 	ListProjectTaskStatusesBy(params ListProjectTaskStatusesByParams) ([]project.ProjectTaskStatus, error)
