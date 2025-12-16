@@ -3989,7 +3989,7 @@ paths:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
       summary: List task comments
       tags:
-      - Task Comment
+      - Task
     post:
       consumes:
       - application/json
@@ -4031,7 +4031,7 @@ paths:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
       summary: Create a task comment
       tags:
-      - Task Comment
+      - Task
   /task/:taskId/comment/:commentId:
     delete:
       consumes:
@@ -4073,7 +4073,7 @@ paths:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
       summary: Delete a task comment
       tags:
-      - Task Comment
+      - Task
     put:
       consumes:
       - application/json
@@ -4120,7 +4120,7 @@ paths:
             $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
       summary: Update a task comment
       tags:
-      - Task Comment
+      - Task
   /task/:taskId/complete:
     post:
       consumes:

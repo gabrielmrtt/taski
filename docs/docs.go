@@ -3493,7 +3493,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task Comment"
+                    "Task"
                 ],
                 "summary": "List task comments",
                 "parameters": [
@@ -3556,7 +3556,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task Comment"
+                    "Task"
                 ],
                 "summary": "Create a task comment",
                 "parameters": [
@@ -3621,7 +3621,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task Comment"
+                    "Task"
                 ],
                 "summary": "Update a task comment",
                 "parameters": [
@@ -3691,7 +3691,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Task Comment"
+                    "Task"
                 ],
                 "summary": "Delete a task comment",
                 "parameters": [
