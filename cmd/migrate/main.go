@@ -56,14 +56,14 @@ func executeMigration(config MigrationConfig) {
 	if config.Method == "up" {
 		cmd = exec.Command(
 			"migrate",
-			"-path", "internal/shared/database/migrations",
+			"-path", "internal/shared/postgres/migrations",
 			"-database", dbConfig.ConnectionURL,
 			"up",
 		)
 	} else {
 		cmd = exec.Command(
 			"migrate",
-			"-path", "internal/shared/database/migrations",
+			"-path", "internal/shared/postgres/migrations",
 			"-database", dbConfig.ConnectionURL,
 			"down", strconv.Itoa(config.Step),
 		)

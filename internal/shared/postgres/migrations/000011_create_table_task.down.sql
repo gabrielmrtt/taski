@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS task_action;
+
+DROP TABLE IF EXISTS task_comment_file;
+
+DROP TABLE IF EXISTS task_comment;
+
+DROP TABLE IF EXISTS sub_task;
+
+DROP TABLE IF EXISTS task_user;
+
+DROP TABLE IF EXISTS task;

@@ -7,7 +7,7 @@ build:
 	@go build -o bin/taski cmd/api/main.go
 
 new-migration:
-	@migrate create -ext sql -dir internal/shared/database/migrations -seq $(name)
+	@migrate create -ext sql -dir internal/shared/postgres/migrations -seq $(name)
 
 migrate-up:
 ifeq ($(env),test)
