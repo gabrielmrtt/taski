@@ -15,6 +15,7 @@ type CreateTaskCommentService struct {
 	UploadedFileRepository storagerepo.UploadedFileRepository
 	StorageRepository      storagerepo.StorageRepository
 	ProjectUserRepository  projectrepo.ProjectUserRepository
+	TaskActionRepository   taskrepo.TaskActionRepository
 	TransactionRepository  core.TransactionRepository
 }
 
@@ -24,6 +25,7 @@ func NewCreateTaskCommentService(
 	uploadedFileRepository storagerepo.UploadedFileRepository,
 	storageRepository storagerepo.StorageRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
 	transactionRepository core.TransactionRepository,
 ) *CreateTaskCommentService {
 	return &CreateTaskCommentService{
@@ -32,6 +34,7 @@ func NewCreateTaskCommentService(
 		UploadedFileRepository: uploadedFileRepository,
 		StorageRepository:      storageRepository,
 		ProjectUserRepository:  projectUserRepository,
+		TaskActionRepository:   taskActionRepository,
 		TransactionRepository:  transactionRepository,
 	}
 }
@@ -73,6 +76,7 @@ func (s *CreateTaskCommentService) Execute(input CreateTaskCommentInput) (*task.
 	s.TaskRepository.SetTransaction(tx)
 	s.TaskCommentRepository.SetTransaction(tx)
 	s.UploadedFileRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
 
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 		TaskIdentity: input.TaskIdentity,
@@ -137,6 +141,15 @@ func (s *CreateTaskCommentService) Execute(input CreateTaskCommentInput) (*task.
 
 	comment, err = s.TaskCommentRepository.StoreTaskComment(taskrepo.StoreTaskCommentParams{
 		TaskComment: comment,
+	})
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeAddComment, &usr.User)
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
 	})
 	if err != nil {
 		tx.Rollback()

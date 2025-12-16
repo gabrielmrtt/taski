@@ -833,6 +833,11 @@ const docTemplate = `{
                         "name": "organizationId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1572,6 +1577,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "relations",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "sortBy",
                         "in": "query"
                     },
@@ -1872,6 +1882,499 @@ const docTemplate = `{
                 }
             }
         },
+        "/project/:projectId/document": {
+            "get": {
+                "description": "Returns all project documents.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "List project documents",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.ListProjectDocumentsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new project document.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "Create a project document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectDocumentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.CreateProjectDocumentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/:projectId/document/:documentVersionManagerId": {
+            "get": {
+                "description": "Returns all project document versions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "List project document versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version Manager ID",
+                        "name": "documentVersionManagerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.ListProjectDocumentVersionsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing project document.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "Delete a project document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version Manager ID",
+                        "name": "documentVersionManagerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.DeleteProjectDocumentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/:projectId/document/:documentVersionManagerId/version/:documentVersionId": {
+            "get": {
+                "description": "Returns a project document version by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "Get a project document version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version Manager ID",
+                        "name": "documentVersionManagerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version ID",
+                        "name": "documentVersionId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.GetProjectDocumentVersionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing project document.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "Update a project document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version Manager ID",
+                        "name": "documentVersionManagerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version ID",
+                        "name": "documentVersionId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectDocumentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.UpdateProjectDocumentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing project document version.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project Document"
+                ],
+                "summary": "Delete a project document version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version Manager ID",
+                        "name": "documentVersionManagerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Document Version ID",
+                        "name": "documentVersionId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_project_infra_http.DeleteProjectDocumentVersionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/project/:projectId/task-category": {
             "get": {
                 "description": "Returns all project task categories.",
@@ -1899,6 +2402,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
                         "in": "query"
                     },
                     {
@@ -2162,6 +2670,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
                         "in": "query"
                     },
                     {
@@ -2593,6 +3106,1062 @@ const docTemplate = `{
                 }
             }
         },
+        "/task": {
+            "get": {
+                "description": "Returns all accessible tasks by the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "List tasks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "categoryId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "completed",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "completedAtGte",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "completedAtLte",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "dueDateGte",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "dueDateLte",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "parentTaskId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "perPage",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "projectId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "statusId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.ListTasksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Create a task",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.CreateTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId": {
+            "get": {
+                "description": "Returns an accessible task by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Get a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.GetTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Update a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.UpdateTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Delete a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.DeleteTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/comment": {
+            "get": {
+                "description": "Returns all accessible task comments by the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task Comment"
+                ],
+                "summary": "List task comments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ListTaskCommentsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.ListTaskCommentsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new task comment.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task Comment"
+                ],
+                "summary": "Create a task comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.CreateTaskCommentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/comment/:commentId": {
+            "put": {
+                "description": "Updates an accessible task comment.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task Comment"
+                ],
+                "summary": "Update a task comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comment ID",
+                        "name": "commentId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.UpdateTaskCommentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an accessible task comment.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task Comment"
+                ],
+                "summary": "Delete a task comment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comment ID",
+                        "name": "commentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.DeleteTaskCommentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/complete": {
+            "post": {
+                "description": "Completes an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Complete a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.CompleteTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/status": {
+            "put": {
+                "description": "Changes the status of an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Change the status of a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ChangeTaskStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.ChangeTaskStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/sub-task": {
+            "post": {
+                "description": "Adds a sub task to an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Add a sub task to a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.AddSubTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.AddSubTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/sub-task/:subTaskId": {
+            "put": {
+                "description": "Updates an accessible sub task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Update a sub task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sub Task ID",
+                        "name": "subTaskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateSubTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.UpdateSubTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Removes a sub task from an accessible task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Remove a sub task from a task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sub Task ID",
+                        "name": "subTaskId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.RemoveSubTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/:taskId/sub-task/:subTaskId/complete": {
+            "post": {
+                "description": "Completes an accessible sub task.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Complete a sub task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sub Task ID",
+                        "name": "subTaskId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_task_infra_http.CompleteSubTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/team": {
             "get": {
                 "description": "Lists all existing teams in an organization.",
@@ -2703,6 +4272,11 @@ const docTemplate = `{
                         "name": "teamId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3143,6 +4717,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "relations",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "sortBy",
                         "in": "query"
                     },
@@ -3281,6 +4860,11 @@ const docTemplate = `{
                         "name": "workspaceId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "relations",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3493,6 +5077,66 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto"
+                    }
+                },
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskCommentDto": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto"
+                    }
+                },
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskDto": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto"
+                    }
+                },
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_team_TeamDto": {
             "type": "object",
             "properties": {
@@ -3537,6 +5181,12 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -3560,6 +5210,9 @@ const docTemplate = `{
         "github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto": {
             "type": "object",
             "properties": {
+                "lastAccessAt": {
+                    "type": "string"
+                },
                 "organizationId": {
                     "type": "string"
                 },
@@ -3621,6 +5274,61 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_project.ProjectDocumentFileDto": {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentFileDto"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "latest": {
+                    "type": "boolean"
+                },
+                "projectDocumentVersionManagerId": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userCreatorId": {
+                    "type": "string"
+                },
+                "userEditorId": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_project.ProjectDto": {
             "type": "object",
             "properties": {
@@ -3630,8 +5338,14 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
                 "description": {
                     "type": "string"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
                 },
                 "endAt": {
                     "type": "string"
@@ -3702,6 +5416,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectDocumentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/multipart.FileHeader"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest": {
             "type": "object",
             "properties": {
@@ -3712,7 +5446,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "endAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -3721,7 +5455,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "startAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "workspaceId": {
                     "type": "string"
@@ -3759,6 +5493,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectDocumentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/multipart.FileHeader"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest": {
             "type": "object",
             "properties": {
@@ -3769,7 +5523,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "endAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -3778,7 +5532,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "startAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
@@ -3825,8 +5579,14 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
                 "description": {
                     "type": "string"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
                 },
                 "id": {
                     "type": "string"
@@ -3891,14 +5651,309 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_gabrielmrtt_taski_internal_task.SubTaskDto": {
+            "type": "object",
+            "properties": {
+                "completedAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task.TaskCommentDto": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentFileDto"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task.TaskCommentFileDto": {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task.TaskDto": {
+            "type": "object",
+            "properties": {
+                "childrenTasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto"
+                    }
+                },
+                "completedAt": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "estimatedMinutes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "subTasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.SubTaskDto"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userCreatorId": {
+                    "type": "string"
+                },
+                "userEditorId": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskUserDto"
+                    }
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task.TaskUserDto": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.AddSubTaskRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ChangeTaskStatusRequest": {
+            "type": "object",
+            "properties": {
+                "advanceOrder": {
+                    "type": "boolean"
+                },
+                "statusId": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateSubTaskRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskCommentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/multipart.FileHeader"
+                    }
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskRequest": {
+            "type": "object",
+            "properties": {
+                "categoryId": {
+                    "type": "string"
+                },
+                "childrenTasks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "estimatedMinutes": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentTaskId": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "projectId": {
+                    "type": "string"
+                },
+                "statusId": {
+                    "type": "string"
+                },
+                "subTasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateSubTaskRequest"
+                    }
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ListTaskCommentsRequest": {
+            "type": "object",
+            "properties": {
+                "authorId": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "perPage": {
+                    "type": "integer"
+                },
+                "relations": {
+                    "type": "string"
+                },
+                "sortBy": {
+                    "type": "string"
+                },
+                "sortDirection": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateSubTaskRequest": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskCommentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/multipart.FileHeader"
+                    }
+                }
+            }
+        },
+        "github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskRequest": {
+            "type": "object",
+            "properties": {
+                "categoryId": {
+                    "type": "string"
+                },
+                "childrenTasks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "estimatedMinutes": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentTaskId": {
+                    "type": "string"
+                },
+                "priorityLevel": {
+                    "type": "integer"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "github_com_gabrielmrtt_taski_internal_team.TeamDto": {
             "type": "object",
             "properties": {
                 "createdAt": {
                     "type": "string"
                 },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
                 "description": {
                     "type": "string"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
                 },
                 "id": {
                     "type": "string"
@@ -3911,6 +5966,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "organization": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization.OrganizationDto"
                 },
                 "status": {
                     "type": "string"
@@ -4114,14 +6172,23 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "creator": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
+                },
                 "description": {
                     "type": "string"
+                },
+                "editor": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto"
                 },
                 "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "organization": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_organization.OrganizationDto"
                 },
                 "organizationId": {
                     "type": "string"
@@ -4450,6 +6517,26 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_project_infra_http.CreateProjectDocumentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_project_infra_http.CreateProjectResponse": {
             "type": "object",
             "properties": {
@@ -4496,6 +6583,40 @@ const docTemplate = `{
                 "data": {
                     "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskStatusDto"
                 },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.DeleteProjectDocumentResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.DeleteProjectDocumentVersionResponse": {
+            "type": "object",
+            "properties": {
                 "message": {
                     "type": "string"
                 },
@@ -4561,11 +6682,71 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_project_infra_http.GetProjectDocumentVersionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_project_infra_http.GetProjectResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.ListProjectDocumentVersionsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.ListProjectDocumentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto"
                 },
                 "message": {
                     "type": "string"
@@ -4627,6 +6808,23 @@ const docTemplate = `{
                 "data": {
                     "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto"
                 },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_project_infra_http.UpdateProjectDocumentResponse": {
+            "type": "object",
+            "properties": {
                 "message": {
                     "type": "string"
                 },
@@ -4750,6 +6948,279 @@ const docTemplate = `{
             }
         },
         "internal_role_infra_http.UpdateRoleResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.AddSubTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.ChangeTaskStatusResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.CompleteSubTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.CompleteTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.CreateTaskCommentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.CreateTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.DeleteTaskCommentResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.DeleteTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.GetTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.ListTaskCommentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskCommentDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.ListTasksResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.RemoveSubTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.UpdateSubTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.UpdateTaskCommentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_task_infra_http.UpdateTaskResponse": {
             "type": "object",
             "properties": {
                 "message": {

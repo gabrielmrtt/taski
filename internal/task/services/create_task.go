@@ -12,6 +12,7 @@ import (
 
 type CreateTaskService struct {
 	TaskRepository                taskrepo.TaskRepository
+	TaskActionRepository          taskrepo.TaskActionRepository
 	ProjectRepository             projectrepo.ProjectRepository
 	ProjectUserRepository         projectrepo.ProjectUserRepository
 	ProjectTaskStatusRepository   projectrepo.ProjectTaskStatusRepository
@@ -21,6 +22,7 @@ type CreateTaskService struct {
 
 func NewCreateTaskService(
 	taskRepository taskrepo.TaskRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
 	projectRepository projectrepo.ProjectRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
 	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
@@ -29,6 +31,7 @@ func NewCreateTaskService(
 ) *CreateTaskService {
 	return &CreateTaskService{
 		TaskRepository:                taskRepository,
+		TaskActionRepository:          taskActionRepository,
 		ProjectRepository:             projectRepository,
 		ProjectUserRepository:         projectUserRepository,
 		ProjectTaskStatusRepository:   projectTaskStatusRepository,
@@ -153,6 +156,7 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 	s.ProjectRepository.SetTransaction(tx)
 	s.ProjectTaskStatusRepository.SetTransaction(tx)
 	s.ProjectTaskCategoryRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
 
 	prj, err := s.ProjectRepository.GetProjectByIdentity(projectrepo.GetProjectByIdentityParams{
 		ProjectIdentity:      input.ProjectIdentity,
@@ -166,6 +170,20 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 	if prj == nil {
 		tx.Rollback()
 		return nil, core.NewNotFoundError("project not found")
+	}
+
+	userCreator, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+		ProjectIdentity: input.ProjectIdentity,
+		UserIdentity:    input.UserCreatorIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if userCreator == nil {
+		tx.Rollback()
+		return nil, core.NewNotFoundError("project user creator not found")
 	}
 
 	status, err := s.ProjectTaskStatusRepository.GetProjectTaskStatusByIdentity(projectrepo.GetProjectTaskStatusByIdentityParams{
@@ -291,6 +309,16 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 
 	_, err = s.TaskRepository.StoreTask(taskrepo.StoreTaskParams{
 		Task: tsk,
+	})
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeCreate, &userCreator.User)
+
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
 	})
 	if err != nil {
 		tx.Rollback()

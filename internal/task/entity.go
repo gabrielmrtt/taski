@@ -52,6 +52,10 @@ func (s *SubTask) Uncomplete() {
 	s.CompletedAt = nil
 }
 
+func (s *SubTask) IsCompleted() bool {
+	return s.CompletedAt != nil
+}
+
 type Task struct {
 	Identity                core.Identity
 	ProjectIdentity         core.Identity
@@ -221,6 +225,10 @@ func (t *Task) Complete() {
 	t.CompletedAt = &now
 }
 
+func (t *Task) Uncomplete() {
+	t.CompletedAt = nil
+}
+
 func (t *Task) Delete() {
 	now := core.NewDateTime()
 	t.DeletedAt = &now
@@ -316,7 +324,7 @@ func (t *Task) RegisterAction(actionType TaskActionType, user *user.User) TaskAc
 		TaskIdentity: t.Identity,
 		Type:         actionType,
 		User:         user,
-		CreatedAT:    now,
+		CreatedAt:    now,
 	}
 }
 
@@ -397,5 +405,5 @@ type TaskAction struct {
 	TaskIdentity core.Identity
 	Type         TaskActionType
 	User         *user.User
-	CreatedAT    core.DateTime
+	CreatedAt    core.DateTime
 }

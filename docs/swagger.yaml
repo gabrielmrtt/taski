@@ -15,6 +15,45 @@ definitions:
       password:
         type: string
     type: object
+  ? github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto'
+        type: array
+      hasMore:
+        type: boolean
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskCommentDto:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto'
+        type: array
+      hasMore:
+        type: boolean
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskDto:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto'
+        type: array
+      hasMore:
+        type: boolean
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_team_TeamDto:
     properties:
       data:
@@ -44,6 +83,10 @@ definitions:
     properties:
       createdAt:
         type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       id:
         type: string
       name:
@@ -59,6 +102,8 @@ definitions:
     type: object
   github_com_gabrielmrtt_taski_internal_organization.OrganizationUserDto:
     properties:
+      lastAccessAt:
+        type: string
       organizationId:
         type: string
       role:
@@ -98,14 +143,54 @@ definitions:
       name:
         type: string
     type: object
+  github_com_gabrielmrtt_taski_internal_project.ProjectDocumentFileDto:
+    properties:
+      fileId:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      files:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentFileDto'
+        type: array
+      id:
+        type: string
+      latest:
+        type: boolean
+      projectDocumentVersionManagerId:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      userCreatorId:
+        type: string
+      userEditorId:
+        type: string
+      version:
+        type: string
+    type: object
   github_com_gabrielmrtt_taski_internal_project.ProjectDto:
     properties:
       color:
         type: string
       createdAt:
         type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       description:
         type: string
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       endAt:
         type: string
       id:
@@ -151,6 +236,19 @@ definitions:
       shouldSetTaskToCompleted:
         type: boolean
     type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectDocumentRequest:
+    properties:
+      content:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/multipart.FileHeader'
+        type: array
+      title:
+        type: string
+      version:
+        type: string
+    type: object
   github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectRequest:
     properties:
       color:
@@ -158,13 +256,13 @@ definitions:
       description:
         type: string
       endAt:
-        type: integer
+        type: string
       name:
         type: string
       priorityLevel:
         type: integer
       startAt:
-        type: integer
+        type: string
       workspaceId:
         type: string
     type: object
@@ -188,6 +286,19 @@ definitions:
       shouldUseOrder:
         type: boolean
     type: object
+  github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectDocumentRequest:
+    properties:
+      content:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/multipart.FileHeader'
+        type: array
+      title:
+        type: string
+      version:
+        type: string
+    type: object
   github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectRequest:
     properties:
       color:
@@ -195,13 +306,13 @@ definitions:
       description:
         type: string
       endAt:
-        type: integer
+        type: string
       name:
         type: string
       priorityLevel:
         type: integer
       startAt:
-        type: integer
+        type: string
       status:
         type: string
       workspaceId:
@@ -231,8 +342,12 @@ definitions:
     properties:
       createdAt:
         type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       description:
         type: string
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       id:
         type: string
       isSystemDefault:
@@ -274,12 +389,204 @@ definitions:
           type: string
         type: array
     type: object
-  github_com_gabrielmrtt_taski_internal_team.TeamDto:
+  github_com_gabrielmrtt_taski_internal_task.SubTaskDto:
     properties:
+      completedAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task.TaskCommentDto:
+    properties:
+      author:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      content:
+        type: string
+      createdAt:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentFileDto'
+        type: array
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task.TaskCommentFileDto:
+    properties:
+      fileId:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task.TaskDto:
+    properties:
+      childrenTasks:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto'
+        type: array
+      completedAt:
+        type: string
       createdAt:
         type: string
       description:
         type: string
+      dueDate:
+        type: string
+      estimatedMinutes:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      priorityLevel:
+        type: integer
+      subTasks:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.SubTaskDto'
+        type: array
+      updatedAt:
+        type: string
+      userCreatorId:
+        type: string
+      userEditorId:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskUserDto'
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_task.TaskUserDto:
+    properties:
+      userId:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.AddSubTaskRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ChangeTaskStatusRequest:
+    properties:
+      advanceOrder:
+        type: boolean
+      statusId:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateSubTaskRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskCommentRequest:
+    properties:
+      content:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/multipart.FileHeader'
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskRequest:
+    properties:
+      categoryId:
+        type: string
+      childrenTasks:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      dueDate:
+        type: string
+      estimatedMinutes:
+        type: integer
+      name:
+        type: string
+      parentTaskId:
+        type: string
+      priorityLevel:
+        type: integer
+      projectId:
+        type: string
+      statusId:
+        type: string
+      subTasks:
+        items:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateSubTaskRequest'
+        type: array
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ListTaskCommentsRequest:
+    properties:
+      authorId:
+        type: string
+      page:
+        type: integer
+      perPage:
+        type: integer
+      relations:
+        type: string
+      sortBy:
+        type: string
+      sortDirection:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateSubTaskRequest:
+    properties:
+      completed:
+        type: boolean
+      name:
+        type: string
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskCommentRequest:
+    properties:
+      content:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/multipart.FileHeader'
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskRequest:
+    properties:
+      categoryId:
+        type: string
+      childrenTasks:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      dueDate:
+        type: string
+      estimatedMinutes:
+        type: integer
+      name:
+        type: string
+      parentTaskId:
+        type: string
+      priorityLevel:
+        type: integer
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_gabrielmrtt_taski_internal_team.TeamDto:
+    properties:
+      createdAt:
+        type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
+      description:
+        type: string
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       id:
         type: string
       members:
@@ -288,6 +595,8 @@ definitions:
         type: array
       name:
         type: string
+      organization:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_organization.OrganizationDto'
       status:
         type: string
       updatedAt:
@@ -418,12 +727,18 @@ definitions:
         type: string
       createdAt:
         type: string
+      creator:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       description:
         type: string
+      editor:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_user.UserDto'
       id:
         type: string
       name:
         type: string
+      organization:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_organization.OrganizationDto'
       organizationId:
         type: string
       status:
@@ -636,6 +951,19 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_project_infra_http.CreateProjectDocumentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   internal_project_infra_http.CreateProjectResponse:
     properties:
       data:
@@ -666,6 +994,28 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectTaskStatusDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.DeleteProjectDocumentResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.DeleteProjectDocumentVersionResponse:
+    properties:
       message:
         type: string
       resource:
@@ -708,10 +1058,49 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_project_infra_http.GetProjectDocumentVersionResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDocumentVersionDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
   internal_project_infra_http.GetProjectResponse:
     properties:
       data:
         $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.ListProjectDocumentVersionsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.ListProjectDocumentsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_project_ProjectDocumentVersionDto'
       message:
         type: string
       resource:
@@ -751,6 +1140,17 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project.ProjectDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_project_infra_http.UpdateProjectDocumentResponse:
+    properties:
       message:
         type: string
       resource:
@@ -831,6 +1231,183 @@ definitions:
         type: string
     type: object
   internal_role_infra_http.UpdateRoleResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.AddSubTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.ChangeTaskStatusResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.CompleteSubTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.CompleteTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.CreateTaskCommentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.CreateTaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.DeleteTaskCommentResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.DeleteTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.GetTaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.ListTaskCommentsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskCommentDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.ListTasksResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core.PaginationOutput-github_com_gabrielmrtt_taski_internal_task_TaskDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.RemoveSubTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.UpdateSubTaskResponse:
+    properties:
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.UpdateTaskCommentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task.TaskCommentDto'
+      message:
+        type: string
+      resource:
+        type: string
+      status:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  internal_task_infra_http.UpdateTaskResponse:
     properties:
       message:
         type: string
@@ -1665,6 +2242,9 @@ paths:
         name: organizationId
         required: true
         type: string
+      - in: query
+        name: relations
+        type: string
       produces:
       - application/json
       responses:
@@ -2109,6 +2689,9 @@ paths:
         name: priorityLevel
         type: integer
       - in: query
+        name: relations
+        type: string
+      - in: query
         name: sortBy
         type: string
       - in: query
@@ -2310,6 +2893,334 @@ paths:
       summary: Update a project
       tags:
       - Project
+  /project/:projectId/document:
+    get:
+      consumes:
+      - application/json
+      description: Returns all project documents.
+      parameters:
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: relations
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      - in: query
+        name: title
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.ListProjectDocumentsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List project documents
+      tags:
+      - Project Document
+    post:
+      consumes:
+      - application/json
+      description: Creates a new project document.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.CreateProjectDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.CreateProjectDocumentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a project document
+      tags:
+      - Project Document
+  /project/:projectId/document/:documentVersionManagerId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing project document.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Document Version Manager ID
+        in: path
+        name: documentVersionManagerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.DeleteProjectDocumentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a project document
+      tags:
+      - Project Document
+    get:
+      consumes:
+      - application/json
+      description: Returns all project document versions.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Document Version Manager ID
+        in: path
+        name: documentVersionManagerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.ListProjectDocumentVersionsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List project document versions
+      tags:
+      - Project Document
+  /project/:projectId/document/:documentVersionManagerId/version/:documentVersionId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing project document version.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Document Version Manager ID
+        in: path
+        name: documentVersionManagerId
+        required: true
+        type: string
+      - description: Document Version ID
+        in: path
+        name: documentVersionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.DeleteProjectDocumentVersionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a project document version
+      tags:
+      - Project Document
+    get:
+      consumes:
+      - application/json
+      description: Returns a project document version by its ID.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Document Version Manager ID
+        in: path
+        name: documentVersionManagerId
+        required: true
+        type: string
+      - description: Document Version ID
+        in: path
+        name: documentVersionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.GetProjectDocumentVersionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get a project document version
+      tags:
+      - Project Document
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing project document.
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Document Version Manager ID
+        in: path
+        name: documentVersionManagerId
+        required: true
+        type: string
+      - description: Document Version ID
+        in: path
+        name: documentVersionId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_project_infra_http_requests.UpdateProjectDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_project_infra_http.UpdateProjectDocumentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a project document
+      tags:
+      - Project Document
   /project/:projectId/task-category:
     get:
       consumes:
@@ -2325,6 +3236,9 @@ paths:
       - in: query
         name: perPage
         type: integer
+      - in: query
+        name: relations
+        type: string
       - in: query
         name: sortBy
         type: string
@@ -2498,6 +3412,9 @@ paths:
       - in: query
         name: perPage
         type: integer
+      - in: query
+        name: relations
+        type: string
       - in: query
         name: sortBy
         type: string
@@ -2785,6 +3702,703 @@ paths:
       summary: Update a role in an organization
       tags:
       - Role
+  /task:
+    get:
+      consumes:
+      - application/json
+      description: Returns all accessible tasks by the authenticated user.
+      parameters:
+      - in: query
+        name: categoryId
+        type: string
+      - in: query
+        name: completed
+        type: boolean
+      - in: query
+        name: completedAtGte
+        type: integer
+      - in: query
+        name: completedAtLte
+        type: integer
+      - in: query
+        name: dueDateGte
+        type: integer
+      - in: query
+        name: dueDateLte
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: parentTaskId
+        type: string
+      - in: query
+        name: perPage
+        type: integer
+      - in: query
+        name: projectId
+        type: string
+      - in: query
+        name: relations
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: sortDirection
+        type: string
+      - in: query
+        name: statusId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.ListTasksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      description: Creates a new task.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.CreateTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a task
+      tags:
+      - Task
+  /task/:taskId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.DeleteTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a task
+      tags:
+      - Task
+    get:
+      consumes:
+      - application/json
+      description: Returns an accessible task by its ID.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.GetTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Get a task
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Updates an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.UpdateTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a task
+      tags:
+      - Task
+  /task/:taskId/comment:
+    get:
+      consumes:
+      - application/json
+      description: Returns all accessible task comments by the authenticated user.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ListTaskCommentsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.ListTaskCommentsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: List task comments
+      tags:
+      - Task Comment
+    post:
+      consumes:
+      - application/json
+      description: Creates a new task comment.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.CreateTaskCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.CreateTaskCommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Create a task comment
+      tags:
+      - Task Comment
+  /task/:taskId/comment/:commentId:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an accessible task comment.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.DeleteTaskCommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Delete a task comment
+      tags:
+      - Task Comment
+    put:
+      consumes:
+      - application/json
+      description: Updates an accessible task comment.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateTaskCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.UpdateTaskCommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a task comment
+      tags:
+      - Task Comment
+  /task/:taskId/complete:
+    post:
+      consumes:
+      - application/json
+      description: Completes an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.CompleteTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Complete a task
+      tags:
+      - Task
+  /task/:taskId/status:
+    put:
+      consumes:
+      - application/json
+      description: Changes the status of an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.ChangeTaskStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.ChangeTaskStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Change the status of a task
+      tags:
+      - Task
+  /task/:taskId/sub-task:
+    post:
+      consumes:
+      - application/json
+      description: Adds a sub task to an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.AddSubTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.AddSubTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Add a sub task to a task
+      tags:
+      - Task
+  /task/:taskId/sub-task/:subTaskId:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a sub task from an accessible task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Sub Task ID
+        in: path
+        name: subTaskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.RemoveSubTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Remove a sub task from a task
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Updates an accessible sub task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Sub Task ID
+        in: path
+        name: subTaskId
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_task_infra_http_requests.UpdateSubTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.UpdateSubTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Update a sub task
+      tags:
+      - Task
+  /task/:taskId/sub-task/:subTaskId/complete:
+    post:
+      consumes:
+      - application/json
+      description: Completes an accessible sub task.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Sub Task ID
+        in: path
+        name: subTaskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_task_infra_http.CompleteSubTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_gabrielmrtt_taski_internal_core_http.HttpErrorResponse'
+      summary: Complete a sub task
+      tags:
+      - Task
   /team:
     get:
       consumes:
@@ -2892,6 +4506,9 @@ paths:
         in: path
         name: teamId
         required: true
+        type: string
+      - in: query
+        name: relations
         type: string
       produces:
       - application/json
@@ -3145,6 +4762,9 @@ paths:
         name: perPage
         type: integer
       - in: query
+        name: relations
+        type: string
+      - in: query
         name: sortBy
         type: string
       - in: query
@@ -3282,6 +4902,9 @@ paths:
         in: path
         name: workspaceId
         required: true
+        type: string
+      - in: query
+        name: relations
         type: string
       produces:
       - application/json

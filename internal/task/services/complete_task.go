@@ -7,37 +7,36 @@ import (
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
 )
 
-type RemoveSubTaskService struct {
+type CompleteTaskService struct {
 	TaskRepository        taskrepo.TaskRepository
-	TransactionRepository core.TransactionRepository
 	TaskActionRepository  taskrepo.TaskActionRepository
 	ProjectUserRepository projectrepo.ProjectUserRepository
+	TransactionRepository core.TransactionRepository
 }
 
-func NewRemoveSubTaskService(
+func NewCompleteTaskService(
 	taskRepository taskrepo.TaskRepository,
 	taskActionRepository taskrepo.TaskActionRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
-) *RemoveSubTaskService {
-	return &RemoveSubTaskService{
+) *CompleteTaskService {
+	return &CompleteTaskService{
 		TaskRepository:        taskRepository,
-		TransactionRepository: transactionRepository,
 		TaskActionRepository:  taskActionRepository,
 		ProjectUserRepository: projectUserRepository,
+		TransactionRepository: transactionRepository,
 	}
 }
 
-type RemoveSubTaskInput struct {
-	OrganizationIdentity *core.Identity
-	TaskIdentity         core.Identity
-	SubTaskIdentity      core.Identity
-	UserRemoverIdentity  core.Identity
+type CompleteTaskInput struct {
+	OrganizationIdentity  *core.Identity
+	TaskIdentity          core.Identity
+	UserCompleterIdentity core.Identity
 }
 
-func (i RemoveSubTaskInput) Validate() error { return nil }
+func (i CompleteTaskInput) Validate() error { return nil }
 
-func (s *RemoveSubTaskService) Execute(input RemoveSubTaskInput) error {
+func (s *CompleteTaskService) Execute(input CompleteTaskInput) error {
 	if err := input.Validate(); err != nil {
 		return err
 	}
@@ -65,35 +64,41 @@ func (s *RemoveSubTaskService) Execute(input RemoveSubTaskInput) error {
 		return core.NewNotFoundError("task not found")
 	}
 
-	userRemover, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+	userCompleter, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
 		ProjectIdentity: tsk.ProjectIdentity,
-		UserIdentity:    input.UserRemoverIdentity,
+		UserIdentity:    input.UserCompleterIdentity,
 	})
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	if userRemover == nil {
+	if userCompleter == nil {
 		tx.Rollback()
-		return core.NewNotFoundError("project user remover not found")
+		return core.NewNotFoundError("project user completer not found")
 	}
 
-	subTask := tsk.GetSubTaskByIdentity(input.SubTaskIdentity)
-	if subTask == nil {
-		tx.Rollback()
-		return core.NewNotFoundError("sub task not found")
+	var actionType task.TaskActionType
+	if tsk.IsCompleted() {
+		actionType = task.TaskActionTypeUncomplete
+	} else {
+		actionType = task.TaskActionTypeComplete
 	}
 
-	err = s.TaskRepository.RemoveSubTask(taskrepo.RemoveSubTaskParams{
-		Task:    tsk,
-		SubTask: subTask,
+	if tsk.IsCompleted() {
+		tsk.Uncomplete()
+	} else {
+		tsk.Complete()
+	}
+
+	err = s.TaskRepository.UpdateTask(taskrepo.UpdateTaskParams{
+		Task: tsk,
 	})
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	taskAction := tsk.RegisterAction(task.TaskActionTypeRemoveSubTask, &userRemover.User)
+	taskAction := tsk.RegisterAction(actionType, &userCompleter.User)
 	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
 		TaskAction: &taskAction,
 	})
@@ -109,5 +114,4 @@ func (s *RemoveSubTaskService) Execute(input RemoveSubTaskInput) error {
 	}
 
 	return nil
-
 }

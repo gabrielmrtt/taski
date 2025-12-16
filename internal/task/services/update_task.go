@@ -9,6 +9,7 @@ import (
 
 type UpdateTaskService struct {
 	TaskRepository                taskrepo.TaskRepository
+	TaskActionRepository          taskrepo.TaskActionRepository
 	ProjectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository
 	ProjectUserRepository         projectrepo.ProjectUserRepository
 	TransactionRepository         core.TransactionRepository
@@ -16,12 +17,14 @@ type UpdateTaskService struct {
 
 func NewUpdateTaskService(
 	taskRepository taskrepo.TaskRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
 	projectTaskCategoryRepository projectrepo.ProjectTaskCategoryRepository,
 	projectUserRepository projectrepo.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *UpdateTaskService {
 	return &UpdateTaskService{
 		TaskRepository:                taskRepository,
+		TaskActionRepository:          taskActionRepository,
 		ProjectTaskCategoryRepository: projectTaskCategoryRepository,
 		ProjectUserRepository:         projectUserRepository,
 		TransactionRepository:         transactionRepository,
@@ -104,6 +107,7 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 
 	s.TaskRepository.SetTransaction(tx)
 	s.ProjectTaskCategoryRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
 
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 		TaskIdentity:         input.TaskIdentity,
@@ -117,6 +121,20 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 	if tsk == nil {
 		tx.Rollback()
 		return core.NewNotFoundError("task not found")
+	}
+
+	userEditor, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+		ProjectIdentity: tsk.ProjectIdentity,
+		UserIdentity:    input.UserEditorIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if userEditor == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("project user editor not found")
 	}
 
 	if input.CategoryIdentity != nil {
@@ -238,6 +256,16 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 
 	err = s.TaskRepository.UpdateTask(taskrepo.UpdateTaskParams{
 		Task: tsk,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeUpdate, &userEditor.User)
+
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
 	})
 	if err != nil {
 		tx.Rollback()

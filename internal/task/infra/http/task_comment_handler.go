@@ -39,7 +39,7 @@ type ListTaskCommentsResponse = corehttp.HttpSuccessResponseWithData[core.Pagina
 // ListTaskComments godoc
 // @Summary List task comments
 // @Description Returns all accessible task comments by the authenticated user.
-// @Tags Task Comment
+// @Tags Task
 // @Accept json
 // @Param taskId path string true "Task ID"
 // @Param request body taskhttprequests.ListTaskCommentsRequest true "Request body"
@@ -76,7 +76,7 @@ type CreateTaskCommentResponse = corehttp.HttpSuccessResponseWithData[task.TaskC
 // CreateTaskComment godoc
 // @Summary Create a task comment
 // @Description Creates a new task comment.
-// @Tags Task Comment
+// @Tags Task
 // @Accept json
 // @Param taskId path string true "Task ID"
 // @Param request body taskhttprequests.CreateTaskCommentRequest true "Request body"
@@ -114,7 +114,7 @@ type UpdateTaskCommentResponse = corehttp.HttpSuccessResponseWithData[task.TaskC
 // UpdateTaskComment godoc
 // @Summary Update a task comment
 // @Description Updates an accessible task comment.
-// @Tags Task Comment
+// @Tags Task
 // @Accept json
 // @Param taskId path string true "Task ID"
 // @Param commentId path string true "Comment ID"
@@ -154,7 +154,7 @@ type DeleteTaskCommentResponse = corehttp.EmptyHttpSuccessResponse
 // DeleteTaskComment godoc
 // @Summary Delete a task comment
 // @Description Deletes an accessible task comment.
-// @Tags Task Comment
+// @Tags Task
 // @Accept json
 // @Param taskId path string true "Task ID"
 // @Param commentId path string true "Comment ID"

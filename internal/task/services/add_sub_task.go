@@ -2,6 +2,7 @@ package taskservice
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
+	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	"github.com/gabrielmrtt/taski/internal/task"
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
 )
@@ -9,15 +10,21 @@ import (
 type AddSubTaskService struct {
 	TaskRepository        taskrepo.TaskRepository
 	TransactionRepository core.TransactionRepository
+	TaskActionRepository  taskrepo.TaskActionRepository
+	ProjectUserRepository projectrepo.ProjectUserRepository
 }
 
 func NewAddSubTaskService(
 	taskRepository taskrepo.TaskRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
+	projectUserRepository projectrepo.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *AddSubTaskService {
 	return &AddSubTaskService{
 		TaskRepository:        taskRepository,
 		TransactionRepository: transactionRepository,
+		TaskActionRepository:  taskActionRepository,
+		ProjectUserRepository: projectUserRepository,
 	}
 }
 
@@ -25,6 +32,7 @@ type AddSubTaskInput struct {
 	OrganizationIdentity *core.Identity
 	TaskIdentity         core.Identity
 	Name                 string
+	UserCreatorIdentity  core.Identity
 }
 
 func (i AddSubTaskInput) Validate() error {
@@ -55,6 +63,8 @@ func (s *AddSubTaskService) Execute(input AddSubTaskInput) error {
 	}
 
 	s.TaskRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
 
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 		TaskIdentity:         input.TaskIdentity,
@@ -70,6 +80,20 @@ func (s *AddSubTaskService) Execute(input AddSubTaskInput) error {
 		return core.NewNotFoundError("task not found")
 	}
 
+	userCreator, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+		ProjectIdentity: tsk.ProjectIdentity,
+		UserIdentity:    input.UserCreatorIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if userCreator == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("project user creator not found")
+	}
+
 	subTask, err := task.NewSubTask(task.NewSubTaskInput{
 		Name: input.Name,
 	})
@@ -81,6 +105,15 @@ func (s *AddSubTaskService) Execute(input AddSubTaskInput) error {
 	err = s.TaskRepository.AddSubTask(taskrepo.AddSubTaskParams{
 		Task:    tsk,
 		SubTask: subTask,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeAddSubTask, &userCreator.User)
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
 	})
 	if err != nil {
 		tx.Rollback()

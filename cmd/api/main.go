@@ -9,7 +9,7 @@ import (
 	organizationinfra "github.com/gabrielmrtt/taski/internal/organization/infra"
 	projectinfra "github.com/gabrielmrtt/taski/internal/project/infra"
 	roleinfra "github.com/gabrielmrtt/taski/internal/role/infra"
-	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
+	sharedpostgres "github.com/gabrielmrtt/taski/internal/shared/postgres"
 	taskinfra "github.com/gabrielmrtt/taski/internal/task/infra"
 	teaminfra "github.com/gabrielmrtt/taski/internal/team/infra"
 	userinfra "github.com/gabrielmrtt/taski/internal/user/infra"
@@ -31,7 +31,7 @@ func bootstrapApplication() {
 
 	docs.SwaggerInfo.BasePath = fmt.Sprintf("/api/%s", apiVersion)
 
-	dbConnection := shareddatabase.GetPostgresConnection()
+	dbConnection := sharedpostgres.GetPostgresConnection()
 
 	g := engine.Group(fmt.Sprintf("/api/%s", apiVersion))
 	{

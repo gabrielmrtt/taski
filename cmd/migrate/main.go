@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gabrielmrtt/taski/config"
-	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
+	sharedpostgres "github.com/gabrielmrtt/taski/internal/shared/postgres"
 )
 
 type MigrationConfig struct {
@@ -25,7 +25,7 @@ type DatabaseConfig struct {
 func getDatabaseConfig(env string) DatabaseConfig {
 	switch env {
 	case "default":
-		shareddatabase.GetPostgresConnection()
+		sharedpostgres.GetPostgresConnection()
 		return DatabaseConfig{
 			ConnectionURL: fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 				config.GetInstance().PostgresUsername,

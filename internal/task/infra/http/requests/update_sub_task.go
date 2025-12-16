@@ -9,7 +9,6 @@ type UpdateSubTaskRequest struct {
 
 func (r *UpdateSubTaskRequest) ToInput() taskservice.UpdateSubTaskInput {
 	return taskservice.UpdateSubTaskInput{
-		Name:      r.Name,
-		Completed: r.Completed,
+		Name: r.Name,
 	}
 }

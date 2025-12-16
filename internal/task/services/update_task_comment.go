@@ -2,6 +2,7 @@ package taskservice
 
 import (
 	"github.com/gabrielmrtt/taski/internal/core"
+	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
 	storagerepo "github.com/gabrielmrtt/taski/internal/storage/repository"
 	storageservice "github.com/gabrielmrtt/taski/internal/storage/service"
 	"github.com/gabrielmrtt/taski/internal/task"
@@ -11,23 +12,29 @@ import (
 type UpdateTaskCommentService struct {
 	TaskCommentRepository  taskrepo.TaskCommentRepository
 	TaskRepository         taskrepo.TaskRepository
+	ProjectUserRepository  projectrepo.ProjectUserRepository
 	UploadedFileRepository storagerepo.UploadedFileRepository
 	StorageRepository      storagerepo.StorageRepository
+	TaskActionRepository   taskrepo.TaskActionRepository
 	TransactionRepository  core.TransactionRepository
 }
 
 func NewUpdateTaskCommentService(
 	taskCommentRepository taskrepo.TaskCommentRepository,
 	taskRepository taskrepo.TaskRepository,
+	projectUserRepository projectrepo.ProjectUserRepository,
 	uploadedFileRepository storagerepo.UploadedFileRepository,
 	storageRepository storagerepo.StorageRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
 	transactionRepository core.TransactionRepository,
 ) *UpdateTaskCommentService {
 	return &UpdateTaskCommentService{
 		TaskCommentRepository:  taskCommentRepository,
 		TaskRepository:         taskRepository,
+		ProjectUserRepository:  projectUserRepository,
 		UploadedFileRepository: uploadedFileRepository,
 		StorageRepository:      storageRepository,
+		TaskActionRepository:   taskActionRepository,
 		TransactionRepository:  transactionRepository,
 	}
 }
@@ -72,6 +79,33 @@ func (s *UpdateTaskCommentService) Execute(input UpdateTaskCommentInput) error {
 	s.TaskCommentRepository.SetTransaction(tx)
 	s.TaskRepository.SetTransaction(tx)
 	s.UploadedFileRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
+
+	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
+		TaskIdentity: input.TaskIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if tsk == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("task not found")
+	}
+
+	userEditor, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+		ProjectIdentity: tsk.ProjectIdentity,
+		UserIdentity:    input.UserEditorIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if userEditor == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("project user editor not found")
+	}
 
 	comment, err := s.TaskCommentRepository.GetTaskCommentByIdentity(taskrepo.GetTaskCommentByIdentityParams{
 		TaskCommentIdentity: input.TaskCommentIdentity,
@@ -131,6 +165,15 @@ func (s *UpdateTaskCommentService) Execute(input UpdateTaskCommentInput) error {
 
 	err = s.TaskCommentRepository.UpdateTaskComment(taskrepo.UpdateTaskCommentParams{
 		TaskComment: comment,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeUpdateComment, &userEditor.User)
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
 	})
 	if err != nil {
 		tx.Rollback()

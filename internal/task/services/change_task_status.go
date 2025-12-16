@@ -4,23 +4,30 @@ import (
 	"github.com/gabrielmrtt/taski/internal/core"
 	"github.com/gabrielmrtt/taski/internal/project"
 	projectrepo "github.com/gabrielmrtt/taski/internal/project/repository"
+	"github.com/gabrielmrtt/taski/internal/task"
 	taskrepo "github.com/gabrielmrtt/taski/internal/task/repository"
 )
 
 type ChangeTaskStatusService struct {
 	TaskRepository              taskrepo.TaskRepository
 	ProjectTaskStatusRepository projectrepo.ProjectTaskStatusRepository
+	TaskActionRepository        taskrepo.TaskActionRepository
+	ProjectUserRepository       projectrepo.ProjectUserRepository
 	TransactionRepository       core.TransactionRepository
 }
 
 func NewChangeTaskStatusService(
 	taskRepository taskrepo.TaskRepository,
 	projectTaskStatusRepository projectrepo.ProjectTaskStatusRepository,
+	taskActionRepository taskrepo.TaskActionRepository,
+	projectUserRepository projectrepo.ProjectUserRepository,
 	transactionRepository core.TransactionRepository,
 ) *ChangeTaskStatusService {
 	return &ChangeTaskStatusService{
 		TaskRepository:              taskRepository,
 		ProjectTaskStatusRepository: projectTaskStatusRepository,
+		TaskActionRepository:        taskActionRepository,
+		ProjectUserRepository:       projectUserRepository,
 		TransactionRepository:       transactionRepository,
 	}
 }
@@ -71,6 +78,8 @@ func (s *ChangeTaskStatusService) Execute(input ChangeTaskStatusInput) error {
 
 	s.TaskRepository.SetTransaction(tx)
 	s.ProjectTaskStatusRepository.SetTransaction(tx)
+	s.TaskActionRepository.SetTransaction(tx)
+	s.ProjectUserRepository.SetTransaction(tx)
 
 	tsk, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 		TaskIdentity:         input.TaskIdentity,
@@ -84,6 +93,19 @@ func (s *ChangeTaskStatusService) Execute(input ChangeTaskStatusInput) error {
 	if tsk == nil {
 		tx.Rollback()
 		return core.NewNotFoundError("task not found")
+	}
+
+	userChangedBy, err := s.ProjectUserRepository.GetProjectUserByIdentity(projectrepo.GetProjectUserByIdentityParams{
+		ProjectIdentity: tsk.ProjectIdentity,
+		UserIdentity:    input.ChangedByUserIdentity,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if userChangedBy == nil {
+		tx.Rollback()
+		return core.NewNotFoundError("project user changed by not found")
 	}
 
 	projectStatuses, err := s.ProjectTaskStatusRepository.ListProjectTaskStatusesBy(projectrepo.ListProjectTaskStatusesByParams{
@@ -150,6 +172,15 @@ func (s *ChangeTaskStatusService) Execute(input ChangeTaskStatusInput) error {
 			tx.Rollback()
 			return err
 		}
+	}
+
+	taskAction := tsk.RegisterAction(task.TaskActionTypeChangeStatus, &userChangedBy.User)
+	_, err = s.TaskActionRepository.StoreTaskAction(taskrepo.StoreTaskActionParams{
+		TaskAction: &taskAction,
+	})
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	err = tx.Commit()

@@ -1,4 +1,4 @@
-package shareddatabase
+package shreadpostgres
 
 import (
 	"database/sql"

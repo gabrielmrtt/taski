@@ -6,7 +6,7 @@ import (
 
 	"github.com/gabrielmrtt/taski/cmd/seed/seeders"
 	roledatabase "github.com/gabrielmrtt/taski/internal/role/infra/database"
-	shareddatabase "github.com/gabrielmrtt/taski/internal/shared/database"
+	sharedpostgres "github.com/gabrielmrtt/taski/internal/shared/postgres"
 	"github.com/uptrace/bun"
 )
 
@@ -31,7 +31,7 @@ func getDatabaseRepositories(env string) (DatabaseRepositories, *bun.DB) {
 
 	switch env {
 	case "default":
-		connection = shareddatabase.GetPostgresConnection()
+		connection = sharedpostgres.GetPostgresConnection()
 		permissionRepository = roledatabase.NewPermissionBunRepository(connection)
 		roleRepository = roledatabase.NewRoleBunRepository(connection)
 	case "test":
