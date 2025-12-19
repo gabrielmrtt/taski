@@ -23,26 +23,32 @@ func (r *UpdateTaskRequest) ToInput() taskservice.UpdateTaskInput {
 
 	var categoryIdentity *core.Identity = nil
 	if r.CategoryId != nil {
-		identity := core.NewIdentity(*r.CategoryId)
+		identity := core.NewIdentityFromPublic(*r.CategoryId)
 		categoryIdentity = &identity
 	}
 
 	var parentTaskIdentity *core.Identity = nil
 	if r.ParentTaskId != nil {
-		identity := core.NewIdentity(*r.ParentTaskId)
+		identity := core.NewIdentityFromPublic(*r.ParentTaskId)
 		parentTaskIdentity = &identity
 	}
 
-	var users []*core.Identity = make([]*core.Identity, len(*r.Users))
-	for i, user := range *r.Users {
-		identity := core.NewIdentity(user)
-		users[i] = &identity
+	var users []*core.Identity = nil
+	if r.Users != nil {
+		users = make([]*core.Identity, len(*r.Users))
+		for i, user := range *r.Users {
+			identity := core.NewIdentityFromPublic(user)
+			users[i] = &identity
+		}
 	}
 
-	var childrenTasks []*core.Identity = make([]*core.Identity, len(*r.ChildrenTasks))
-	for i, childTask := range *r.ChildrenTasks {
-		identity := core.NewIdentity(childTask)
-		childrenTasks[i] = &identity
+	var childrenTasks []*core.Identity = nil
+	if r.ChildrenTasks != nil {
+		childrenTasks = make([]*core.Identity, len(*r.ChildrenTasks))
+		for i, childTask := range *r.ChildrenTasks {
+			identity := core.NewIdentityFromPublic(childTask)
+			childrenTasks[i] = &identity
+		}
 	}
 
 	var priorityLevel *task.TaskPriorityLevels = nil
@@ -55,9 +61,10 @@ func (r *UpdateTaskRequest) ToInput() taskservice.UpdateTaskInput {
 	if r.DueDate != nil {
 		d, err := core.NewDateTimeFromRFC3339(*r.DueDate)
 		if err != nil {
-			return taskservice.UpdateTaskInput{}
+			dueDate = nil
+		} else {
+			dueDate = &d
 		}
-		dueDate = &d
 	}
 
 	return taskservice.UpdateTaskInput{

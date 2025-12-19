@@ -87,7 +87,7 @@ func (s *CompleteTaskService) Execute(input CompleteTaskInput) error {
 	if tsk.IsCompleted() {
 		tsk.Uncomplete()
 	} else {
-		tsk.Complete()
+		tsk.Complete(&input.UserCompleterIdentity)
 	}
 
 	err = s.TaskRepository.UpdateTask(taskrepo.UpdateTaskParams{

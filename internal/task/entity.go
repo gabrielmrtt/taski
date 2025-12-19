@@ -115,11 +115,9 @@ func NewTask(input NewTaskInput) (*Task, error) {
 	var taskType TaskType = TaskTypeNormal
 
 	if input.ChildrenTasks != nil {
-		if len(input.ChildrenTasks) == 0 {
-			return nil, core.NewInternalError("children tasks cannot be empty")
+		if len(input.ChildrenTasks) > 0 {
+			taskType = TaskTypeGroup
 		}
-
-		taskType = TaskTypeGroup
 	}
 
 	return &Task{
@@ -220,13 +218,15 @@ func (t *Task) ChangeCategory(category *project.ProjectTaskCategory, userEditorI
 	return nil
 }
 
-func (t *Task) Complete() {
+func (t *Task) Complete(userCompleterIdentity *core.Identity) {
 	now := core.NewDateTime()
 	t.CompletedAt = &now
+	t.UserCompletedByIdentity = userCompleterIdentity
 }
 
 func (t *Task) Uncomplete() {
 	t.CompletedAt = nil
+	t.UserCompletedByIdentity = nil
 }
 
 func (t *Task) Delete() {

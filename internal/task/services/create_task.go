@@ -218,6 +218,7 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 	}
 
 	var parentTask *task.Task = nil
+	var parentTaskIdentity *core.Identity = nil
 	if input.ParentTaskIdentity != nil {
 		parentTask, err = s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
 			TaskIdentity:    *input.ParentTaskIdentity,
@@ -232,6 +233,8 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 			tx.Rollback()
 			return nil, core.NewNotFoundError("parent task not found")
 		}
+
+		parentTaskIdentity = &parentTask.Identity
 	}
 
 	subTasks := make([]*task.SubTask, 0)
@@ -291,7 +294,7 @@ func (s *CreateTaskService) Execute(input CreateTaskInput) (*task.TaskDto, error
 		ProjectIdentity:     input.ProjectIdentity,
 		Status:              status,
 		Category:            category,
-		ParentTaskIdentity:  &parentTask.Identity,
+		ParentTaskIdentity:  parentTaskIdentity,
 		Name:                input.Name,
 		Description:         input.Description,
 		EstimatedMinutes:    input.EstimatedMinutes,

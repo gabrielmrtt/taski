@@ -69,8 +69,8 @@ type TaskTable struct {
 	DueDate                       *int64  `bun:"due_date,type:bigint"`
 	CompletedAt                   *int64  `bun:"completed_at,type:bigint"`
 	Type                          string  `bun:"type,notnull,type:varchar(100)"`
-	ProjectTaskStatusInternalId   string  `bun:"project_task_status_internal_id,notnull,type:uuid"`
-	ProjectTaskCategoryInternalId string  `bun:"project_task_category_internal_id,notnull,type:uuid"`
+	ProjectTaskStatusInternalId   *string `bun:"project_task_status_internal_id,type:uuid"`
+	ProjectTaskCategoryInternalId *string `bun:"project_task_category_internal_id,type:uuid"`
 	ParentTaskInternalId          *string `bun:"parent_task_internal_id,type:uuid"`
 	ProjectInternalId             string  `bun:"project_internal_id,notnull,type:uuid"`
 	UserCompletedInternalId       *string `bun:"user_completed_internal_id,type:uuid"`
@@ -112,12 +112,12 @@ func (t *TaskTable) ToEntity() *task.Task {
 	}
 
 	var projectTaskStatus *project.ProjectTaskStatus = nil
-	if t.ProjectTaskStatusInternalId != "" {
+	if t.ProjectTaskStatusInternalId != nil {
 		projectTaskStatus = t.ProjectTaskStatus.ToEntity()
 	}
 
 	var projectTaskCategory *project.ProjectTaskCategory = nil
-	if t.ProjectTaskCategoryInternalId != "" {
+	if t.ProjectTaskCategoryInternalId != nil {
 		projectTaskCategory = t.ProjectTaskCategory.ToEntity()
 	}
 
@@ -288,6 +288,8 @@ func (r *TaskBunRepository) GetTaskByIdentity(params taskrepo.GetTaskByIdentityP
 
 	if r.tx != nil && !r.tx.IsClosed() {
 		selectQuery = r.tx.Tx.NewSelect()
+	} else {
+		selectQuery = r.db.NewSelect()
 	}
 
 	selectQuery = selectQuery.Model(task)
@@ -585,6 +587,18 @@ func (r *TaskBunRepository) StoreTask(params taskrepo.StoreTaskParams) (*task.Ta
 		deletedAt = &params.Task.DeletedAt.Value
 	}
 
+	var projectTaskStatusInternalId *string = nil
+	if params.Task.Status != nil {
+		internalId := params.Task.Status.Identity.Internal.String()
+		projectTaskStatusInternalId = &internalId
+	}
+
+	var projectTaskCategoryInternalId *string = nil
+	if params.Task.Category != nil {
+		internalId := params.Task.Category.Identity.Internal.String()
+		projectTaskCategoryInternalId = &internalId
+	}
+
 	_, err := tx.NewInsert().Model(&TaskTable{
 		InternalId:                    params.Task.Identity.Internal.String(),
 		PublicId:                      params.Task.Identity.Public,
@@ -595,8 +609,8 @@ func (r *TaskBunRepository) StoreTask(params taskrepo.StoreTaskParams) (*task.Ta
 		DueDate:                       dueDate,
 		CompletedAt:                   completedAt,
 		Type:                          string(params.Task.Type),
-		ProjectTaskStatusInternalId:   params.Task.Status.Identity.Internal.String(),
-		ProjectTaskCategoryInternalId: params.Task.Category.Identity.Internal.String(),
+		ProjectTaskStatusInternalId:   projectTaskStatusInternalId,
+		ProjectTaskCategoryInternalId: projectTaskCategoryInternalId,
 		ParentTaskInternalId:          parentTaskInternalId,
 		ProjectInternalId:             params.Task.ProjectIdentity.Internal.String(),
 		UserCreatorInternalId:         params.Task.UserCreatorIdentity.Internal.String(),
@@ -661,6 +675,12 @@ func (r *TaskBunRepository) UpdateTask(params taskrepo.UpdateTaskParams) error {
 		userEditorInternalId = &internalId
 	}
 
+	var userCompletedInternalId *string = nil
+	if params.Task.UserCompletedByIdentity != nil {
+		internalId := params.Task.UserCompletedByIdentity.Internal.String()
+		userCompletedInternalId = &internalId
+	}
+
 	var dueDate *int64 = nil
 	if params.Task.DueDate != nil {
 		dueDate = &params.Task.DueDate.Value
@@ -681,6 +701,18 @@ func (r *TaskBunRepository) UpdateTask(params taskrepo.UpdateTaskParams) error {
 		deletedAt = &params.Task.DeletedAt.Value
 	}
 
+	var projectTaskStatusInternalId *string = nil
+	if params.Task.Status != nil {
+		internalId := params.Task.Status.Identity.Internal.String()
+		projectTaskStatusInternalId = &internalId
+	}
+
+	var projectTaskCategoryInternalId *string = nil
+	if params.Task.Category != nil {
+		internalId := params.Task.Category.Identity.Internal.String()
+		projectTaskCategoryInternalId = &internalId
+	}
+
 	taskTable := &TaskTable{
 		InternalId:                    params.Task.Identity.Internal.String(),
 		PublicId:                      params.Task.Identity.Public,
@@ -691,12 +723,14 @@ func (r *TaskBunRepository) UpdateTask(params taskrepo.UpdateTaskParams) error {
 		DueDate:                       dueDate,
 		CompletedAt:                   completedAt,
 		Type:                          string(params.Task.Type),
-		ProjectTaskStatusInternalId:   params.Task.Status.Identity.Internal.String(),
-		ProjectTaskCategoryInternalId: params.Task.Category.Identity.Internal.String(),
+		ProjectTaskStatusInternalId:   projectTaskStatusInternalId,
+		ProjectTaskCategoryInternalId: projectTaskCategoryInternalId,
 		ParentTaskInternalId:          parentTaskInternalId,
 		ProjectInternalId:             params.Task.ProjectIdentity.Internal.String(),
 		UserCreatorInternalId:         params.Task.UserCreatorIdentity.Internal.String(),
 		UserEditorInternalId:          userEditorInternalId,
+		UserCompletedInternalId:       userCompletedInternalId,
+		CreatedAt:                     params.Task.Timestamps.CreatedAt.Value,
 		UpdatedAt:                     updatedAt,
 		DeletedAt:                     deletedAt,
 	}

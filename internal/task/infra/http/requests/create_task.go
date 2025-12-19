@@ -61,14 +61,15 @@ func (r *CreateTaskRequest) ToInput() taskservice.CreateTaskInput {
 	if r.DueDate != nil {
 		d, err := core.NewDateTimeFromRFC3339(*r.DueDate)
 		if err != nil {
-			return taskservice.CreateTaskInput{}
+			dueDate = nil
+		} else {
+			dueDate = &d
 		}
-		dueDate = &d
 	}
 
 	return taskservice.CreateTaskInput{
-		ProjectIdentity:    core.NewIdentity(r.ProjectId),
-		StatusIdentity:     core.NewIdentity(r.StatusId),
+		ProjectIdentity:    core.NewIdentityFromPublic(r.ProjectId),
+		StatusIdentity:     core.NewIdentityFromPublic(r.StatusId),
 		CategoryIdentity:   categoryIdentity,
 		ParentTaskIdentity: parentTaskIdentity,
 		Name:               r.Name,

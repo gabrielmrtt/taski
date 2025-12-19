@@ -5,9 +5,9 @@ import (
 )
 
 type SubTaskDto struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	CompletedAt string `json:"completedAt"`
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	CompletedAt *string `json:"completedAt"`
 }
 
 func SubTaskToDto(subTask *SubTask) *SubTaskDto {
@@ -20,7 +20,7 @@ func SubTaskToDto(subTask *SubTask) *SubTaskDto {
 	return &SubTaskDto{
 		Id:          subTask.Identity.Public,
 		Name:        subTask.Name,
-		CompletedAt: *completedAt,
+		CompletedAt: completedAt,
 	}
 }
 
@@ -40,13 +40,15 @@ type TaskDto struct {
 	Description      string         `json:"description"`
 	EstimatedMinutes int16          `json:"estimatedMinutes"`
 	PriorityLevel    int8           `json:"priorityLevel"`
-	DueDate          string         `json:"dueDate"`
-	CompletedAt      string         `json:"completedAt"`
+	DueDate          *string        `json:"dueDate"`
+	CompletedAt      *string        `json:"completedAt"`
 	SubTasks         []*SubTaskDto  `json:"subTasks"`
 	ChildrenTasks    []*TaskDto     `json:"childrenTasks"`
+	ParentTaskId     *string        `json:"parentTaskId"`
 	Users            []*TaskUserDto `json:"users"`
 	UserCreatorId    string         `json:"userCreatorId"`
 	UserEditorId     *string        `json:"userEditorId"`
+	UserCompletedId  *string        `json:"userCompletedId"`
 	CreatedAt        string         `json:"createdAt"`
 	UpdatedAt        *string        `json:"updatedAt"`
 }
@@ -95,19 +97,31 @@ func TaskToDto(task *Task) *TaskDto {
 		userEditorId = &task.UserEditorIdentity.Public
 	}
 
+	var userCompletedId *string = nil
+	if task.UserCompletedByIdentity != nil {
+		userCompletedId = &task.UserCompletedByIdentity.Public
+	}
+
+	var parentTaskId *string = nil
+	if task.ParentTaskIdentity != nil {
+		parentTaskId = &task.ParentTaskIdentity.Public
+	}
+
 	return &TaskDto{
 		Id:               task.Identity.Public,
 		Name:             task.Name,
 		Description:      task.Description,
 		EstimatedMinutes: *task.EstimatedMinutes,
 		PriorityLevel:    int8(task.PriorityLevel),
-		DueDate:          *dueDate,
-		CompletedAt:      *completedAt,
+		DueDate:          dueDate,
+		CompletedAt:      completedAt,
 		SubTasks:         subTasksDto,
 		ChildrenTasks:    childrenTasksDto,
+		ParentTaskId:     parentTaskId,
 		Users:            usersDto,
 		UserCreatorId:    *userCreatorId,
 		UserEditorId:     userEditorId,
+		UserCompletedId:  userCompletedId,
 		CreatedAt:        task.Timestamps.CreatedAt.ToRFC3339(),
 		UpdatedAt:        updatedAt,
 	}
@@ -152,5 +166,21 @@ func TaskCommentToDto(taskComment *TaskComment) *TaskCommentDto {
 		Author:    author,
 		CreatedAt: taskComment.Timestamps.CreatedAt.ToRFC3339(),
 		UpdatedAt: updatedAt,
+	}
+}
+
+type TaskActionDto struct {
+	Id        string        `json:"id"`
+	Type      string        `json:"type"`
+	User      *user.UserDto `json:"user"`
+	CreatedAt string        `json:"createdAt"`
+}
+
+func TaskActionToDto(taskAction *TaskAction) *TaskActionDto {
+	return &TaskActionDto{
+		Id:        taskAction.Identity.Public,
+		Type:      string(taskAction.Type),
+		User:      user.UserToDto(taskAction.User),
+		CreatedAt: taskAction.CreatedAt.ToRFC3339(),
 	}
 }

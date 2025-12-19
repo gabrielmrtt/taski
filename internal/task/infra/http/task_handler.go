@@ -1,6 +1,7 @@
 package taskhttp
 
 import (
+	"fmt"
 	"net/http"
 
 	authhttpmiddlewares "github.com/gabrielmrtt/taski/internal/auth/infra/http/middlewares"
@@ -25,6 +26,7 @@ type TaskHandler struct {
 	ChangeTaskStatusService *taskservice.ChangeTaskStatusService
 	CompleteTaskService     *taskservice.CompleteTaskService
 	CompleteSubTaskService  *taskservice.CompleteSubTaskService
+	GetTaskHistoryService   *taskservice.GetTaskHistoryService
 }
 
 func NewTaskHandler(
@@ -39,6 +41,7 @@ func NewTaskHandler(
 	changeTaskStatusService *taskservice.ChangeTaskStatusService,
 	completeTaskService *taskservice.CompleteTaskService,
 	completeSubTaskService *taskservice.CompleteSubTaskService,
+	getTaskHistoryService *taskservice.GetTaskHistoryService,
 ) *TaskHandler {
 	return &TaskHandler{
 		ListTasksService:        listTasksService,
@@ -52,6 +55,7 @@ func NewTaskHandler(
 		ChangeTaskStatusService: changeTaskStatusService,
 		CompleteTaskService:     completeTaskService,
 		CompleteSubTaskService:  completeSubTaskService,
+		GetTaskHistoryService:   getTaskHistoryService,
 	}
 }
 
@@ -162,6 +166,9 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	input = request.ToInput()
 	input.OrganizationIdentity = organizationIdentity
 	input.UserCreatorIdentity = *authenticatedUserIdentity
+
+	fmt.Println(input.ProjectIdentity.Internal)
+	fmt.Println(input.OrganizationIdentity.Internal)
 
 	response, err := h.CreateTaskService.Execute(input)
 	if err != nil {
@@ -491,6 +498,46 @@ func (h *TaskHandler) CompleteSubTask(c *gin.Context) {
 	corehttp.NewEmptyHttpSuccessResponse(c, http.StatusOK)
 }
 
+type GetTaskHistoryResponse = corehttp.HttpSuccessResponseWithData[core.PaginationOutput[task.TaskActionDto]]
+
+// GetTaskHistory godoc
+// @Summary Get the history of a task
+// @Description Returns the history of an accessible task.
+// @Tags Task
+// @Accept json
+// @Param taskId path string true "Task ID"
+// @Param request query taskhttprequests.GetTaskHistoryRequest true "Query parameters"
+// @Produce json
+// @Success 200 {object} GetTaskHistoryResponse
+// @Failure 400 {object} corehttp.HttpErrorResponse
+// @Failure 401 {object} corehttp.HttpErrorResponse
+// @Failure 403 {object} corehttp.HttpErrorResponse
+// @Failure 404 {object} corehttp.HttpErrorResponse
+// @Failure 500 {object} corehttp.HttpErrorResponse
+// @Router /task/:taskId/history [get]
+func (h *TaskHandler) GetTaskHistory(c *gin.Context) {
+	var request taskhttprequests.GetTaskHistoryRequest
+	var organizationIdentity *core.Identity = authhttpmiddlewares.GetAuthenticatedUserLastAccessedOrganizationIdentity(c)
+	var taskIdentity core.Identity = core.NewIdentityFromPublic(c.Param("taskId"))
+	var input taskservice.GetTaskHistoryInput
+
+	if err := request.FromQuery(c); err != nil {
+		corehttp.NewHttpErrorResponse(c, err)
+		return
+	}
+
+	input = request.ToInput()
+	input.OrganizationIdentity = organizationIdentity
+	input.TaskIdentity = taskIdentity
+	result, err := h.GetTaskHistoryService.Execute(input)
+	if err != nil {
+		corehttp.NewHttpErrorResponse(c, err)
+		return
+	}
+
+	corehttp.NewHttpSuccessResponseWithData(c, http.StatusOK, result)
+}
+
 func (h *TaskHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *gin.RouterGroup {
 	middlewareOptions := corehttp.MiddlewareOptions{
 		DbConnection: options.DbConnection,
@@ -505,11 +552,11 @@ func (h *TaskHandler) ConfigureRoutes(options corehttp.ConfigureRoutesOptions) *
 		g.PUT("/:taskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.UpdateTask)
 		g.DELETE("/:taskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:delete", middlewareOptions), h.DeleteTask)
 		g.PATCH("/:taskId/status", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.ChangeTaskStatus)
-		g.POST("/:taskId/complete", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.CompleteTask)
+		g.PUT("/:taskId/complete", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.CompleteTask)
 		g.POST("/:taskId/sub-task", organizationhttpmiddlewares.UserMustHavePermission("tasks:create", middlewareOptions), h.AddSubTask)
 		g.PUT("/:taskId/sub-task/:subTaskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.UpdateSubTask)
 		g.DELETE("/:taskId/sub-task/:subTaskId", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.RemoveSubTask)
-		g.POST("/:taskId/sub-task/:subTaskId/complete", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.CompleteSubTask)
+		g.PUT("/:taskId/sub-task/:subTaskId/complete", organizationhttpmiddlewares.UserMustHavePermission("tasks:update", middlewareOptions), h.CompleteSubTask)
 	}
 
 	return g

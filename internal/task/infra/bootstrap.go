@@ -40,13 +40,14 @@ func BootstrapInfra(options BootstrapInfraOptions) {
 	changeTaskStatusService := taskservice.NewChangeTaskStatusService(taskRepository, projectTaskStatusRepository, taskActionRepository, projectUserRepository, transactionRepository)
 	completeTaskService := taskservice.NewCompleteTaskService(taskRepository, taskActionRepository, projectUserRepository, transactionRepository)
 	completeSubTaskService := taskservice.NewCompleteSubTaskService(taskRepository, taskActionRepository, projectUserRepository, transactionRepository)
+	getTaskHistoryService := taskservice.NewGetTaskHistoryService(taskActionRepository, taskRepository)
 
 	listTaskCommentsService := taskservice.NewListTaskCommentsService(taskCommentRepository, taskRepository)
 	createTaskCommentService := taskservice.NewCreateTaskCommentService(taskRepository, taskCommentRepository, uploadedFileRepository, storageRepository, projectUserRepository, taskActionRepository, transactionRepository)
 	updateTaskCommentService := taskservice.NewUpdateTaskCommentService(taskCommentRepository, taskRepository, projectUserRepository, uploadedFileRepository, storageRepository, taskActionRepository, transactionRepository)
 	deleteTaskCommentService := taskservice.NewDeleteTaskCommentService(taskCommentRepository, taskRepository, projectUserRepository, uploadedFileRepository, storageRepository, taskActionRepository, transactionRepository)
 
-	taskHandler := taskhttp.NewTaskHandler(listTasksService, getTaskService, createTaskService, updateTaskService, deleteTaskService, addSubTaskService, updateSubTaskService, removeSubTaskService, changeTaskStatusService, completeTaskService, completeSubTaskService)
+	taskHandler := taskhttp.NewTaskHandler(listTasksService, getTaskService, createTaskService, updateTaskService, deleteTaskService, addSubTaskService, updateSubTaskService, removeSubTaskService, changeTaskStatusService, completeTaskService, completeSubTaskService, getTaskHistoryService)
 	taskCommentHandler := taskhttp.NewTaskCommentHandler(listTaskCommentsService, createTaskCommentService, updateTaskCommentService, deleteTaskCommentService)
 
 	taskHandler.ConfigureRoutes(corehttp.ConfigureRoutesOptions{

@@ -254,6 +254,24 @@ func (s *UpdateTaskService) Execute(input UpdateTaskInput) error {
 		}
 	}
 
+	if input.ParentTaskIdentity != nil {
+		parentTask, err := s.TaskRepository.GetTaskByIdentity(taskrepo.GetTaskByIdentityParams{
+			TaskIdentity:    *input.ParentTaskIdentity,
+			ProjectIdentity: &tsk.ProjectIdentity,
+		})
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		if parentTask == nil {
+			tx.Rollback()
+			return core.NewNotFoundError("parent task not found")
+		}
+
+		tsk.ParentTaskIdentity = input.ParentTaskIdentity
+	}
+
 	err = s.TaskRepository.UpdateTask(taskrepo.UpdateTaskParams{
 		Task: tsk,
 	})
